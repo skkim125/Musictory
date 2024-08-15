@@ -18,6 +18,7 @@
 		04E4306A2C6E1903007FA9C6 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430692C6E1903007FA9C6 /* Kingfisher */; };
 		04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306C2C6E1912007FA9C6 /* Toast */; };
 		04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */; };
+		04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430722C6E2142007FA9C6 /* MusadoraKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */,
 				04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */,
 				04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */,
 				04E4306A2C6E1903007FA9C6 /* Kingfisher in Frameworks */,
@@ -99,6 +101,7 @@
 				04E430692C6E1903007FA9C6 /* Kingfisher */,
 				04E4306C2C6E1912007FA9C6 /* Toast */,
 				04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */,
+				04E430722C6E2142007FA9C6 /* MusadoraKit */,
 			);
 			productName = Musictory;
 			productReference = 04E430472C6CF68E007FA9C6 /* Musictory.app */;
@@ -133,6 +136,7 @@
 				04E430682C6E1903007FA9C6 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				04E4306B2C6E1912007FA9C6 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				04E4306E2C6E1A2A007FA9C6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
+				04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
 			);
 			productRefGroup = 04E430482C6CF68E007FA9C6 /* Products */;
 			projectDirPath = "";
@@ -421,6 +425,14 @@
 				minimumVersion = 7.1.1;
 			};
 		};
+		04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rryam/MusadoraKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = 4.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -443,6 +455,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 04E4306E2C6E1A2A007FA9C6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
 			productName = IQKeyboardManagerSwift;
+		};
+		04E430722C6E2142007FA9C6 /* MusadoraKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */;
+			productName = MusadoraKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
