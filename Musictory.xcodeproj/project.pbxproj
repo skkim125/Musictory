@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */; };
+		048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDD92C6F9C92000F5293 /* RxCocoa */; };
+		048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDDB2C6F9C92000F5293 /* RxSwift */; };
 		04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */; };
 		04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */; };
-		04E4304F2C6CF68E007FA9C6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304E2C6CF68E007FA9C6 /* ViewController.swift */; };
 		04E430542C6CF68F007FA9C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E430532C6CF68F007FA9C6 /* Assets.xcassets */; };
 		04E430572C6CF68F007FA9C6 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 04E430562C6CF68F007FA9C6 /* Base */; };
 		04E4305F2C6CF8B9007FA9C6 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 04E4305E2C6CF8B9007FA9C6 /* .gitignore */; };
@@ -22,10 +24,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 		04E430472C6CF68E007FA9C6 /* Musictory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Musictory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		04E4304E2C6CF68E007FA9C6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		04E430532C6CF68F007FA9C6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		04E430562C6CF68F007FA9C6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		04E430582C6CF68F007FA9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -38,11 +40,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */,
 				04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */,
 				04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */,
 				04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */,
 				04E4306A2C6E1903007FA9C6 /* Kingfisher in Frameworks */,
 				04E430662C6E18EC007FA9C6 /* SnapKit in Frameworks */,
+				048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +75,7 @@
 			children = (
 				04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */,
 				04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */,
-				04E4304E2C6CF68E007FA9C6 /* ViewController.swift */,
+				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
 				04E430532C6CF68F007FA9C6 /* Assets.xcassets */,
 				04E430552C6CF68F007FA9C6 /* LaunchScreen.storyboard */,
 				04E430582C6CF68F007FA9C6 /* Info.plist */,
@@ -102,6 +106,8 @@
 				04E4306C2C6E1912007FA9C6 /* Toast */,
 				04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */,
 				04E430722C6E2142007FA9C6 /* MusadoraKit */,
+				048DFDD92C6F9C92000F5293 /* RxCocoa */,
+				048DFDDB2C6F9C92000F5293 /* RxSwift */,
 			);
 			productName = Musictory;
 			productReference = 04E430472C6CF68E007FA9C6 /* Musictory.app */;
@@ -137,6 +143,7 @@
 				04E4306B2C6E1912007FA9C6 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 				04E4306E2C6E1A2A007FA9C6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
+				048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			productRefGroup = 04E430482C6CF68E007FA9C6 /* Products */;
 			projectDirPath = "";
@@ -165,7 +172,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				04E4304F2C6CF68E007FA9C6 /* ViewController.swift in Sources */,
+				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
 				04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */,
@@ -393,6 +400,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.1;
+			};
+		};
 		04E430642C6E18EC007FA9C6 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -436,6 +451,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		048DFDD92C6F9C92000F5293 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		048DFDDB2C6F9C92000F5293 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
 		04E430652C6E18EC007FA9C6 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 04E430642C6E18EC007FA9C6 /* XCRemoteSwiftPackageReference "SnapKit" */;
