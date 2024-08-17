@@ -10,6 +10,8 @@
 		048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */; };
 		048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDD92C6F9C92000F5293 /* RxCocoa */; };
 		048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDDB2C6F9C92000F5293 /* RxSwift */; };
+		048DFDE02C70F012000F5293 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDDF2C70F012000F5293 /* LoginViewModel.swift */; };
+		048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDE32C70F04F000F5293 /* BaseViewModel.swift */; };
 		04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */; };
 		04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */; };
 		04E430542C6CF68F007FA9C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E430532C6CF68F007FA9C6 /* Assets.xcassets */; };
@@ -25,6 +27,8 @@
 
 /* Begin PBXFileReference section */
 		048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
+		048DFDDF2C70F012000F5293 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
+		048DFDE32C70F04F000F5293 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
 		04E430472C6CF68E007FA9C6 /* Musictory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Musictory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -53,6 +57,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		048DFDDD2C70E773000F5293 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		048DFDDE2C70F008000F5293 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDDF2C70F012000F5293 /* LoginViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		048DFDE12C70F025000F5293 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		048DFDE22C70F02F000F5293 /* Reusable */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDE32C70F04F000F5293 /* BaseViewModel.swift */,
+			);
+			path = Reusable;
+			sourceTree = "<group>";
+		};
 		04E4303E2C6CF68E007FA9C6 = {
 			isa = PBXGroup;
 			children = (
@@ -75,8 +110,11 @@
 			children = (
 				04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */,
 				04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */,
-				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
+				048DFDE22C70F02F000F5293 /* Reusable */,
+				048DFDE12C70F025000F5293 /* Resource */,
+				048DFDDD2C70E773000F5293 /* View */,
 				04E430532C6CF68F007FA9C6 /* Assets.xcassets */,
+				048DFDDE2C70F008000F5293 /* ViewModel */,
 				04E430552C6CF68F007FA9C6 /* LaunchScreen.storyboard */,
 				04E430582C6CF68F007FA9C6 /* Info.plist */,
 				04E430622C6DCA4C007FA9C6 /* APIKey.swift */,
@@ -175,7 +213,9 @@
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
+				048DFDE02C70F012000F5293 /* LoginViewModel.swift in Sources */,
 				04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */,
+				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,7 +359,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -351,7 +391,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
