@@ -60,18 +60,21 @@ final class LogInViewController: UIViewController {
         return tf
     }()
     private let loginButton = {
-        let button = UIButton(type: .custom)
+        let button = UIButton(type: .system)
         var configuration = UIButton(configuration: .bordered()).configuration
         button.configuration = configuration
         
+        button.backgroundColor = .systemGray5
+        button.tintColor = .lightGray
         button.setTitle("로그인", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.clipsToBounds = true
+        button.isEnabled = false
         button.layer.cornerRadius = 8
+        button.clipsToBounds = true
         
         return button
     }()
     
+    let viewModel = LoginViewModel()
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -97,7 +100,7 @@ final class LogInViewController: UIViewController {
         }
         
         emailLabel.snp.makeConstraints { make in
-            make.top.lessThanOrEqualTo(appTitleLabel.snp.bottom).offset(50)
+            make.top.equalTo(appTitleLabel.snp.bottom).offset(80)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(60)
             make.height.equalTo(20)
         }
@@ -122,23 +125,26 @@ final class LogInViewController: UIViewController {
         }
         
         loginButton.snp.makeConstraints { make in
-            make.top.equalTo(passwordTextField.snp.bottom).offset(80)
+            make.top.equalTo(passwordTextField.snp.bottom).offset(40)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(60)
-            make.bottom.greaterThanOrEqualTo(view.keyboardLayoutGuide.snp.top).offset(-20)
+            make.bottom.lessThanOrEqualTo(view.keyboardLayoutGuide.snp.top).offset(-20)
             make.height.equalTo(45)
         }
     }
     
     func bind() {
-        Observable.combineLatest(emailTextField.rx.text.orEmpty, passwordTextField.rx.text.orEmpty)
-            .map({ $0.0.trimmingCharacters(in: .whitespaces).count > 8 && $0.1.trimmingCharacters(in: .whitespaces).count > 8 })
+        let input = LoginViewModel.Input(email: emailTextField.rx.text.orEmpty, password: passwordTextField.rx.text.orEmpty, loginButtonTap: loginButton.rx.tap)
+        let output = viewModel.transform(input: input)
+        
+        output.loginButtonEnable
             .bind(with: self) { owner, value in
-                owner.loginButton.rx.backgroundColor.onNext(value ? .systemPurple : .systemGray6)
+                owner.loginButton.rx.backgroundColor.onNext(value ? .systemPurple : .systemGray5)
+                owner.loginButton.rx.tintColor.onNext(value ? .white : .lightGray)
                 owner.loginButton.rx.isEnabled.onNext(value)
             }
             .disposed(by: disposeBag)
         
-        loginButton.rx.tap
+        output.loginButtonTap
             .bind(with: self) { owner, _ in
                 owner.view.endEditing(true)
                 let vc = UIViewController()
@@ -146,6 +152,7 @@ final class LogInViewController: UIViewController {
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+
     }
     
 }
