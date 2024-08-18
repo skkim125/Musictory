@@ -25,8 +25,7 @@ final class LogInViewController: UIViewController {
         label.font = .systemFont(ofSize: 12)
         
         return label
-         
-     }()
+    }()
     private let emailTextField = {
         let tf = UITextField()
         tf.backgroundColor = .systemGray5
@@ -144,15 +143,16 @@ final class LogInViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        output.loginButtonTap
-            .bind(with: self) { owner, _ in
+        output.loginModel
+            .bind(with: self) { owner, loginModel in
                 owner.view.endEditing(true)
                 let vc = UIViewController()
                 vc.view.backgroundColor = .systemBackground
+                vc.navigationItem.title = "\(loginModel.nick)"
+                vc.navigationItem.rightBarButtonItem?.title = "\(loginModel.email)"
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
-
     }
     
 }
