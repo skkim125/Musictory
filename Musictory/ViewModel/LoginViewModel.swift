@@ -48,6 +48,8 @@ final class LoginViewModel: BaseViewModel {
             .bind(with: self) { owner, _ in
                 owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result in
                     loginModel.accept(result)
+                    UserDefaultsManager.shared.accessT = result.accessT
+                    UserDefaultsManager.shared.refreshT = result.refreshT
                 }
             }
             .disposed(by: disposeBag)

@@ -9,7 +9,7 @@ import Foundation
 
 enum LSLPRouter {
     case login(LoginQuery)
-    case fetchPost(String)
+    case fetchPost(PostQuery)
     case refresh
 }
 
@@ -33,7 +33,7 @@ extension LSLPRouter {
         case .login:
             APIPath.login
         case .fetchPost:
-            ""
+            APIPath.fetchPost
         case .refresh:
             ""
         }
@@ -49,7 +49,7 @@ extension LSLPRouter {
         case .fetchPost:
             [
                 APIKey.sesac: APIKey.key,
-                APIHeader.contentType: APIHeader.json
+                APIHeader.authorization: UserDefaultsManager.shared.accessT
             ]
         case .refresh:
             [
@@ -59,11 +59,26 @@ extension LSLPRouter {
         }
     }
     
+    var parameters: [URLQueryItem]? {
+        switch self {
+        case .fetchPost(let postQuery):
+            return [
+                URLQueryItem(name: "limit", value: postQuery.limit),
+                URLQueryItem(name: "next", value: postQuery.next),
+            ]
+            
+        default:
+            return nil
+        }
+    }
+    
     var httpBody: Data? {
+        let encoder = JSONEncoder()
+        
         switch self {
         case .login(let loginQuery):
-            let encoder = JSONEncoder()
             return try? encoder.encode(loginQuery)
+            
         default:
             return nil
         }
@@ -80,6 +95,14 @@ extension LSLPRouter {
             }
         case .fetchPost:
             switch statusCode {
+            case 400:
+                return NetworkError.custom("잘못된 요청입니다.")
+            case 401:
+                return NetworkError.custom("인증할 수 없는 액세스 토큰입니다.")
+            case 403:
+                return NetworkError.custom("접근 권한이 없습니다.")
+            case 419:
+                return NetworkError.custom("액세스 토큰이 만료되었습니다.")
             default:
                 return NetworkError.custom("")
             }
@@ -95,5 +118,6 @@ extension LSLPRouter {
 
 enum NetworkError: Error {
     case custom(String)
+    case decodingError(String)
 }
 

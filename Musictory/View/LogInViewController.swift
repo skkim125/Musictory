@@ -28,6 +28,7 @@ final class LogInViewController: UIViewController {
     }()
     private let emailTextField = {
         let tf = UITextField()
+        tf.text = "qwer123@gmail.com"
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
         tf.clipsToBounds = true
@@ -48,6 +49,7 @@ final class LogInViewController: UIViewController {
     }()
     private let passwordTextField = {
         let tf = UITextField()
+        tf.text = "12345678"
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
         tf.clipsToBounds = true
@@ -83,7 +85,7 @@ final class LogInViewController: UIViewController {
         bind()
     }
     
-    func configureView() {
+    private func configureView() {
         view.backgroundColor = .systemBackground
         
         let subViews = [appTitleLabel, emailLabel, emailTextField, passwordLabel, passwordTextField, loginButton]
@@ -131,7 +133,7 @@ final class LogInViewController: UIViewController {
         }
     }
     
-    func bind() {
+    private func bind() {
         let input = LoginViewModel.Input(email: emailTextField.rx.text.orEmpty, password: passwordTextField.rx.text.orEmpty, loginButtonTap: loginButton.rx.tap)
         let output = viewModel.transform(input: input)
         
@@ -146,10 +148,9 @@ final class LogInViewController: UIViewController {
         output.loginModel
             .bind(with: self) { owner, loginModel in
                 owner.view.endEditing(true)
-                let vc = UIViewController()
+                let vc = MusictoryHomeViewController()
                 vc.view.backgroundColor = .systemBackground
                 vc.navigationItem.title = "\(loginModel.nick)"
-                vc.navigationItem.rightBarButtonItem?.title = "\(loginModel.email)"
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

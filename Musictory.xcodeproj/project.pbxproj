@@ -16,6 +16,13 @@
 		048DFDE92C71E1FA000F5293 /* LSLPRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */; };
 		048DFDEC2C722A9E000F5293 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDEB2C722A9E000F5293 /* LoginModel.swift */; };
 		048DFDEF2C722AE3000F5293 /* LoginQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDEE2C722AE3000F5293 /* LoginQuery.swift */; };
+		048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDFA2C7363FE000F5293 /* PostModel.swift */; };
+		048DFDFD2C736411000F5293 /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDFC2C736411000F5293 /* UserModel.swift */; };
+		048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDFE2C736423000F5293 /* CommentModel.swift */; };
+		048DFE032C736670000F5293 /* MusictoryHomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */; };
+		048DFE052C738525000F5293 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFE042C738525000F5293 /* UserDefaultsManager.swift */; };
+		048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFE062C738BC5000F5293 /* RequsetPostModel.swift */; };
+		048DFE092C738E33000F5293 /* MusictoryHomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */; };
 		04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */; };
 		04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */; };
 		04E430542C6CF68F007FA9C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E430532C6CF68F007FA9C6 /* Assets.xcassets */; };
@@ -37,6 +44,13 @@
 		048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LSLPRouter.swift; sourceTree = "<group>"; };
 		048DFDEB2C722A9E000F5293 /* LoginModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		048DFDEE2C722AE3000F5293 /* LoginQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginQuery.swift; sourceTree = "<group>"; };
+		048DFDFA2C7363FE000F5293 /* PostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostModel.swift; sourceTree = "<group>"; };
+		048DFDFC2C736411000F5293 /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
+		048DFDFE2C736423000F5293 /* CommentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentModel.swift; sourceTree = "<group>"; };
+		048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryHomeViewModel.swift; sourceTree = "<group>"; };
+		048DFE042C738525000F5293 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
+		048DFE062C738BC5000F5293 /* RequsetPostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequsetPostModel.swift; sourceTree = "<group>"; };
+		048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryHomeViewController.swift; sourceTree = "<group>"; };
 		04E430472C6CF68E007FA9C6 /* Musictory.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Musictory.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E4304A2C6CF68E007FA9C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04E4304C2C6CF68E007FA9C6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
+				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -77,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				048DFDDF2C70F012000F5293 /* LoginViewModel.swift */,
+				048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -102,6 +118,10 @@
 			isa = PBXGroup;
 			children = (
 				048DFDEB2C722A9E000F5293 /* LoginModel.swift */,
+				048DFE062C738BC5000F5293 /* RequsetPostModel.swift */,
+				048DFDFA2C7363FE000F5293 /* PostModel.swift */,
+				048DFDFC2C736411000F5293 /* UserModel.swift */,
+				048DFDFE2C736423000F5293 /* CommentModel.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -142,6 +162,7 @@
 				04E430532C6CF68F007FA9C6 /* Assets.xcassets */,
 				04E430552C6CF68F007FA9C6 /* LaunchScreen.storyboard */,
 				04E430582C6CF68F007FA9C6 /* Info.plist */,
+				048DFE042C738525000F5293 /* UserDefaultsManager.swift */,
 				048DFDE52C71D1E5000F5293 /* Network */,
 				048DFDEA2C722A92000F5293 /* ResponseModel */,
 				048DFDED2C722ACC000F5293 /* QueryModel */,
@@ -239,13 +260,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				048DFDEF2C722AE3000F5293 /* LoginQuery.swift in Sources */,
+				048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */,
+				048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
+				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,
+				048DFE092C738E33000F5293 /* MusictoryHomeViewController.swift in Sources */,
+				048DFE052C738525000F5293 /* UserDefaultsManager.swift in Sources */,
 				048DFDE02C70F012000F5293 /* LoginViewModel.swift in Sources */,
 				048DFDEC2C722A9E000F5293 /* LoginModel.swift in Sources */,
 				04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */,
+				048DFE032C736670000F5293 /* MusictoryHomeViewModel.swift in Sources */,
 				048DFDE72C71D1F7000F5293 /* LSLPAPI.swift in Sources */,
+				048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */,
 				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,
 				048DFDE92C71E1FA000F5293 /* LSLPRouter.swift in Sources */,
 			);

@@ -11,3 +11,8 @@ struct LoginQuery: Encodable {
     var email: String
     var password: String
 }
+
+struct PostQuery: Encodable {
+    let next: String
+    let limit: String = "20"
+}

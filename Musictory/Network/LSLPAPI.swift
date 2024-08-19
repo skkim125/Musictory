@@ -14,7 +14,8 @@ final class LSLP_API {
     func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping ((T) -> Void)) {
         
         let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let component = URLComponents(string: encodingUrl)
+        var component = URLComponents(string: encodingUrl)
+        component?.queryItems = apiType.parameters
         
         guard let url = component?.url else { return }
         var request = URLRequest(url: url.appendingPathComponent(apiType.path))
@@ -25,7 +26,7 @@ final class LSLP_API {
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 guard error == nil else {
-                    print(error)
+                    print(error?.localizedDescription)
                     
                     return
                 }
@@ -41,15 +42,13 @@ final class LSLP_API {
                     return
                 }
                 
-                print(response)
-                
                 guard let data = data else { return }
                 do {
                     let result = try JSONDecoder().decode(decodingType.self, from: data)
                     return completionHandler(result)
                     
                 } catch {
-                    print("any error")
+                    NetworkError.decodingError("애러가 발생했습니다.")
                 }
             }
         }.resume()

@@ -7,20 +7,20 @@
 
 import Foundation
 
-final class LoginModel: Decodable {
-    let id: String
+struct LoginModel: Decodable {
+    let userID: String
     let email: String
     let nick: String
-    let profile: String?
-    let access: String
-    let refresh: String
+    let profileImage: String?
+    let accessT: String
+    let refreshT: String
     
     enum CodingKeys: String, CodingKey {
-        case id = "user_id"
+        case userID = "user_id"
         case email
         case nick
-        case profile = "profileImage"
-        case access = "accessToken"
-        case refresh = "refreshToken"
+        case profileImage
+        case accessT = "accessToken"
+        case refreshT = "refreshToken"
     }
 }
