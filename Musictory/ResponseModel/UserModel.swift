@@ -9,8 +9,8 @@ import Foundation
 
 // 유저 모델
 struct User: Decodable {
-    let userID: String?
-    let nickname: String?
+    let userID: String
+    let nickname: String
     let profileImage: String?
     
     enum CodingKeys: String, CodingKey {

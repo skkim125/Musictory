@@ -63,10 +63,10 @@ extension LSLPRouter {
         switch self {
         case .fetchPost(let postQuery):
             return [
+                URLQueryItem(name: "product_id", value: postQuery.product_id),
                 URLQueryItem(name: "limit", value: postQuery.limit),
-                URLQueryItem(name: "next", value: postQuery.next),
+                URLQueryItem(name: "next", value: postQuery.next)
             ]
-            
         default:
             return nil
         }

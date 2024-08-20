@@ -9,28 +9,12 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import RxGesture
+import MusicKit
+import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
-    private let postTitleLabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 12)
-        
-        return label
-    }()
-    
-    private let postContentLabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 12)
-        
-        return label
-    }()
-    
-    private let postCreateAtLabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 12)
-        
-        return label
-    }()
+    private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.postCollectionViewLayout())
     
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
@@ -44,26 +28,13 @@ final class MusictoryHomeViewController: UIViewController {
     
     private func configureView() {
         view.backgroundColor = .white
-        let subViews = [postTitleLabel, postContentLabel, postCreateAtLabel]
+        view.addSubview(postCollectionView)
         
-        subViews.forEach { subView in
-            view.addSubview(subView)
+        postCollectionView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        postTitleLabel.snp.makeConstraints { make in
-            make.top.leading.equalTo(view.safeAreaLayoutGuide).inset(20)
-        }
-        
-        postContentLabel.snp.makeConstraints { make in
-            make.top.equalTo(postTitleLabel.snp.bottom).offset(20)
-            make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
-        }
-        
-        postCreateAtLabel.snp.makeConstraints { make in
-            make.top.equalTo(postContentLabel.snp.bottom).offset(20)
-            make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
-        }
-        
+        postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
     }
     
     private func bind() {
@@ -73,13 +44,60 @@ final class MusictoryHomeViewController: UIViewController {
         refreshPost.accept(())
         
         output.posts
-            .bind(with: self) { owner, value in
-                let index = 3
-                owner.postTitleLabel.rx.text.onNext(value[index].title)
-                owner.postContentLabel.rx.text.onNext(value[index].content)
-                owner.postCreateAtLabel.rx.text.onNext(value[index].createdAt)
+            .bind(to: postCollectionView.rx.items(cellIdentifier: PostCollectionViewCell.identifier, cellType: PostCollectionViewCell.self)) { [weak self] item, value, cell in
+                guard let self = self else { return }
+                
+                DispatchQueue.main.async {
+                    Task {
+                        do {
+                            let song = try await MusicManager.shared.requsetMusicId(id: value.content1)
+                            cell.configureCell(post: value, song: song)
+                            cell.songView.rx
+                                .tapGesture()
+                                .when(.recognized)
+                                .bind(with: self) { owner, tap in
+                                    owner.showAlert(title: "\(song.title)의 앨범으로 이동합니다.", message: nil) {
+                                        print(song.url?.absoluteString)
+                                        if let url = URL(string: "\(song.url!.absoluteString)") {
+                                            if UIApplication.shared.canOpenURL(url) {
+                                                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                                let musicPlayer = MPMusicPlayerController.systemMusicPlayer
+                                                print(song.id)
+                                                musicPlayer.setQueue(with: ["\(song.id.rawValue)"])
+                                                musicPlayer.play()
+                                            } else {
+                                                // Handle case where app cannot be opened
+                                                print("Cannot open Apple Music app")
+                                            }
+                                        } else {
+                                            // Handle case where URL is invalid
+                                            print("Invalid URL for Apple Music app")
+                                        }
+                                    }
+                                }
+                                .disposed(by: self.disposeBag)
+                        }
+                        catch {
+                            print(error)
+                        }
+                        
+                    }
+                }
+                cell.layer.cornerRadius = 12
+                cell.clipsToBounds = true
             }
             .disposed(by: disposeBag)
+    }
+    
+    func showAlert(title: String?, message: String?, completionHandelr: (()->Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let open = UIAlertAction(title: "확인", style: .default) { _ in
+            completionHandelr?()
+        }
+        alert.addAction(open)
+        
+        present(alert, animated: true)
     }
     
 }

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		045833892C74AF14000D6E81 /* PostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833882C74AF14000D6E81 /* PostQuery.swift */; };
+		0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */; };
+		0458338D2C74B00A000D6E81 /* UIcollectionViewLayout+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0458338C2C74B00A000D6E81 /* UIcollectionViewLayout+Extension.swift */; };
+		045833912C74C145000D6E81 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 045833902C74C145000D6E81 /* RxGesture */; };
 		048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */; };
 		048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDD92C6F9C92000F5293 /* RxCocoa */; };
 		048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDDB2C6F9C92000F5293 /* RxSwift */; };
@@ -37,6 +41,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		045833882C74AF14000D6E81 /* PostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostQuery.swift; sourceTree = "<group>"; };
+		0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
+		0458338C2C74B00A000D6E81 /* UIcollectionViewLayout+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIcollectionViewLayout+Extension.swift"; sourceTree = "<group>"; };
 		048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 		048DFDDF2C70F012000F5293 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		048DFDE32C70F04F000F5293 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
@@ -68,6 +75,7 @@
 			files = (
 				048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */,
 				04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */,
+				045833912C74C145000D6E81 /* RxGesture in Frameworks */,
 				04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */,
 				04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */,
 				04E4306A2C6E1903007FA9C6 /* Kingfisher in Frameworks */,
@@ -79,11 +87,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0458338E2C74B016000D6E81 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
 		048DFDDD2C70E773000F5293 /* View */ = {
 			isa = PBXGroup;
 			children = (
 				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
 				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
+				0458338E2C74B016000D6E81 /* Cell */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -130,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				048DFDEE2C722AE3000F5293 /* LoginQuery.swift */,
+				045833882C74AF14000D6E81 /* PostQuery.swift */,
 			);
 			path = QueryModel;
 			sourceTree = "<group>";
@@ -167,6 +185,7 @@
 				048DFDEA2C722A92000F5293 /* ResponseModel */,
 				048DFDED2C722ACC000F5293 /* QueryModel */,
 				04E430622C6DCA4C007FA9C6 /* APIKey.swift */,
+				0458338C2C74B00A000D6E81 /* UIcollectionViewLayout+Extension.swift */,
 			);
 			path = Musictory;
 			sourceTree = "<group>";
@@ -195,6 +214,7 @@
 				04E430722C6E2142007FA9C6 /* MusadoraKit */,
 				048DFDD92C6F9C92000F5293 /* RxCocoa */,
 				048DFDDB2C6F9C92000F5293 /* RxSwift */,
+				045833902C74C145000D6E81 /* RxGesture */,
 			);
 			productName = Musictory;
 			productReference = 04E430472C6CF68E007FA9C6 /* Musictory.app */;
@@ -231,6 +251,7 @@
 				04E4306E2C6E1A2A007FA9C6 /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
 				048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */,
 			);
 			productRefGroup = 04E430482C6CF68E007FA9C6 /* Products */;
 			projectDirPath = "";
@@ -263,15 +284,18 @@
 				048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */,
 				048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
+				0458338D2C74B00A000D6E81 /* UIcollectionViewLayout+Extension.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
 				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,
 				048DFE092C738E33000F5293 /* MusictoryHomeViewController.swift in Sources */,
 				048DFE052C738525000F5293 /* UserDefaultsManager.swift in Sources */,
 				048DFDE02C70F012000F5293 /* LoginViewModel.swift in Sources */,
+				045833892C74AF14000D6E81 /* PostQuery.swift in Sources */,
 				048DFDEC2C722A9E000F5293 /* LoginModel.swift in Sources */,
 				04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */,
 				048DFE032C736670000F5293 /* MusictoryHomeViewModel.swift in Sources */,
+				0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */,
 				048DFDE72C71D1F7000F5293 /* LSLPAPI.swift in Sources */,
 				048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */,
 				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,
@@ -419,7 +443,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -451,7 +475,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -500,6 +524,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.4;
+			};
+		};
 		048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -551,6 +583,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		045833902C74C145000D6E81 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
+		};
 		048DFDD92C6F9C92000F5293 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */;
