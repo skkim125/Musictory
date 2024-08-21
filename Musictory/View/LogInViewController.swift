@@ -65,8 +65,6 @@ final class LogInViewController: UIViewController {
         var configuration = UIButton(configuration: .bordered()).configuration
         button.configuration = configuration
         
-        button.backgroundColor = .systemGray5
-        button.tintColor = .lightGray
         button.setTitle("로그인", for: .normal)
         button.isEnabled = false
         button.layer.cornerRadius = 8
@@ -139,7 +137,7 @@ final class LogInViewController: UIViewController {
         
         output.loginButtonEnable
             .bind(with: self) { owner, value in
-                owner.loginButton.rx.backgroundColor.onNext(value ? .systemPurple : .systemGray5)
+                owner.loginButton.rx.backgroundColor.onNext(value ? .systemRed : .clear)
                 owner.loginButton.rx.tintColor.onNext(value ? .white : .lightGray)
                 owner.loginButton.rx.isEnabled.onNext(value)
             }
@@ -155,5 +153,4 @@ final class LogInViewController: UIViewController {
             }
             .disposed(by: disposeBag)
     }
-    
 }

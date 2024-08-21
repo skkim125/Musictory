@@ -46,10 +46,22 @@ final class LoginViewModel: BaseViewModel {
         
         loginButtonTap
             .bind(with: self) { owner, _ in
-                owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result in
-                    loginModel.accept(result)
-                    UserDefaultsManager.shared.accessT = result.accessT
-                    UserDefaultsManager.shared.refreshT = result.refreshT
+                owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
+                    
+                    switch result {
+                    case .success(let success):
+                        loginModel.accept(success)
+                        UserDefaultsManager.shared.accessT = success.accessT
+                        UserDefaultsManager.shared.refreshT = success.refreshT
+                    case .failure(let failure):
+                        switch failure {
+                        case .expiredAccessToken:
+                            owner.lslp_API.tokenRefresh()
+                            
+                        default:
+                            print(failure)
+                        }
+                    }
                 }
             }
             .disposed(by: disposeBag)

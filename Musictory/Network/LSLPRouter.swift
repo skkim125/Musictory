@@ -31,9 +31,9 @@ extension LSLPRouter {
     var path: String {
         switch self {
         case .login:
-            APIPath.login
+            APIPath.login.rawValue
         case .fetchPost:
-            APIPath.fetchPost
+            APIPath.fetchPost.rawValue
         case .refresh:
             ""
         }
@@ -43,18 +43,20 @@ extension LSLPRouter {
         switch self {
         case .login:
             [
-                APIKey.sesac: APIKey.key,
-                APIHeader.contentType: APIHeader.json
+                APIHeader.sesac.rawValue: APIKey.key,
+                APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
         case .fetchPost:
             [
-                APIKey.sesac: APIKey.key,
-                APIHeader.authorization: UserDefaultsManager.shared.accessT
+                APIHeader.sesac.rawValue: APIKey.key,
+                APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT
             ]
         case .refresh:
             [
-                APIKey.sesac: APIKey.key,
-                APIHeader.contentType: APIHeader.json
+                APIHeader.sesac.rawValue: APIKey.key,
+                APIHeader.contentType.rawValue: APIHeader.json.rawValue,
+                APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
+                APIHeader.refresh.rawValue: UserDefaultsManager.shared.refreshT
             ]
         }
     }
@@ -90,6 +92,8 @@ extension LSLPRouter {
             switch statusCode {
             case 401:
                 return NetworkError.custom("유효하지 않은 계정입니다.")
+            case 419:
+                return NetworkError.expiredAccessToken
             default:
                 return NetworkError.custom("")
             }
@@ -102,9 +106,9 @@ extension LSLPRouter {
             case 403:
                 return NetworkError.custom("접근 권한이 없습니다.")
             case 419:
-                return NetworkError.custom("액세스 토큰이 만료되었습니다.")
+                return NetworkError.expiredAccessToken
             default:
-                return NetworkError.custom("")
+                return NetworkError.custom("확인할 수 없는 에러")
             }
         case .refresh:
             switch statusCode {
@@ -118,6 +122,7 @@ extension LSLPRouter {
 
 enum NetworkError: Error {
     case custom(String)
+    case expiredAccessToken
     case decodingError(String)
 }
 

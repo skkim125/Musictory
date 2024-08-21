@@ -16,6 +16,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private let userImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.tintColor = .systemGray3
         
         return imageView
     }()
@@ -44,6 +45,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private let postCreateAtLabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12)
+        label.textColor = .systemGray
         label.textAlignment = .left
         
         return label
@@ -57,7 +59,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         
-        imageView.layer.borderColor = UIColor.systemGray6.cgColor
+        imageView.layer.borderColor = UIColor.label.withAlphaComponent(0.5).cgColor
         imageView.layer.borderWidth = 1
         
         return imageView
@@ -104,14 +106,14 @@ final class PostCollectionViewCell: UICollectionViewCell {
         }
         
         userImageView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(20)
+            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(10)
             make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
-            make.size.equalTo(40)
+            make.size.equalTo(30)
         }
         
         userNicknameLabel.snp.makeConstraints { make in
             make.centerY.equalTo(userImageView)
-            make.leading.equalTo(userImageView.snp.trailing).offset(10)
+            make.leading.equalTo(userImageView.snp.trailing).offset(5)
         }
         
         postCreateAtLabel.snp.makeConstraints { make in
@@ -135,7 +137,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         }
         
         songView.snp.makeConstraints { make in
-            make.top.equalTo(postContentLabel.snp.bottom).offset(15)
+            make.top.equalTo(postContentLabel.snp.bottom).offset(5)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(10)
             make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
             make.height.equalTo(70)
@@ -175,7 +177,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             userImageView.kf.setImage(with: url)
         } else {
             userImageView.image = UIImage(systemName: "person.circle")
-            userImageView.tintColor = .systemPurple.withAlphaComponent(0.8)
+            userImageView.tintColor = .gray
         }
         
         userNicknameLabel.text = post.creator.nickname
@@ -183,9 +185,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postContentLabel.text = post.content
         postCreateAtLabel.text = post.createdAt
         
-        songView.layer.cornerRadius = 8
-        songView.clipsToBounds = true
-        songView.backgroundColor = .systemPurple.withAlphaComponent(0.8)
         songTitleLabel.text = song.title
         songArtistLabel.text = song.artistName
         guard let url = song.artwork?.url(width: 80, height: 80) else { return }

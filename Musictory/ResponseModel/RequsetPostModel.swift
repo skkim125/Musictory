@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RequestPostModel: Decodable {
+struct fetchPostModel: Decodable {
     let data: [PostModel]
     let nextCursor: String?
     

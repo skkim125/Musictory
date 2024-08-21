@@ -13,7 +13,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
     let disposeBag = DisposeBag()
     
     struct Input {
-        let refreshPost: PublishRelay<Void>
+        let fetchPost: PublishRelay<Void>
     }
     
     struct Output {
@@ -21,22 +21,29 @@ final class MusictoryHomeViewModel: BaseViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let refreshPost = input.refreshPost
+        let refreshPost = input.fetchPost
         var nextCursor = ""
-        let result = PublishRelay<[PostModel]>()
+        let posts = PublishRelay<[PostModel]>()
         
         refreshPost
             .bind(with: self) { owner, _ in
-                owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: RequestPostModel.self) { data in
-                    result.accept(data.data)
-                    nextCursor = data.nextCursor ?? ""
-                    print(data.data)
-                    print(nextCursor)
+                
+                owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        posts.accept(success.data)
+                        nextCursor = success.nextCursor ?? ""
+                        print(success.data)
+                        print(nextCursor)
+                    case .failure(let failure):
+                        print(failure)
+                    }
+                    // refreshToken
                 }
             }
             .disposed(by: disposeBag)
         
-        return Output(posts: result)
+        return Output(posts: posts)
     }
     
 }

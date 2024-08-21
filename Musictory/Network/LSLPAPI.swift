@@ -11,7 +11,7 @@ final class LSLP_API {
     static let shared = LSLP_API()
     private init() { }
     
-    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping ((T) -> Void)) {
+    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
         
         let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         var component = URLComponents(string: encodingUrl)
@@ -37,20 +37,35 @@ final class LSLP_API {
                     return
                 }
                 
-                guard response.statusCode == 200 else {
-                    print(apiType.errorHandler(statusCode: response.statusCode))
-                    return
-                }
-                
-                guard let data = data else { return }
-                do {
-                    let result = try JSONDecoder().decode(decodingType.self, from: data)
-                    return completionHandler(result)
+                if response.statusCode == 419 {
+                    self.callRequest(apiType: apiType, decodingType: decodingType, completionHandler: completionHandler)
                     
-                } catch {
-                    NetworkError.decodingError("애러가 발생했습니다.")
+                } else if response.statusCode != 200 {
+                    apiType.errorHandler(statusCode: response.statusCode)
+                    
+                } else {
+                    
+                    guard let data = data else { return }
+                    do {
+                        let result = try JSONDecoder().decode(decodingType.self, from: data)
+                        return completionHandler(.success(result))
+                        
+                    } catch {
+                        completionHandler(.failure(.decodingError("디코딩 에러")))
+                    }
                 }
             }
         }.resume()
+    }
+    
+    func tokenRefresh() {
+        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+            switch result {
+            case .success(let success):
+                UserDefaultsManager.shared.accessT = success.accessToken
+            case .failure(let failure):
+                print(failure)
+            }
+        }
     }
 }
