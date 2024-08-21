@@ -21,11 +21,11 @@ final class MusictoryHomeViewModel: BaseViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let refreshPost = input.fetchPost
+        let fetchPost = input.fetchPost
         var nextCursor = ""
         let posts = PublishRelay<[PostModel]>()
         
-        refreshPost
+        fetchPost
             .bind(with: self) { owner, _ in
                 
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
@@ -38,7 +38,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     case .failure(let failure):
                         print(failure)
                     }
-                    // refreshToken
                 }
             }
             .disposed(by: disposeBag)

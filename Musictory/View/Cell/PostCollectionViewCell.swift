@@ -16,7 +16,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private let userImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.tintColor = .systemGray3
         
         return imageView
     }()
@@ -106,7 +105,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         }
         
         userImageView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(10)
+            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
             make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
             make.size.equalTo(30)
         }
@@ -118,8 +117,9 @@ final class PostCollectionViewCell: UICollectionViewCell {
         
         postCreateAtLabel.snp.makeConstraints { make in
             make.centerY.equalTo(userNicknameLabel)
-            make.leading.equalTo(userNicknameLabel.snp.trailing).offset(20)
-            make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+//            make.width.equalTo(90)
+            make.leading.equalTo(userNicknameLabel.snp.trailing)
+            make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(15)
         }
         
         postTitleLabel.snp.makeConstraints { make in
@@ -177,13 +177,13 @@ final class PostCollectionViewCell: UICollectionViewCell {
             userImageView.kf.setImage(with: url)
         } else {
             userImageView.image = UIImage(systemName: "person.circle")
-            userImageView.tintColor = .gray
+            userImageView.tintColor = .systemRed
         }
         
         userNicknameLabel.text = post.creator.nickname
         postTitleLabel.text = post.title
         postContentLabel.text = post.content
-        postCreateAtLabel.text = post.createdAt
+        postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
         
         songTitleLabel.text = song.title
         songArtistLabel.text = song.artistName

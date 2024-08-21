@@ -11,7 +11,7 @@ final class LSLP_API {
     static let shared = LSLP_API()
     private init() { }
     
-    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
+    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
         
         let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         var component = URLComponents(string: encodingUrl)
@@ -48,10 +48,10 @@ final class LSLP_API {
                     guard let data = data else { return }
                     do {
                         let result = try JSONDecoder().decode(decodingType.self, from: data)
-                        return completionHandler(.success(result))
+                        return completionHandler?(.success(result)) ?? ()
                         
                     } catch {
-                        completionHandler(.failure(.decodingError("디코딩 에러")))
+                        completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
                 }
             }

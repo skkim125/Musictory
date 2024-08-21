@@ -11,13 +11,21 @@ import RxSwift
 import RxCocoa
 
 final class LogInViewController: UIViewController {
+    private let musicImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "music.note"))
+        imageView.tintColor = .systemRed
+        imageView.contentMode = .scaleAspectFill
+        
+        return imageView
+    }()
     private let appTitleLabel = {
         let label = UILabel()
         label.text = "Musictory"
         label.font = .boldSystemFont(ofSize: 45)
         label.textAlignment = .center
-        return label
+        label.textColor = .systemRed
         
+        return label
     }()
     private let emailLabel = {
         let label = UILabel()
@@ -28,6 +36,7 @@ final class LogInViewController: UIViewController {
     }()
     private let emailTextField = {
         let tf = UITextField()
+        tf.placeholder = "이메일을 입력하세요"
         tf.text = "qwer123@gmail.com"
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
@@ -36,6 +45,8 @@ final class LogInViewController: UIViewController {
         tf.leftViewMode = .always
         tf.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         tf.rightViewMode = .always
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         
         return tf
     }()
@@ -49,6 +60,7 @@ final class LogInViewController: UIViewController {
     }()
     private let passwordTextField = {
         let tf = UITextField()
+        tf.placeholder = "비밀번호를 입력하세요"
         tf.text = "12345678"
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
@@ -57,6 +69,8 @@ final class LogInViewController: UIViewController {
         tf.leftViewMode = .always
         tf.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 0))
         tf.rightViewMode = .always
+        tf.autocapitalizationType = .none
+        tf.autocorrectionType = .no
         
         return tf
     }()
@@ -86,7 +100,7 @@ final class LogInViewController: UIViewController {
     private func configureView() {
         view.backgroundColor = .systemBackground
         
-        let subViews = [appTitleLabel, emailLabel, emailTextField, passwordLabel, passwordTextField, loginButton]
+        let subViews = [musicImageView, appTitleLabel, emailLabel, emailTextField, passwordLabel, passwordTextField, loginButton]
         
         subViews.forEach { sv in
             view.addSubview(sv)
@@ -96,6 +110,12 @@ final class LogInViewController: UIViewController {
             make.top.lessThanOrEqualTo(view.safeAreaLayoutGuide).offset(100)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.height.equalTo(60)
+        }
+        
+        musicImageView.snp.makeConstraints { make in
+            make.centerX.equalTo(appTitleLabel.snp.centerX).offset(-60)
+            make.bottom.equalTo(appTitleLabel.snp.top)
+            make.size.equalTo(30)
         }
         
         emailLabel.snp.makeConstraints { make in
@@ -147,9 +167,9 @@ final class LogInViewController: UIViewController {
             .bind(with: self) { owner, loginModel in
                 owner.view.endEditing(true)
                 let vc = MusictoryHomeViewController()
-                vc.view.backgroundColor = .systemBackground
-                vc.navigationItem.title = "\(loginModel.nick)"
-                owner.navigationController?.pushViewController(vc, animated: true)
+                vc.user = loginModel
+                let nav = UINavigationController(rootViewController: vc)
+                owner.setRootViewController(nav)
             }
             .disposed(by: disposeBag)
     }

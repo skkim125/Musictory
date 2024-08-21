@@ -15,7 +15,7 @@ import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
     private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.postCollectionViewLayout())
-    
+    var user: LoginModel?
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
     
@@ -27,7 +27,14 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     private func configureView() {
-        view.backgroundColor = .white
+        guard let user = user else { return }
+        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.label, .font: UIFont.boldSystemFont(ofSize: 25)]
+        navigationItem.title = "Musictory"
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: nil, action: nil)
+        navigationController?.navigationBar.tintColor = .systemRed
+        
+        view.backgroundColor = .systemBackground
         view.addSubview(postCollectionView)
         
         postCollectionView.snp.makeConstraints { make in
@@ -64,6 +71,26 @@ final class MusictoryHomeViewController: UIViewController {
                 }
                 cell.layer.cornerRadius = 12
                 cell.clipsToBounds = true
+            }
+            .disposed(by: disposeBag)
+        
+        navigationItem.leftBarButtonItem?.rx.tap
+            .bind(with: self) { owner, _ in
+                let vc = UIViewController()
+                vc.view.backgroundColor = .systemBackground
+                vc.navigationItem.title = owner.user?.nick
+                
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        navigationItem.rightBarButtonItem?.rx.tap
+            .bind(with: self) { owner, _ in
+                //            let vc = WriteMusictoryViewController()
+                let nav = UINavigationController(rootViewController: WriteMusictoryViewController())
+                nav.modalPresentationStyle = .fullScreen
+                owner.present(nav, animated: true)
+                //            self.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 extension UIViewController {
     func showAlert(title: String?, message: String?, completionHandelr: (()->Void)? = nil) {
@@ -31,5 +32,17 @@ extension UIViewController {
         alert.addAction(open)
         
         present(alert, animated: true)
+    }
+    
+    func setRootViewController(_ viewController: UIViewController) {
+ 
+        if let scene = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate,
+        let window = scene.window {
+             
+            window.rootViewController = viewController
+            window.makeKeyAndVisible()
+            
+            UIView.transition(with: window, duration: 0.2, options: [.transitionCrossDissolve], animations: nil, completion: nil)
+        }
     }
 }
