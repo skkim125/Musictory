@@ -14,7 +14,7 @@ final class WriteMusictoryViewController: UIViewController {
     private let postTitleTextField = {
         let tf = UITextField()
         tf.font = .systemFont(ofSize: 16)
-        tf.placeholder = "제목을 입력해주세요"
+        tf.placeholder = "뮤직토리의 타이틀을 입력하세요"
         tf.autocapitalizationType = .none
         tf.autocorrectionType = .no
         tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 3, height: 0))
@@ -35,15 +35,16 @@ final class WriteMusictoryViewController: UIViewController {
         tv.font = .systemFont(ofSize: 14)
         tv.backgroundColor = .clear
         tv.layer.borderColor = UIColor.systemRed.cgColor
-        tv.layer.borderWidth = 1
+        tv.layer.borderWidth = 2
         tv.layer.cornerRadius = 4
         tv.clipsToBounds = true
+        tv.textContainerInset = UIEdgeInsets(top: 10, left: 5, bottom: 10, right: 5)
         
         return tv
     }()
     private let postContentTextViewPlaceholder = {
         let label = UILabel()
-        label.text = "내용을 입력해주세요"
+        label.text = "지금의 뮤직토리를 입력해보세요"
         label.textColor = .systemGray
         label.font = .systemFont(ofSize: 14)
         
@@ -75,7 +76,8 @@ final class WriteMusictoryViewController: UIViewController {
         }
         
         postTitleTextField.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(10)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.height.equalTo(40)
         }
         
@@ -112,8 +114,8 @@ final class WriteMusictoryViewController: UIViewController {
         }
         
         postContentTextViewPlaceholder.snp.makeConstraints { make in
-            make.top.equalTo(postContentTextView).inset(8)
-            make.leading.equalTo(postContentTextView).inset(7)
+            make.top.equalTo(postContentTextView).inset(11)
+            make.leading.equalTo(postContentTextView).inset(12)
         }
     }
     
@@ -121,6 +123,12 @@ final class WriteMusictoryViewController: UIViewController {
         navigationItem.leftBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        addSongButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.pushViewController(addSongViewController(), animated: true)
             }
             .disposed(by: disposeBag)
     }

@@ -14,7 +14,7 @@ import MusicKit
 import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
-    private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.postCollectionViewLayout())
+    private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
     var loginUser: LoginModel?
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()

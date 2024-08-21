@@ -117,9 +117,9 @@ final class PostCollectionViewCell: UICollectionViewCell {
         
         postCreateAtLabel.snp.makeConstraints { make in
             make.centerY.equalTo(userNicknameLabel)
-//            make.width.equalTo(90)
             make.leading.equalTo(userNicknameLabel.snp.trailing)
-            make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(15)
+            make.width.equalTo(90)
+            make.trailing.greaterThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
         }
         
         postTitleLabel.snp.makeConstraints { make in
