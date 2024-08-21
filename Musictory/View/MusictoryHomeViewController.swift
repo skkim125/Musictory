@@ -15,7 +15,7 @@ import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
     private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.postCollectionViewLayout())
-    var user: LoginModel?
+    var loginUser: LoginModel?
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
     
@@ -27,7 +27,6 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     private func configureView() {
-        guard let user = user else { return }
         self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.label, .font: UIFont.boldSystemFont(ofSize: 25)]
         navigationItem.title = "Musictory"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
@@ -78,7 +77,7 @@ final class MusictoryHomeViewController: UIViewController {
             .bind(with: self) { owner, _ in
                 let vc = UIViewController()
                 vc.view.backgroundColor = .systemBackground
-                vc.navigationItem.title = owner.user?.nick
+                vc.navigationItem.title = owner.loginUser?.nick
                 
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
