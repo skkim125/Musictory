@@ -7,11 +7,13 @@
 
 import UIKit
 import SnapKit
+import MusicKit
+import RxSwift
 
 class CustomButton: UIButton {
-    let buttonTitleLabel = UILabel()
-    let goNextViewImageView = UIImageView()
-    let dataLabel = UILabel()
+    private let buttonTitleLabel = UILabel()
+    private let goNextViewImageView = UIImageView()
+    private let dataLabel = UILabel()
     
     init(_ type: ButtonType) {
         super.init(frame: .zero)
@@ -52,8 +54,8 @@ class CustomButton: UIButton {
         }
         
         dataLabel.snp.makeConstraints { make in
-            make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
             make.leading.equalTo(self.snp.centerX)
+            make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
             make.centerY.equalTo(goNextViewImageView.snp.centerY)
             make.height.equalTo(25)
         }
@@ -66,6 +68,7 @@ class CustomButton: UIButton {
         
         dataLabel.textColor = .systemRed
         dataLabel.textAlignment = .right
+        dataLabel.font = .systemFont(ofSize: 14)
         
         goNextViewImageView.image = UIImage(systemName: "plus")
         goNextViewImageView.tintColor = .systemRed
@@ -74,6 +77,21 @@ class CustomButton: UIButton {
     
     func configureButtonText(data: String) {
         dataLabel.text = data
+    }
+    
+    func configureAddSongUI(song: Song) {
+        dataLabel.rx.text.onNext("\(song.title) - \(song.artistName)")
+        goNextViewImageView.rx.image.onNext(UIImage(systemName: "checkmark"))
+        buttonTitleLabel.rx.isHidden.onNext(true)
+        dataLabel.rx.textAlignment.onNext(.left)
+        
+        dataLabel.rx.font.onNext(.boldSystemFont(ofSize: 16))
+        dataLabel.snp.remakeConstraints { make in
+            make.leading.equalTo(self.snp.leading).offset(10)
+            make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
+            make.centerY.equalTo(goNextViewImageView.snp.centerY)
+            make.height.equalTo(25)
+        }
     }
     
     required init?(coder: NSCoder) {

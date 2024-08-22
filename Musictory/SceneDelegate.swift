@@ -16,9 +16,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: scene)
         
-        let vc = addSongViewController()
+        checkLogin()
+    }
+    
+    func checkLogin() {
+        let userDefaults = UserDefaultsManager.shared
+        if userDefaults.accessT.isEmpty {
+            let vc = LogInViewController()
+            
+            window?.rootViewController = vc
+        } else {
+            let vc = MusictoryHomeViewController()
+            let nav = UINavigationController(rootViewController: vc)
+            
+            window?.rootViewController = nav
+        }
         
-        window?.rootViewController = UINavigationController(rootViewController: vc)
         window?.makeKeyAndVisible()
     }
 

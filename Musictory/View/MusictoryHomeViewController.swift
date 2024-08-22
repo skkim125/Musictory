@@ -21,7 +21,7 @@ final class MusictoryHomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        isRefreshTokenExpired()
         configureView()
         bind()
     }
@@ -92,5 +92,24 @@ final class MusictoryHomeViewController: UIViewController {
                 //            self.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+    }
+    
+    func isRefreshTokenExpired() {
+        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success(let success):
+                UserDefaultsManager.shared.accessT = success.accessToken
+            case .failure(let failure):
+                self.showAlert(title: "로그인 시간이 만료되었습니다. 로그인 화면으로 이동합니다.", message: nil) {
+                    UserDefaultsManager.shared.accessT = ""
+                    UserDefaultsManager.shared.refreshT = ""
+                    
+                    let vc = LogInViewController()
+                    self.setRootViewController(vc)
+                }
+            }
+        }
     }
 }

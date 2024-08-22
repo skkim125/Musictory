@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import MusicKit
 
 final class WriteMusictoryViewController: UIViewController {
     private let postTitleTextField = {
@@ -120,15 +121,23 @@ final class WriteMusictoryViewController: UIViewController {
     }
     
     private func bind() {
+        
         navigationItem.leftBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
         
+        let addSongInfo = PublishRelay<Song>()
+        
         addSongButton.rx.tap
             .bind(with: self) { owner, _ in
-                owner.navigationController?.pushViewController(addSongViewController(), animated: true)
+                let vc = AddSongViewController()
+                vc.bindData = { song in
+                    owner.addSongButton.configureAddSongUI(song: song)
+                    addSongInfo.accept(song)
+                }
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }

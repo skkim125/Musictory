@@ -112,8 +112,10 @@ extension LSLPRouter {
             }
         case .refresh:
             switch statusCode {
+            case 418:
+                return NetworkError.expiredRefreshToken
             default:
-                return NetworkError.custom("")
+                return NetworkError.custom("알수없는 에러입니다.")
             }
         }
     }
@@ -123,6 +125,7 @@ extension LSLPRouter {
 enum NetworkError: Error {
     case custom(String)
     case expiredAccessToken
+    case expiredRefreshToken
     case decodingError(String)
 }
 

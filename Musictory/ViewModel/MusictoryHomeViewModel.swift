@@ -27,7 +27,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         fetchPost
             .bind(with: self) { owner, _ in
-                
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let success):
