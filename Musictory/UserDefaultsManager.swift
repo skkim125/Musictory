@@ -14,8 +14,11 @@ final class UserDefaultsManager {
     private let userDefaults = UserDefaults.standard
     
     private enum UserDefaultsKeys: String {
+        case userID
         case accessT
         case refreshT
+        case email
+        case password
     }
     
     var accessT: String {
@@ -33,6 +36,33 @@ final class UserDefaultsManager {
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.refreshT.rawValue)
+        }
+    }
+    
+    var email: String {
+        get {
+            userDefaults.string(forKey: UserDefaultsKeys.email.rawValue) ?? ""
+        }
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultsKeys.email.rawValue)
+        }
+    }
+    
+    var password: String {
+        get {
+            userDefaults.string(forKey: UserDefaultsKeys.password.rawValue) ?? ""
+        }
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultsKeys.password.rawValue)
+        }
+    }
+    
+    var userID: String {
+        get {
+            userDefaults.string(forKey: UserDefaultsKeys.userID.rawValue) ?? ""
+        }
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultsKeys.userID.rawValue)
         }
     }
 }

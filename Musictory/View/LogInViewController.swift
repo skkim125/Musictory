@@ -37,7 +37,7 @@ final class LogInViewController: UIViewController {
     private let emailTextField = {
         let tf = UITextField()
         tf.placeholder = "이메일을 입력하세요"
-        tf.text = "qwer123@gmail.com"
+        tf.text = UserDefaultsManager.shared.email
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
         tf.clipsToBounds = true
@@ -61,7 +61,7 @@ final class LogInViewController: UIViewController {
     private let passwordTextField = {
         let tf = UITextField()
         tf.placeholder = "비밀번호를 입력하세요"
-        tf.text = "12345678"
+        tf.text = UserDefaultsManager.shared.password
         tf.backgroundColor = .systemGray5
         tf.layer.cornerRadius = 4
         tf.clipsToBounds = true

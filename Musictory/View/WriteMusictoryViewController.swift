@@ -55,6 +55,22 @@ final class WriteMusictoryViewController: UIViewController {
     private let addSongButton = CustomButton(.song)
     private let addPhotoButton = CustomButton(.photo)
     private let addLocationButton = CustomButton(.location)
+    private let writeMusictoryButton = {
+        let button = UIButton(type: .system)
+        var configuration = UIButton(configuration: .bordered()).configuration
+        configuration?.image = UIImage(systemName: "pin.fill")
+        configuration?.baseForegroundColor = .white
+        configuration?.title = "뮤직토리 남기기"
+        button.configuration = configuration
+        
+        button.isEnabled = false
+        button.layer.cornerRadius = 8
+        button.clipsToBounds = true
+        
+        return button
+    }()
+    
+    private let viewModel = WriteMusictoryViewModel()
     let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -71,13 +87,13 @@ final class WriteMusictoryViewController: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        let subViews = [postTitleTextField, dividerLine, addSongButton, addLocationButton, addPhotoButton, postContentTextView, postContentTextViewPlaceholder]
+        let subViews = [postTitleTextField, dividerLine, addSongButton, addLocationButton, addPhotoButton, postContentTextView, postContentTextViewPlaceholder, writeMusictoryButton]
         subViews.forEach { subView in
             view.addSubview(subView)
         }
         
         postTitleTextField.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(10)
+            make.top.equalTo(view.safeAreaLayoutGuide).inset(30)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.height.equalTo(40)
         }
@@ -111,16 +127,63 @@ final class WriteMusictoryViewController: UIViewController {
         postContentTextView.snp.makeConstraints { make in
             make.top.equalTo(addPhotoButton.snp.bottom).offset(20)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(200)
         }
         
         postContentTextViewPlaceholder.snp.makeConstraints { make in
             make.top.equalTo(postContentTextView).inset(11)
             make.leading.equalTo(postContentTextView).inset(12)
         }
+        
+        writeMusictoryButton.snp.makeConstraints { make in
+            make.height.equalTo(50)
+            make.top.equalTo(postContentTextView.snp.bottom).offset(20)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide).inset(20)
+        }
     }
     
     private func bind() {
+        let addSongInfo = PublishRelay<Song>()
+        let uploadPost = PublishRelay<Void>()
+        
+        let input = WriteMusictoryViewModel.Input(song: addSongInfo, title: postTitleTextField.rx.text.orEmpty, content: postContentTextView.rx.text.orEmpty, uploadPost: uploadPost)
+        
+        let output = viewModel.transform(input: input)
+        
+        output.postContentHidden
+            .bind(to: postContentTextViewPlaceholder.rx.isHidden)
+            .disposed(by: disposeBag)
+        
+        output.writeButtonEnable
+            .bind(with: self) { owner, value in
+                owner.writeMusictoryButton.rx.backgroundColor.onNext(value ? .systemRed : .clear)
+                owner.writeMusictoryButton.rx.tintColor.onNext(value ? .white : .lightGray)
+                owner.writeMusictoryButton.rx.isEnabled.onNext(value)
+            }
+            .disposed(by: disposeBag)
+        
+        writeMusictoryButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.showTwoButtonAlert(title: "뮤직 토리를 남기시겠습니까?", message: "남긴 뮤직토리는 수정할 수 없습니다.") {
+                    uploadPost.accept(())
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        output.showUploadPostErrorAlert
+            .bind(with: self) { owner, error in
+                owner.showAlert(title: error.title, message: error.alertMessage)
+            }
+            .disposed(by: disposeBag)
+        
+        output.postingEnd
+            .bind(with: self) { owner, _ in
+                owner.showAlert(title: "성공적으로 기록되었습니다.", message: "") {
+                    owner.dismiss(animated: true)
+                }
+            }
+            .disposed(by: disposeBag)
         
         navigationItem.leftBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
@@ -128,13 +191,11 @@ final class WriteMusictoryViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        let addSongInfo = PublishRelay<Song>()
-        
         addSongButton.rx.tap
             .bind(with: self) { owner, _ in
                 let vc = AddSongViewController()
                 vc.bindData = { song in
-                    owner.addSongButton.configureAddSongUI(song: song)
+                    owner.addSongButton.configureAddSongUI(song: song, .song)
                     addSongInfo.accept(song)
                 }
                 owner.navigationController?.pushViewController(vc, animated: true)

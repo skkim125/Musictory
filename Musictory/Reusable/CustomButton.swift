@@ -79,19 +79,28 @@ class CustomButton: UIButton {
         dataLabel.text = data
     }
     
-    func configureAddSongUI(song: Song) {
-        dataLabel.rx.text.onNext("\(song.title) - \(song.artistName)")
+    func configureAddSongUI(song: Song, _ type: ButtonType) {
+        switch type {
+        case .song:
+            dataLabel.rx.text.onNext("\(song.title) - \(song.artistName)")
+            
+            dataLabel.rx.font.onNext(.boldSystemFont(ofSize: 16))
+            dataLabel.snp.remakeConstraints { make in
+                make.leading.equalTo(self.snp.leading).offset(10)
+                make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
+                make.centerY.equalTo(goNextViewImageView.snp.centerY)
+                make.height.equalTo(25)
+            }
+        default:
+            break
+        }
         goNextViewImageView.rx.image.onNext(UIImage(systemName: "checkmark"))
+        goNextViewImageView.rx.tintColor.onNext(.white)
         buttonTitleLabel.rx.isHidden.onNext(true)
         dataLabel.rx.textAlignment.onNext(.left)
+        dataLabel.rx.textColor.onNext(.white)
         
-        dataLabel.rx.font.onNext(.boldSystemFont(ofSize: 16))
-        dataLabel.snp.remakeConstraints { make in
-            make.leading.equalTo(self.snp.leading).offset(10)
-            make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
-            make.centerY.equalTo(goNextViewImageView.snp.centerY)
-            make.height.equalTo(25)
-        }
+        self.configuration?.baseBackgroundColor = .systemRed
     }
     
     required init?(coder: NSCoder) {

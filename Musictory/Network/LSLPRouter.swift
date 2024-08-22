@@ -10,6 +10,7 @@ import Foundation
 enum LSLPRouter {
     case login(LoginQuery)
     case fetchPost(PostQuery)
+    case writePost(WritePostQuery)
     case refresh
 }
 
@@ -21,7 +22,7 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login:
+        case .login, .writePost:
             "POST"
         case .fetchPost, .refresh:
             "GET"
@@ -32,10 +33,10 @@ extension LSLPRouter {
         switch self {
         case .login:
             APIPath.login.rawValue
-        case .fetchPost:
+        case .fetchPost, .writePost:
             APIPath.fetchPost.rawValue
         case .refresh:
-            ""
+            APIPath.refresh.rawValue
         }
     }
     
@@ -57,6 +58,12 @@ extension LSLPRouter {
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.refresh.rawValue: UserDefaultsManager.shared.refreshT
+            ]
+        case .writePost:
+            [
+                APIHeader.sesac.rawValue: APIKey.key,
+                APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
+                APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
         }
     }
@@ -80,7 +87,8 @@ extension LSLPRouter {
         switch self {
         case .login(let loginQuery):
             return try? encoder.encode(loginQuery)
-            
+        case .writePost(let writePostQuery):
+            return try? encoder.encode(writePostQuery)
         default:
             return nil
         }
@@ -95,7 +103,7 @@ extension LSLPRouter {
             case 419:
                 return NetworkError.expiredAccessToken
             default:
-                return NetworkError.custom("")
+                return NetworkError.custom("알 수 없는 에러입니다.")
             }
         case .fetchPost:
             switch statusCode {
@@ -108,14 +116,23 @@ extension LSLPRouter {
             case 419:
                 return NetworkError.expiredAccessToken
             default:
-                return NetworkError.custom("확인할 수 없는 에러")
+                return NetworkError.custom("알 수 없는 에러입니다.")
             }
         case .refresh:
             switch statusCode {
             case 418:
                 return NetworkError.expiredRefreshToken
             default:
-                return NetworkError.custom("알수없는 에러입니다.")
+                return NetworkError.custom("알 수 없는 에러입니다.")
+            }
+        case .writePost:
+            switch statusCode {
+            case 400...410:
+                return NetworkError.custom("게시글을 생성할 수 없습니다.")
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("알 수 없는 에러입니다.")
             }
         }
     }
@@ -127,5 +144,22 @@ enum NetworkError: Error {
     case expiredAccessToken
     case expiredRefreshToken
     case decodingError(String)
+    
+    var title: String {
+        switch self {
+        case .custom(let error):
+            "\(error)"
+        case .expiredAccessToken:
+            "토큰이 만료되었습니다."
+        case .expiredRefreshToken:
+            "리프래시 토큰이 만료되었습니다."
+        case .decodingError(let error):
+            "\(error)"
+        }
+    }
+    
+    var alertMessage: String {
+        "다시 시도해주세요"
+    }
 }
 

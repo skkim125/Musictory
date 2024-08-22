@@ -13,10 +13,8 @@ struct PostModel: Decodable {
     let title: String // 게시물 제목
     let content: String // 게시물 내용
     let content1: String // 노래 id
-    let content2: String // 노래 제목
-    let content3: String // 가창자 이름
-    let content4: String? // 위도
-    let content5: String? // 경도
+    let content2: String? // 위도
+    let content3: String? // 경도
     let creator: User // 작성자(유저 구조체 만들기)
     let files: [String]? // 이미지 파일
     let likes: [String] // 좋아요한 사람 id(좋아요 개수로 만들기)
@@ -31,8 +29,6 @@ struct PostModel: Decodable {
         case content1
         case content2
         case content3
-        case content4
-        case content5
         case creator
         case files
         case likes

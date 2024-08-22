@@ -101,10 +101,13 @@ final class MusictoryHomeViewController: UIViewController {
             switch result {
             case .success(let success):
                 UserDefaultsManager.shared.accessT = success.accessToken
+                let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
+                LSLP_API.shared.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self)
             case .failure(let failure):
                 self.showAlert(title: "로그인 시간이 만료되었습니다. 로그인 화면으로 이동합니다.", message: nil) {
                     UserDefaultsManager.shared.accessT = ""
                     UserDefaultsManager.shared.refreshT = ""
+                    UserDefaultsManager.shared.userID = ""
                     
                     let vc = LogInViewController()
                     self.setRootViewController(vc)
