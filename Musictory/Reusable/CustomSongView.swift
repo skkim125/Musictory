@@ -8,6 +8,8 @@
 import UIKit
 import SnapKit
 import MusicKit
+import RxSwift
+import RxCocoa
 
 final class CustomSongView: UIView {
     private let songImageView = {
@@ -36,10 +38,11 @@ final class CustomSongView: UIView {
         return label
     }()
     
-    private let songPlayButton = {
+    let songPlayButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "play.fill"), for: .normal)
         button.tintColor = .label
+        button.isUserInteractionEnabled = false
         
         return button
     }()

@@ -15,13 +15,11 @@ import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
     private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
-    var loginUser: LoginModel?
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        isRefreshTokenExpired()
         configureView()
         bind()
     }
@@ -45,22 +43,38 @@ final class MusictoryHomeViewController: UIViewController {
     
     private func bind() {
         let fetchPost = PublishRelay<Void>()
-        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost)
+        let checkRefreshToken = PublishRelay<Void>()
+        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken)
         let output = viewModel.transform(input: input)
+        
         fetchPost.accept(())
+        checkRefreshToken.accept(())
+        
+        output.showErrorAlert
+            .bind(with: self) { owner, _ in
+                self.showAlert(title: NetworkError.expiredRefreshToken.title, message: NetworkError.expiredRefreshToken.alertMessage) {
+                    UserDefaultsManager.shared.accessT = ""
+                    UserDefaultsManager.shared.refreshT = ""
+                    UserDefaultsManager.shared.userID = ""
+                    
+                    let vc = LogInViewController()
+                    self.setRootViewController(vc)
+                }
+            }
+            .disposed(by: disposeBag)
         
         output.posts
-            .bind(to: postCollectionView.rx.items(cellIdentifier: PostCollectionViewCell.identifier, cellType: PostCollectionViewCell.self)) { [weak self] item, value, cell in
-                guard let self = self else { return }
+            .bind(to: postCollectionView.rx.items(cellIdentifier: PostCollectionViewCell.identifier, cellType: PostCollectionViewCell.self)) { item, value, cell in
                 
                 DispatchQueue.main.async {
                     Task {
                         let song = try await MusicManager.shared.requsetMusicId(id: value.content1)
                         cell.configureCell(post: value, song: song)
+                        cell.bind()
                         cell.songView.rx
                             .tapGesture()
                             .when(.recognized)
-                            .bind(with: self) { owner, tap in
+                            .bind(with: self) { owner, _ in
                                 owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
                                     MusicManager.shared.playSong(song: song)
                                 }
@@ -77,7 +91,7 @@ final class MusictoryHomeViewController: UIViewController {
             .bind(with: self) { owner, _ in
                 let vc = UIViewController()
                 vc.view.backgroundColor = .systemBackground
-                vc.navigationItem.title = owner.loginUser?.nick
+                vc.navigationItem.title = owner.viewModel.loginUser?.nick
                 
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
@@ -85,34 +99,10 @@ final class MusictoryHomeViewController: UIViewController {
         
         navigationItem.rightBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
-                //            let vc = WriteMusictoryViewController()
                 let nav = UINavigationController(rootViewController: WriteMusictoryViewController())
                 nav.modalPresentationStyle = .fullScreen
                 owner.present(nav, animated: true)
-                //            self.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
-    }
-    
-    func isRefreshTokenExpired() {
-        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let success):
-                UserDefaultsManager.shared.accessT = success.accessToken
-                let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
-                LSLP_API.shared.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self)
-            case .failure(let failure):
-                self.showAlert(title: "로그인 시간이 만료되었습니다. 로그인 화면으로 이동합니다.", message: nil) {
-                    UserDefaultsManager.shared.accessT = ""
-                    UserDefaultsManager.shared.refreshT = ""
-                    UserDefaultsManager.shared.userID = ""
-                    
-                    let vc = LogInViewController()
-                    self.setRootViewController(vc)
-                }
-            }
-        }
     }
 }

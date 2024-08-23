@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import MusicKit
 import Kingfisher
+import RxSwift
 
 final class PostCollectionViewCell: UICollectionViewCell {
     static let identifier = "PostCollectionViewCell"
@@ -51,6 +52,28 @@ final class PostCollectionViewCell: UICollectionViewCell {
     }()
     
     let songView = CustomSongView(.musictoryHome)
+    private let likeButton = {
+        let button = UIButton()
+        let imageConfiguration = UIImage.SymbolConfiguration(font: UIFont.systemFont(ofSize: 20, weight: .semibold))
+        button.setImage(UIImage(systemName: "heart")?.withConfiguration(imageConfiguration), for: .normal)
+        button.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFill
+        button.isUserInteractionEnabled = true
+        
+        return button
+    }()
+    private let commentButton = {
+        let button = UIButton()
+        let imageConfiguration = UIImage.SymbolConfiguration(font: UIFont.systemFont(ofSize: 20, weight: .semibold))
+        button.setImage(UIImage(systemName: "message")?.withConfiguration(imageConfiguration), for: .normal)
+        button.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFill
+        button.isUserInteractionEnabled = true
+        
+        return button
+    }()
+    
+    var disposdBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -59,7 +82,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureView() {
-        let subViews = [userImageView, userNicknameLabel, postTitleLabel, postContentLabel, postCreateAtLabel, songView]
+        let subViews = [userImageView, userNicknameLabel, postTitleLabel, postContentLabel, postCreateAtLabel, songView, likeButton, commentButton]
 
         subViews.forEach { subView in
             contentView.addSubview(subView)
@@ -100,8 +123,21 @@ final class PostCollectionViewCell: UICollectionViewCell {
         songView.snp.makeConstraints { make in
             make.top.equalTo(postContentLabel.snp.bottom).offset(5)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(10)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
             make.height.equalTo(70)
+        }
+        
+        likeButton.snp.makeConstraints { make in
+            make.top.equalTo(songView.snp.bottom).offset(5)
+            make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(15)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            make.size.equalTo(30)
+        }
+        
+        commentButton.snp.makeConstraints { make in
+            make.top.equalTo(songView.snp.bottom).offset(5)
+            make.leading.equalTo(likeButton.snp.trailing).offset(20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            make.size.equalTo(30)
         }
     }
     
@@ -123,5 +159,25 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
         
         songView.configureUI(song: song)
+    }
+    
+    func bind() {
+        likeButton.rx.tap
+            .bind(with: self) { owner, _ in
+                print("라이크 버튼 탭됨")
+            }
+            .disposed(by: disposdBag)
+        
+        commentButton.rx.tap
+            .bind(with: self) { owner, _ in
+                print("코멘트 버튼 탭됨")
+            }
+            .disposed(by: disposdBag)
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        disposdBag = DisposeBag()
     }
 }

@@ -9,21 +9,42 @@ import RxSwift
 import RxCocoa
 
 final class MusictoryHomeViewModel: BaseViewModel {
+    var loginUser: LoginModel?
     private let lslp_API = LSLP_API.shared
     let disposeBag = DisposeBag()
     
     struct Input {
         let fetchPost: PublishRelay<Void>
+        let checkRefreshToken: PublishRelay<Void>
     }
     
     struct Output {
         let posts: PublishRelay<[PostModel]>
+        let showErrorAlert: PublishRelay<Void>
     }
     
     func transform(input: Input) -> Output {
+        let showErrorAlert = PublishRelay<Void>()
         let fetchPost = input.fetchPost
         var nextCursor = ""
         let posts = PublishRelay<[PostModel]>()
+        
+        input.checkRefreshToken
+            .bind(with: self) { owner, _ in
+                LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        print(#function)
+                        print(#function, 1, UserDefaultsManager.shared.accessT)
+                        UserDefaultsManager.shared.accessT = success.accessToken
+                        print(#function, 2, UserDefaultsManager.shared.accessT)
+                    case .failure(let error):
+                        print(error)
+                        showErrorAlert.accept(())
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
         
         fetchPost
             .bind(with: self) { owner, _ in
@@ -32,8 +53,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     case .success(let success):
                         posts.accept(success.data)
                         nextCursor = success.nextCursor ?? ""
-                        print(success.data)
-                        print(nextCursor)
                     case .failure(let failure):
                         print(failure)
                     }
@@ -41,7 +60,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(posts: posts)
+        return Output(posts: posts, showErrorAlert: showErrorAlert)
     }
     
 }

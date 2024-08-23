@@ -120,6 +120,8 @@ extension LSLPRouter {
             }
         case .refresh:
             switch statusCode {
+            case 401:
+                return NetworkError.custom("인증할 수 없는 토큰입니다.")
             case 418:
                 return NetworkError.expiredRefreshToken
             default:

@@ -21,7 +21,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func checkLogin() {
         let userDefaults = UserDefaultsManager.shared
-        if userDefaults.userID.isEmpty {
+        print(userDefaults.email)
+        print(userDefaults.password)
+        if userDefaults.userID.trimmingCharacters(in: .whitespaces).isEmpty {
             let vc = LogInViewController()
             
             window?.rootViewController = vc

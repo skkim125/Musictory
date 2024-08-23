@@ -59,7 +59,7 @@ final class LoginViewModel: BaseViewModel {
                     case .failure(let failure):
                         switch failure {
                         case .expiredAccessToken:
-                            owner.lslp_API.tokenRefresh()
+                            owner.tokenRefresh()
                             
                         default:
                             print(failure)
@@ -70,6 +70,17 @@ final class LoginViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         return Output(loginButtonEnable: loginButtonEnable, loginModel: loginModel)
+    }
+    
+    private func tokenRefresh() {
+        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+            switch result {
+            case .success(let success):
+                UserDefaultsManager.shared.accessT = success.accessToken
+            case .failure(let failure):
+                print(failure.localizedDescription)
+            }
+        }
     }
     
 }

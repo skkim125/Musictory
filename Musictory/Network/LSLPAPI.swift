@@ -37,14 +37,8 @@ final class LSLP_API {
                     return
                 }
                 
-                if response.statusCode == 419 {
-                    self.callRequest(apiType: apiType, decodingType: decodingType, completionHandler: completionHandler)
-                    
-                } else if response.statusCode != 200 {
-                    apiType.errorHandler(statusCode: response.statusCode)
-                    
-                } else {
-                    
+                switch response.statusCode {
+                case 200 :
                     guard let data = data else { return }
                     do {
                         let result = try JSONDecoder().decode(decodingType.self, from: data)
@@ -53,19 +47,13 @@ final class LSLP_API {
                     } catch {
                         completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
+                default:
+                    let error = apiType.errorHandler(statusCode: response.statusCode)
+                    print(error, 1)
+                    print(response.statusCode)
+                    completionHandler?(.failure(error))
                 }
             }
         }.resume()
-    }
-    
-    func tokenRefresh() {
-        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
-            switch result {
-            case .success(let success):
-                UserDefaultsManager.shared.accessT = success.accessToken
-            case .failure(let failure):
-                print(failure)
-            }
-        }
     }
 }
