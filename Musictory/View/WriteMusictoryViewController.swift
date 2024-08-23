@@ -71,6 +71,7 @@ final class WriteMusictoryViewController: UIViewController {
     }()
     
     private let viewModel = WriteMusictoryViewModel()
+    var bindData: (() -> Void)?
     let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -181,6 +182,7 @@ final class WriteMusictoryViewController: UIViewController {
             .bind(with: self) { owner, _ in
                 owner.showAlert(title: "성공적으로 기록되었습니다.", message: "") {
                     owner.dismiss(animated: true)
+                    owner.bindData?()
                 }
             }
             .disposed(by: disposeBag)

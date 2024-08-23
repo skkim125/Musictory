@@ -10,8 +10,10 @@ import Foundation
 enum LSLPRouter {
     case login(LoginQuery)
     case fetchPost(PostQuery)
+    case fetchPostOfReload(String, PostQuery)
     case writePost(WritePostQuery)
     case refresh
+    case like(String, LikeQuery)
 }
 
 extension LSLPRouter {
@@ -22,9 +24,9 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost:
+        case .login, .writePost, .like:
             "POST"
-        case .fetchPost, .refresh:
+        case .fetchPost, .fetchPostOfReload, .refresh:
             "GET"
         }
     }
@@ -37,6 +39,10 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue
         case .refresh:
             APIPath.refresh.rawValue
+        case .like(let id, _):
+            APIPath.fetchPost.rawValue + "/\(id)/like"
+        case .fetchPostOfReload(let id, _):
+            APIPath.fetchPost.rawValue + "/\(id)"
         }
     }
     
@@ -47,7 +53,7 @@ extension LSLPRouter {
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .fetchPost:
+        case .fetchPost, .fetchPostOfReload:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT
@@ -59,7 +65,7 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.refresh.rawValue: UserDefaultsManager.shared.refreshT
             ]
-        case .writePost:
+        case .writePost, .like:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
@@ -70,7 +76,7 @@ extension LSLPRouter {
     
     var parameters: [URLQueryItem]? {
         switch self {
-        case .fetchPost(let postQuery):
+        case .fetchPost(let postQuery), .fetchPostOfReload(_, let postQuery):
             return [
                 URLQueryItem(name: "product_id", value: postQuery.product_id),
                 URLQueryItem(name: "limit", value: postQuery.limit),
@@ -89,6 +95,8 @@ extension LSLPRouter {
             return try? encoder.encode(loginQuery)
         case .writePost(let writePostQuery):
             return try? encoder.encode(writePostQuery)
+        case .like(_, let likeQuery):
+            return try? encoder.encode(likeQuery)
         default:
             return nil
         }
@@ -136,12 +144,17 @@ extension LSLPRouter {
             default:
                 return NetworkError.custom("알 수 없는 에러입니다.")
             }
+        case .like:
+            return NetworkError.custom("\(statusCode)")
+        case .fetchPostOfReload:
+            return NetworkError.custom("\(statusCode)")
         }
     }
 }
 
 
 enum NetworkError: Error {
+    case responseError(String)
     case custom(String)
     case expiredAccessToken
     case expiredRefreshToken
@@ -149,12 +162,14 @@ enum NetworkError: Error {
     
     var title: String {
         switch self {
+        case .responseError(let error):
+            "\(error)"
         case .custom(let error):
             "\(error)"
         case .expiredAccessToken:
-            "토큰이 만료되었습니다."
+            "로그인 시간이 만료되었습니다."
         case .expiredRefreshToken:
-            "리프래시 토큰이 만료되었습니다."
+            "로그인 시간이 만료되었습니다."
         case .decodingError(let error):
             "\(error)"
         }

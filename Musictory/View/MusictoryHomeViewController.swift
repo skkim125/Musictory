@@ -44,7 +44,8 @@ final class MusictoryHomeViewController: UIViewController {
     private func bind() {
         let fetchPost = PublishRelay<Void>()
         let checkRefreshToken = PublishRelay<Void>()
-        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken)
+        let likePostIndex = PublishRelay<Int>()
+        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken, likePostIndex: likePostIndex)
         let output = viewModel.transform(input: input)
         
         fetchPost.accept(())
@@ -65,23 +66,37 @@ final class MusictoryHomeViewController: UIViewController {
         
         output.posts
             .bind(to: postCollectionView.rx.items(cellIdentifier: PostCollectionViewCell.identifier, cellType: PostCollectionViewCell.self)) { item, value, cell in
-                
-                DispatchQueue.main.async {
-                    Task {
-                        let song = try await MusicManager.shared.requsetMusicId(id: value.content1)
-                        cell.configureCell(post: value, song: song)
-                        cell.bind()
-                        cell.songView.rx
-                            .tapGesture()
-                            .when(.recognized)
-                            .bind(with: self) { owner, _ in
-                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                    MusicManager.shared.playSong(song: song)
-                                }
+                Task {
+                    let song = try await MusicManager.shared.requsetMusicId(id: value.content1)
+                    
+                    cell.configureCell(post: value, song: song)
+                    
+                    cell.likeButton.rx.tap
+                        .map({
+                            print(#function, item)
+                           return item
+                        })
+                        .bind(to: likePostIndex)
+                        .disposed(by: cell.disposeBag)
+                    
+                    cell.songView.rx
+                        .tapGesture()
+                        .when(.recognized)
+                        .bind(with: self) { owner, _ in
+                            owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                MusicManager.shared.playSong(song: song)
                             }
-                            .disposed(by: self.disposeBag)
-                    }
+                        }
+                        .disposed(by: cell.disposeBag)
                 }
+                
+                output.newPost
+                    .bind(with: self) { owner, model in
+                        print("model =", model)
+                        cell.configureLikeButtonUI(like: model.isLike)
+                    }
+                    .disposed(by: cell.disposeBag)
+                
                 cell.layer.cornerRadius = 12
                 cell.clipsToBounds = true
             }
@@ -99,7 +114,14 @@ final class MusictoryHomeViewController: UIViewController {
         
         navigationItem.rightBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
-                let nav = UINavigationController(rootViewController: WriteMusictoryViewController())
+                let vc = WriteMusictoryViewController()
+                
+                vc.bindData = {
+                    owner.postCollectionView.reloadData()
+                    fetchPost.accept(())
+                }
+                
+                let nav = UINavigationController(rootViewController: vc)
                 nav.modalPresentationStyle = .fullScreen
                 owner.present(nav, animated: true)
             }

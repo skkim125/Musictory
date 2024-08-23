@@ -47,7 +47,7 @@ final class CustomSongView: UIView {
         return button
     }()
     
-    init(_ type: SongViewType) {
+    init() {
         super.init(frame: .zero)
         
         let songSubView = [songImageView, songTitleLabel, songArtistLabel, songPlayButton]
@@ -56,10 +56,10 @@ final class CustomSongView: UIView {
             addSubview(subView)
         }
         
-        configureView(type)
+        configureView()
     }
     
-    private func configureView(_ type: SongViewType) {
+    private func configureView() {
         songImageView.snp.makeConstraints { make in
             make.leading.verticalEdges.equalTo(self).inset(7)
             make.width.equalTo(songImageView.snp.height)
@@ -70,11 +70,6 @@ final class CustomSongView: UIView {
             make.leading.equalTo(songImageView.snp.trailing).offset(10)
         }
         
-        songArtistLabel.snp.makeConstraints { make in
-            make.leading.equalTo(songTitleLabel)
-            make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
-        }
-        
         songPlayButton.snp.makeConstraints { make in
             make.leading.equalTo(songTitleLabel.snp.trailing).offset(10)
             make.trailing.equalTo(self.snp.trailing).inset(10)
@@ -82,7 +77,11 @@ final class CustomSongView: UIView {
             make.centerY.equalTo(songImageView)
         }
         
-        songPlayButton.isHidden = type == .writeMusictory
+        songArtistLabel.snp.makeConstraints { make in
+            make.leading.equalTo(songTitleLabel)
+            make.trailing.equalTo(songPlayButton.snp.leading).inset(-10)
+            make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
+        }
     }
     
     func configureUI(song: Song) {

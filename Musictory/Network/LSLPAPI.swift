@@ -33,7 +33,7 @@ final class LSLP_API {
                 
                 guard let response = response as? HTTPURLResponse else {
                     print("response error")
-                    
+                    completionHandler?(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
                     return
                 }
                 
@@ -48,6 +48,7 @@ final class LSLP_API {
                         completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
                 default:
+                    print(response.url)
                     let error = apiType.errorHandler(statusCode: response.statusCode)
                     print(error, 1)
                     print(response.statusCode)

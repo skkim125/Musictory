@@ -23,6 +23,8 @@
 		045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D12C773B57000D6E81 /* AddPhotoViewController.swift */; };
 		045833D42C774B72000D6E81 /* WriteMusictoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */; };
 		045833D62C774F3E000D6E81 /* WritePostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D52C774F3E000D6E81 /* WritePostQuery.swift */; };
+		045833D82C786FE1000D6E81 /* LikeQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D72C786FE1000D6E81 /* LikeQuery.swift */; };
+		045833DA2C787125000D6E81 /* LikeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D92C787125000D6E81 /* LikeModel.swift */; };
 		048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */; };
 		048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDD92C6F9C92000F5293 /* RxCocoa */; };
 		048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDDB2C6F9C92000F5293 /* RxSwift */; };
@@ -68,6 +70,8 @@
 		045833D12C773B57000D6E81 /* AddPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotoViewController.swift; sourceTree = "<group>"; };
 		045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteMusictoryViewModel.swift; sourceTree = "<group>"; };
 		045833D52C774F3E000D6E81 /* WritePostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritePostQuery.swift; sourceTree = "<group>"; };
+		045833D72C786FE1000D6E81 /* LikeQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeQuery.swift; sourceTree = "<group>"; };
+		045833D92C787125000D6E81 /* LikeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeModel.swift; sourceTree = "<group>"; };
 		048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 		048DFDDF2C70F012000F5293 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		048DFDE32C70F04F000F5293 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
@@ -191,6 +195,7 @@
 				048DFDFC2C736411000F5293 /* UserModel.swift */,
 				048DFDFE2C736423000F5293 /* CommentModel.swift */,
 				045833B02C75A192000D6E81 /* RefreshModel.swift */,
+				045833D92C787125000D6E81 /* LikeModel.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -201,6 +206,7 @@
 				048DFDEE2C722AE3000F5293 /* LoginQuery.swift */,
 				045833882C74AF14000D6E81 /* PostQuery.swift */,
 				045833D52C774F3E000D6E81 /* WritePostQuery.swift */,
+				045833D72C786FE1000D6E81 /* LikeQuery.swift */,
 			);
 			path = QueryModel;
 			sourceTree = "<group>";
@@ -353,6 +359,7 @@
 				045833D42C774B72000D6E81 /* WriteMusictoryViewModel.swift in Sources */,
 				045833B62C75C0E7000D6E81 /* UIViewController+Extension.swift in Sources */,
 				045833CC2C77264B000D6E81 /* AddSongViewModel.swift in Sources */,
+				045833D82C786FE1000D6E81 /* LikeQuery.swift in Sources */,
 				045833892C74AF14000D6E81 /* PostQuery.swift in Sources */,
 				045833D62C774F3E000D6E81 /* WritePostQuery.swift in Sources */,
 				048DFDEC2C722A9E000F5293 /* LoginModel.swift in Sources */,
@@ -363,6 +370,7 @@
 				048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */,
 				045833C32C763EB2000D6E81 /* SearchSongCollectionViewCell.swift in Sources */,
 				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,
+				045833DA2C787125000D6E81 /* LikeModel.swift in Sources */,
 				048DFDE92C71E1FA000F5293 /* LSLPRouter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
