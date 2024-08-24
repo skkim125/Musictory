@@ -145,7 +145,12 @@ extension LSLPRouter {
                 return NetworkError.custom("알 수 없는 에러입니다.")
             }
         case .like:
-            return NetworkError.custom("\(statusCode)")
+            switch statusCode {
+            case 410:
+                return NetworkError.custom("삭제된 게시물입니다.")
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
         case .fetchPostOfReload:
             return NetworkError.custom("\(statusCode)")
         }
@@ -153,7 +158,7 @@ extension LSLPRouter {
 }
 
 
-enum NetworkError: Error {
+enum NetworkError: Equatable, Error {
     case responseError(String)
     case custom(String)
     case expiredAccessToken
@@ -176,7 +181,14 @@ enum NetworkError: Error {
     }
     
     var alertMessage: String {
-        "다시 시도해주세요"
+        switch self {
+        case .custom(let string):
+            "새로고침해주세요"
+        case .expiredAccessToken, .expiredRefreshToken:
+            "로그인 화면으로 이동합니다."
+        default:
+            "다시 시도해주세요"
+        }
     }
 }
 

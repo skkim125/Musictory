@@ -52,8 +52,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         
         return label
     }()
-
-    var song: Song?
+    
     var disposeBag = DisposeBag()
     
     override init(frame: CGRect) {
@@ -178,6 +177,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+//        configureUI()
         
         disposeBag = DisposeBag()
     }

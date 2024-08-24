@@ -19,6 +19,7 @@ final class UserDefaultsManager {
         case refreshT
         case email
         case password
+        case userNickname
     }
     
     var accessT: String {
@@ -63,6 +64,15 @@ final class UserDefaultsManager {
         }
         set {
             userDefaults.set(newValue, forKey: UserDefaultsKeys.userID.rawValue)
+        }
+    }
+    
+    var userNickname: String {
+        get {
+            userDefaults.string(forKey: UserDefaultsKeys.userNickname.rawValue) ?? ""
+        }
+        set {
+            userDefaults.set(newValue, forKey: UserDefaultsKeys.userNickname.rawValue)
         }
     }
 }

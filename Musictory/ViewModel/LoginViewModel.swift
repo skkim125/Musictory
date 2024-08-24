@@ -51,11 +51,13 @@ final class LoginViewModel: BaseViewModel {
                     switch result {
                     case .success(let success):
                         loginModel.accept(success)
+                        UserDefaultsManager.shared.userNickname = success.nick
                         UserDefaultsManager.shared.userID = success.userID
-                        UserDefaultsManager.shared.password = loginQuery.password
                         UserDefaultsManager.shared.email = success.email
                         UserDefaultsManager.shared.accessT = success.accessT
                         UserDefaultsManager.shared.refreshT = success.refreshT
+                        UserDefaultsManager.shared.password = loginQuery.password
+                        
                     case .failure(let failure):
                         switch failure {
                         case .expiredAccessToken:

@@ -34,6 +34,7 @@ final class SearchSongCollectionViewCell: UICollectionViewCell {
         let imgConfig = UIImage.SymbolConfiguration(paletteColors: [.systemGray6, .systemRed])
         configuration?.image = UIImage(systemName: "plus.circle.fill", withConfiguration: imgConfig)
         button.configuration = configuration
+        button.isUserInteractionEnabled = false
         
         return button
     }()
@@ -81,7 +82,7 @@ final class SearchSongCollectionViewCell: UICollectionViewCell {
         artistNameLabel.snp.makeConstraints { make in
             make.leading.equalTo(songTitleLabel)
             make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
-            make.trailing.greaterThanOrEqualTo(checkButton.snp.leading).inset(10)
+            make.trailing.equalTo(checkButton.snp.leading).inset(-10)
         }
     }
     

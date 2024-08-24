@@ -28,10 +28,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             window?.rootViewController = vc
         } else {
-            let vc = MusictoryHomeViewController()
-            let nav = UINavigationController(rootViewController: vc)
+            let vc = TabViewController()
             
-            window?.rootViewController = nav
+            window?.rootViewController = vc
         }
         
         window?.makeKeyAndVisible()

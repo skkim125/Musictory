@@ -80,10 +80,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
-                        print(#function, 3, success)
                         fetchNewPost.accept(())
                     case .failure(let error):
-                        print(#function, 3, error)
                         postLike.toggle()
                         networkError.accept(error)
                         showErrorAlert.accept(())
@@ -98,10 +96,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 LSLP_API.shared.callRequest(apiType: .fetchPostOfReload(owner.originalPosts[value].postID, PostQuery(next: nil)), decodingType: PostModel.self) { result in
                     switch result {
                     case .success(let post):
-                        print(#function, 4, owner.originalPosts[value])
-                        print(#function, 5, post.isLike)
+                        print(#function, 4, post.postID)
                         owner.originalPosts[value] = post
-                        print(#function, 6, owner.originalPosts[value])
                         posts.accept(owner.originalPosts)
                     case .failure(let error):
                         networkError.accept(error)

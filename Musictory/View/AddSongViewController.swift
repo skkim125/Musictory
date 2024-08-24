@@ -67,19 +67,25 @@ final class AddSongViewController: UIViewController {
         
         output.resultIsEmpty
             .bind(with: self) { owner, _ in
-                owner.showAlert(title: "검색 결과가 없습니다.", message: nil)
+                DispatchQueue.main.async {
+                    owner.showAlert(title: "검색 결과가 없습니다.", message: nil)
+                }
             }
             .disposed(by: disposeBag)
         
         output.showErrorAlert
             .bind(with: self) { owner, value in
-                owner.showAlert(title: value.1, message: value.2)
+                DispatchQueue.main.async {
+                    owner.showAlert(title: value.1, message: value.2)
+                }
             }
             .disposed(by: disposeBag)
         
         output.showSearchTextIsEmptyAlert
             .bind(with: self) { owner, _ in
-                owner.showAlert(title: "한글자 이상 입력해주세요", message: nil)
+                DispatchQueue.main.async {
+                    owner.showAlert(title: "한글자 이상 입력해주세요", message: nil)
+                }
             }
             .disposed(by: disposeBag)
         

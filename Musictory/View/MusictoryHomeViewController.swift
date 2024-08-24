@@ -14,21 +14,24 @@ import MusicKit
 import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
-    private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
+    let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
+    
+    let fetchPost = PublishRelay<Void>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
         bind()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView), name: Notification.Name(rawValue: "updatePost"), object: nil)
     }
     
     private func configureView() {
         self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.label, .font: UIFont.boldSystemFont(ofSize: 25)]
         navigationItem.title = "Musictory"
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "square.and.pencil"), style: .plain, target: nil, action: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
         navigationController?.navigationBar.tintColor = .systemRed
         
         view.backgroundColor = .systemBackground
@@ -42,7 +45,6 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     private func bind() {
-        let fetchPost = PublishRelay<Void>()
         let checkRefreshToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
         let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken, likePostIndex: likePostIndex)
@@ -52,14 +54,17 @@ final class MusictoryHomeViewController: UIViewController {
         checkRefreshToken.accept(())
         
         output.showErrorAlert
-            .bind(with: self) { owner, _ in
-                self.showAlert(title: NetworkError.expiredRefreshToken.title, message: NetworkError.expiredRefreshToken.alertMessage) {
-                    UserDefaultsManager.shared.accessT = ""
-                    UserDefaultsManager.shared.refreshT = ""
-                    UserDefaultsManager.shared.userID = ""
-                    
-                    let vc = LogInViewController()
-                    self.setRootViewController(vc)
+            .withLatestFrom(output.networkError)
+            .bind(with: self) { owner, error in
+                self.showAlert(title: error.title, message: error.alertMessage) {
+                    if error == NetworkError.expiredRefreshToken {
+                        UserDefaultsManager.shared.accessT = ""
+                        UserDefaultsManager.shared.refreshT = ""
+                        UserDefaultsManager.shared.userID = ""
+                        
+                        let vc = LogInViewController()
+                        self.setRootViewController(vc)
+                    }
                 }
             }
             .disposed(by: disposeBag)
@@ -90,41 +95,47 @@ final class MusictoryHomeViewController: UIViewController {
                         .disposed(by: cell.disposeBag)
                 }
                 
-                output.newPost
-                    .bind(with: self) { owner, model in
-                        print("model =", model)
-                        cell.configureLikeButtonUI(like: model.isLike)
-                    }
-                    .disposed(by: cell.disposeBag)
-                
                 cell.layer.cornerRadius = 12
                 cell.clipsToBounds = true
             }
             .disposed(by: disposeBag)
         
-        navigationItem.leftBarButtonItem?.rx.tap
+        navigationItem.rightBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
                 let vc = UIViewController()
                 vc.view.backgroundColor = .systemBackground
                 vc.navigationItem.title = owner.viewModel.loginUser?.nick
+                print(owner.viewModel.loginUser?.nick)
                 
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
         
-        navigationItem.rightBarButtonItem?.rx.tap
+        updateCollectionView()
+    }
+    
+    @objc func updateCollectionView() {
+        let refreshControl = UIRefreshControl()
+        refreshControl.endRefreshing()
+        postCollectionView.rx.refreshControl.onNext(refreshControl)
+        
+        let refreshLoading = PublishRelay<Bool>()
+        
+        refreshControl.rx.controlEvent(.valueChanged)
             .bind(with: self) { owner, _ in
-                let vc = WriteMusictoryViewController()
                 
-                vc.bindData = {
-                    owner.postCollectionView.reloadData()
-                    fetchPost.accept(())
+                refreshLoading.accept(true)
+                
+                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
+                    owner.fetchPost.accept(())
+                    
+                    refreshLoading.accept(false)
                 }
-                
-                let nav = UINavigationController(rootViewController: vc)
-                nav.modalPresentationStyle = .fullScreen
-                owner.present(nav, animated: true)
             }
+            .disposed(by: disposeBag)
+        
+        refreshLoading
+            .bind(to: refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
     }
 }
