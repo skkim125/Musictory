@@ -14,6 +14,7 @@ enum LSLPRouter {
     case writePost(WritePostQuery)
     case refresh
     case like(String, LikeQuery)
+    case fetchProfile
 }
 
 extension LSLPRouter {
@@ -26,7 +27,7 @@ extension LSLPRouter {
         switch self {
         case .login, .writePost, .like:
             "POST"
-        case .fetchPost, .fetchPostOfReload, .refresh:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh:
             "GET"
         }
     }
@@ -43,6 +44,8 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/\(id)/like"
         case .fetchPostOfReload(let id, _):
             APIPath.fetchPost.rawValue + "/\(id)"
+        case .fetchProfile:
+            APIPath.fetchProfile.rawValue
         }
     }
     
@@ -53,7 +56,7 @@ extension LSLPRouter {
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .fetchPost, .fetchPostOfReload:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT
@@ -152,6 +155,10 @@ extension LSLPRouter {
                 return NetworkError.custom("\(statusCode)")
             }
         case .fetchPostOfReload:
+            return NetworkError.custom("\(statusCode)")
+            
+        case .fetchProfile:
+            print(statusCode)
             return NetworkError.custom("\(statusCode)")
         }
     }

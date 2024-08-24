@@ -10,6 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import RxGesture
+import RxDataSources
 import MusicKit
 import MediaPlayer
 
@@ -19,13 +20,12 @@ final class MusictoryHomeViewController: UIViewController {
     let disposeBag = DisposeBag()
     
     let fetchPost = PublishRelay<Void>()
+    private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
         bind()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView), name: Notification.Name(rawValue: "updatePost"), object: nil)
     }
     
     private func configureView() {
@@ -42,6 +42,8 @@ final class MusictoryHomeViewController: UIViewController {
         }
         
         postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView), name: Notification.Name(rawValue: "updatePost"), object: nil)
     }
     
     private func bind() {
@@ -69,35 +71,45 @@ final class MusictoryHomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        output.posts
-            .bind(to: postCollectionView.rx.items(cellIdentifier: PostCollectionViewCell.identifier, cellType: PostCollectionViewCell.self)) { item, value, cell in
-                Task {
-                    let song = try await MusicManager.shared.requsetMusicId(id: value.content1)
-                    
-                    cell.configureCell(post: value, song: song)
-                    
-                    cell.likeButton.rx.tap
-                        .map({
-                            print(#function, item)
-                           return item
-                        })
-                        .bind(to: likePostIndex)
-                        .disposed(by: cell.disposeBag)
-                    
-                    cell.songView.rx
-                        .tapGesture()
-                        .when(.recognized)
-                        .bind(with: self) { owner, _ in
-                            owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                MusicManager.shared.playSong(song: song)
-                            }
-                        }
-                        .disposed(by: cell.disposeBag)
-                }
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { _, collectionView, indexPath, item in
+            
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
+            
+            Task {
+                let song = try await MusicManager.shared.requsetMusicId(id: item.content1)
                 
-                cell.layer.cornerRadius = 12
-                cell.clipsToBounds = true
+                cell.configureCell(post: item, song: song)
+                
+                cell.songView.rx
+                    .tapGesture()
+                    .when(.recognized)
+                    .bind(with: self) { owner, _ in
+                        owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                            MusicManager.shared.playSong(song: song)
+                        }
+                    }
+                    .disposed(by: cell.disposeBag)
             }
+            
+            let post = item.likes.contains(where: { $0 == UserDefaultsManager.shared.userID })
+            cell.isLike = post
+            
+            cell.likeButton.rx.tap
+                .map({
+                    return indexPath.item
+                })
+                .bind(to: likePostIndex)
+                .disposed(by: cell.disposeBag)
+            
+            cell.layer.cornerRadius = 12
+            cell.clipsToBounds = true
+            
+            return cell
+        })
+        
+        output.posts
+            .map({ [SectionModel(model: "", items: $0)] })
+            .bind(to: postCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
         navigationItem.rightBarButtonItem?.rx.tap
@@ -111,31 +123,29 @@ final class MusictoryHomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        updateCollectionView()
+        updateCollectionViewMethod()
     }
     
-    @objc func updateCollectionView() {
-        let refreshControl = UIRefreshControl()
-        refreshControl.endRefreshing()
+    @objc func updateCollectionView(_: NotificationCenter) {
+        updateCollectionViewMethod()
+    }
+    
+    func updateCollectionViewMethod() {
         postCollectionView.rx.refreshControl.onNext(refreshControl)
         
-        let refreshLoading = PublishRelay<Bool>()
+        let refreshLoading = PublishRelay<Void>()
         
         refreshControl.rx.controlEvent(.valueChanged)
             .bind(with: self) { owner, _ in
-                
-                refreshLoading.accept(true)
+                owner.refreshControl.rx.isRefreshing.onNext(true)
+                refreshLoading.accept(())
                 
                 DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
                     owner.fetchPost.accept(())
-                    
-                    refreshLoading.accept(false)
+                    owner.refreshControl.endRefreshing()
+                    owner.refreshControl.rx.isRefreshing.onNext(false)
                 }
             }
-            .disposed(by: disposeBag)
-        
-        refreshLoading
-            .bind(to: refreshControl.rx.isRefreshing)
             .disposed(by: disposeBag)
     }
 }

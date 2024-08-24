@@ -27,6 +27,10 @@
 		045833DA2C787125000D6E81 /* LikeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D92C787125000D6E81 /* LikeModel.swift */; };
 		045833DC2C78F86C000D6E81 /* TabViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833DB2C78F86C000D6E81 /* TabViewController.swift */; };
 		045833DE2C79979E000D6E81 /* MyPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833DD2C79979E000D6E81 /* MyPageViewController.swift */; };
+		045833E12C79CF5A000D6E81 /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 045833E02C79CF5A000D6E81 /* Differentiator */; };
+		045833E32C79CF5A000D6E81 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 045833E22C79CF5A000D6E81 /* RxDataSources */; };
+		045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */; };
+		045833E72C79DF27000D6E81 /* ProfileModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833E62C79DF27000D6E81 /* ProfileModel.swift */; };
 		048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */; };
 		048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDD92C6F9C92000F5293 /* RxCocoa */; };
 		048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 048DFDDB2C6F9C92000F5293 /* RxSwift */; };
@@ -76,6 +80,8 @@
 		045833D92C787125000D6E81 /* LikeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeModel.swift; sourceTree = "<group>"; };
 		045833DB2C78F86C000D6E81 /* TabViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViewController.swift; sourceTree = "<group>"; };
 		045833DD2C79979E000D6E81 /* MyPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewController.swift; sourceTree = "<group>"; };
+		045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageViewModel.swift; sourceTree = "<group>"; };
+		045833E62C79DF27000D6E81 /* ProfileModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModel.swift; sourceTree = "<group>"; };
 		048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogInViewController.swift; sourceTree = "<group>"; };
 		048DFDDF2C70F012000F5293 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		048DFDE32C70F04F000F5293 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
@@ -108,10 +114,12 @@
 				048DFDDA2C6F9C92000F5293 /* RxCocoa in Frameworks */,
 				04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */,
 				045833912C74C145000D6E81 /* RxGesture in Frameworks */,
+				045833E32C79CF5A000D6E81 /* RxDataSources in Frameworks */,
 				04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */,
 				04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */,
 				04E4306A2C6E1903007FA9C6 /* Kingfisher in Frameworks */,
 				04E430662C6E18EC007FA9C6 /* SnapKit in Frameworks */,
+				045833E12C79CF5A000D6E81 /* Differentiator in Frameworks */,
 				048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -153,10 +161,10 @@
 				045833DB2C78F86C000D6E81 /* TabViewController.swift */,
 				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
 				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
-				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
 				045833B82C75E536000D6E81 /* WriteMusictoryViewController.swift */,
 				045833C02C763CC9000D6E81 /* AddSongViewController.swift */,
 				045833D12C773B57000D6E81 /* AddPhotoViewController.swift */,
+				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
 				0458338E2C74B016000D6E81 /* Cell */,
 			);
 			path = View;
@@ -169,6 +177,7 @@
 				048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */,
 				045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */,
 				045833CB2C77264B000D6E81 /* AddSongViewModel.swift */,
+				045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -202,6 +211,7 @@
 				048DFDFE2C736423000F5293 /* CommentModel.swift */,
 				045833B02C75A192000D6E81 /* RefreshModel.swift */,
 				045833D92C787125000D6E81 /* LikeModel.swift */,
+				045833E62C79DF27000D6E81 /* ProfileModel.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -279,6 +289,8 @@
 				048DFDD92C6F9C92000F5293 /* RxCocoa */,
 				048DFDDB2C6F9C92000F5293 /* RxSwift */,
 				045833902C74C145000D6E81 /* RxGesture */,
+				045833E02C79CF5A000D6E81 /* Differentiator */,
+				045833E22C79CF5A000D6E81 /* RxDataSources */,
 			);
 			productName = Musictory;
 			productReference = 04E430472C6CF68E007FA9C6 /* Musictory.app */;
@@ -316,6 +328,7 @@
 				04E430712C6E2142007FA9C6 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
 				048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */,
+				045833DF2C79CF5A000D6E81 /* XCRemoteSwiftPackageReference "RxDataSources" */,
 			);
 			productRefGroup = 04E430482C6CF68E007FA9C6 /* Products */;
 			projectDirPath = "";
@@ -350,6 +363,7 @@
 				045833BB2C7620F6000D6E81 /* DateFormatter+Extension.swift in Sources */,
 				048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */,
 				048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */,
+				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,
@@ -366,6 +380,7 @@
 				045833DE2C79979E000D6E81 /* MyPageViewController.swift in Sources */,
 				045833B62C75C0E7000D6E81 /* UIViewController+Extension.swift in Sources */,
 				045833CC2C77264B000D6E81 /* AddSongViewModel.swift in Sources */,
+				045833E72C79DF27000D6E81 /* ProfileModel.swift in Sources */,
 				045833D82C786FE1000D6E81 /* LikeQuery.swift in Sources */,
 				045833892C74AF14000D6E81 /* PostQuery.swift in Sources */,
 				045833D62C774F3E000D6E81 /* WritePostQuery.swift in Sources */,
@@ -612,6 +627,14 @@
 				minimumVersion = 4.0.4;
 			};
 		};
+		045833DF2C79CF5A000D6E81 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
 		048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -667,6 +690,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */;
 			productName = RxGesture;
+		};
+		045833E02C79CF5A000D6E81 /* Differentiator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 045833DF2C79CF5A000D6E81 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = Differentiator;
+		};
+		045833E22C79CF5A000D6E81 /* RxDataSources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 045833DF2C79CF5A000D6E81 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
 		};
 		048DFDD92C6F9C92000F5293 /* RxCocoa */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -53,6 +53,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    var isLike: Bool?
     var disposeBag = DisposeBag()
     
     override init(frame: CGRect) {
@@ -130,6 +131,8 @@ final class PostCollectionViewCell: UICollectionViewCell {
             make.leading.equalTo(commentImageView.snp.trailing).offset(5)
             make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
         }
+        
+        configureUI()
     }
     
     required init?(coder: NSCoder) {
@@ -137,7 +140,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
     }
     
     func configureCell(post: PostModel, song: Song) {
-        configureUI()
         
         if let url = URL(string: post.creator.profileImage ?? "") {
             userImageView.kf.setImage(with: url)
@@ -152,8 +154,17 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
         likeCountLabel.text = post.likes.count.formatted(.number)
         commentCountLabel.text = post.comments.count.formatted(.number)
-        configureLikeButtonUI(like: post.isLike)
         songView.configureUI(song: song)
+        
+        configureLikeButton(isLike: isLike ?? false)
+    }
+    
+    private func configureLikeButton(isLike: Bool) {
+        likeButton.isSelected = isLike
+        
+        let imageConfiguration = UIImage.SymbolConfiguration(font: UIFont.systemFont(ofSize: 20, weight: .semibold))
+        likeButton.tintColor = likeButton.isSelected ? .systemRed : .label
+        likeButton.setImage(UIImage(systemName: likeButton.isSelected ? "heart.fill" : "heart")?.withConfiguration(imageConfiguration), for: .normal)
     }
     
     private func configureUI() {
@@ -167,17 +178,20 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postCreateAtLabel.textAlignment = .left
         
         commentImageView.image = UIImage(systemName: "bubble.right")
-    }
-    
-    func configureLikeButtonUI(like: Bool) {
-        let imageConfiguration = UIImage.SymbolConfiguration(font: UIFont.systemFont(ofSize: 20, weight: .semibold))
-        likeButton.tintColor = like ? .systemRed : .label
-        likeButton.setImage(UIImage(systemName: like ? "heart.fill" : "heart")?.withConfiguration(imageConfiguration), for: .normal)
+        
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-//        configureUI()
+        
+        songView.songImageView.image = UIImage(systemName: "")
+        songView.songTitleLabel.text = nil
+        songView.songArtistLabel.text = nil
+        songView.songPlayButton.imageView?.image = UIImage(systemName: "")
+        userNicknameLabel.text = nil
+        postTitleLabel.text = nil
+        postContentLabel.text = nil
+        postCreateAtLabel.text = nil
         
         disposeBag = DisposeBag()
     }

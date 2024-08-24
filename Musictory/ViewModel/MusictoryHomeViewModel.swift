@@ -21,7 +21,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
     }
     
     struct Output {
-        let posts: PublishRelay<[PostModel]>
+        let posts: BehaviorRelay<[PostModel]>
         let newPost: PublishRelay<PostModel>
         let showErrorAlert: PublishRelay<Void>
         let networkError: PublishRelay<NetworkError>
@@ -31,7 +31,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let showErrorAlert = PublishRelay<Void>()
         let fetchPost = input.fetchPost
         var nextCursor = ""
-        let posts = PublishRelay<[PostModel]>()
+        let posts = BehaviorRelay<[PostModel]>(value: originalPosts)
         let fetchNewPost = PublishRelay<Void>()
         let newPost = PublishRelay<PostModel>()
         let networkError = PublishRelay<NetworkError>()
@@ -60,7 +60,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     switch result {
                     case .success(let success):
                         owner.originalPosts = success.data
-                        posts.accept(success.data)
+                        posts.accept(owner.originalPosts)
                         nextCursor = success.nextCursor ?? ""
                     case .failure(let failure):
                         print(failure)
@@ -71,35 +71,38 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.likePostIndex
             .bind(with: self) { owner, value in
-                print(#function, 1, owner.originalPosts[value].isLike)
-                var postLike = owner.originalPosts[value].isLike
-                postLike.toggle()
-                print(#function, 2, postLike)
-                let likeQuery = LikeQuery(like_status: postLike)
+                var updatedPost = owner.originalPosts[value]
+                
+                let isLike = updatedPost.likes.contains(where: { $0 == UserDefaultsManager.shared.userID })
+                
+                if isLike {
+                    updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
+                } else {
+                    updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                }
+                
+                owner.originalPosts[value] = updatedPost
+                let likeQuery = LikeQuery(like_status: isLike)
                 
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
-                        fetchNewPost.accept(())
+                        print(#function, 3, owner.originalPosts[value].postID)
+                        var currentPosts = owner.originalPosts
+                        currentPosts[value] = updatedPost
+                        posts.accept(currentPosts)
+                        
                     case .failure(let error):
-                        postLike.toggle()
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-        
-        fetchNewPost
-            .withLatestFrom(input.likePostIndex)
-            .bind(with: self) { owner, value in
-                LSLP_API.shared.callRequest(apiType: .fetchPostOfReload(owner.originalPosts[value].postID, PostQuery(next: nil)), decodingType: PostModel.self) { result in
-                    switch result {
-                    case .success(let post):
-                        print(#function, 4, post.postID)
-                        owner.originalPosts[value] = post
-                        posts.accept(owner.originalPosts)
-                    case .failure(let error):
+                        if !isLike {
+                            updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
+                        } else {
+                            updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                        }
+                        owner.originalPosts[value] = updatedPost
+                        
+                        var currentPosts = owner.originalPosts
+                        currentPosts[value] = updatedPost
+                        posts.accept(currentPosts)
                         networkError.accept(error)
                         showErrorAlert.accept(())
                     }

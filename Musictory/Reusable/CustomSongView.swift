@@ -12,7 +12,7 @@ import RxSwift
 import RxCocoa
 
 final class CustomSongView: UIView {
-    private let songImageView = {
+    let songImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
@@ -24,14 +24,14 @@ final class CustomSongView: UIView {
         return imageView
     }()
     
-    private let songTitleLabel = {
+    let songTitleLabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16)
         
         return label
     }()
     
-    private let songArtistLabel = {
+    let songArtistLabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         
