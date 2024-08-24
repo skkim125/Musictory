@@ -44,7 +44,7 @@ final class TabViewController: UITabBarController {
         let vc = WriteMusictoryViewController()
         
         let nav = UINavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .fullScreen
+        nav.modalPresentationStyle = .pageSheet
         self.present(nav, animated: true)
     }
 }

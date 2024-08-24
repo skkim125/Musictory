@@ -179,9 +179,7 @@ final class WriteMusictoryViewController: UIViewController {
         
         output.postingEnd
             .bind(with: self) { owner, _ in
-                print("Posting notification for updatePost")
                 owner.showAlert(title: "성공적으로 기록되었습니다.", message: "") {
-                    print("Posting notification for updatePost")
                     NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: "updatePost")))
                     owner.dismiss(animated: true)
                 }

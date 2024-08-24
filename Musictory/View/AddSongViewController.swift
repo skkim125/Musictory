@@ -36,9 +36,10 @@ final class AddSongViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: nil, action: nil)
         navigationItem.rx.searchController.onNext(searchViewController)
         searchViewController.searchBar.rx.searchBarStyle.onNext(.minimal)
-        searchViewController.searchBar.returnKeyType = .search
-        searchViewController.hidesNavigationBarDuringPresentation = true
+        searchViewController.searchBar.searchTextField.rx.returnKeyType.onNext(.search)
+        searchViewController.rx.hidesNavigationBarDuringPresentation.onNext(false)
         searchViewController.searchBar.placeholder = "뮤직토리에 남길 노래를 검색해보세요"
+        navigationItem.rx.hidesSearchBarWhenScrolling.onNext(false)
         
         view.backgroundColor = .systemBackground
         

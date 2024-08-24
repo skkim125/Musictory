@@ -21,6 +21,7 @@ final class MusictoryHomeViewController: UIViewController {
     
     let fetchPost = PublishRelay<Void>()
     private var refreshControl = UIRefreshControl()
+    private let refreshLoading = PublishRelay<Void>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,7 +44,7 @@ final class MusictoryHomeViewController: UIViewController {
         
         postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView), name: Notification.Name(rawValue: "updatePost"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
     }
     
     private func bind() {
@@ -78,8 +79,15 @@ final class MusictoryHomeViewController: UIViewController {
             cell.configureCell(post: item)
             
             Task {
+                let group = DispatchGroup()
+                
+                group.enter()
                 let song = try await MusicManager.shared.requsetMusicId(id: item.content1)
-                cell.songView.configureUI(song: song)
+                group.leave()
+                
+                group.notify(queue: .main) {
+                    cell.songView.configureUI(song: song)
+                }
                 
                 cell.songView.rx
                     .tapGesture()
@@ -112,38 +120,37 @@ final class MusictoryHomeViewController: UIViewController {
         
         navigationItem.rightBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
-                let vc = UIViewController()
-                vc.view.backgroundColor = .systemBackground
-                vc.navigationItem.title = owner.viewModel.loginUser?.nick
-                print(owner.viewModel.loginUser?.nick)
-                
-                owner.navigationController?.pushViewController(vc, animated: true)
+                let vc = MusictoryMapViewController()
+                let nav = UINavigationController(rootViewController: vc)
+                nav.modalPresentationStyle = .fullScreen
+                owner.present(nav, animated: true)
             }
             .disposed(by: disposeBag)
+        
+        postCollectionView.rx.refreshControl.onNext(refreshControl)
         
         updateCollectionViewMethod()
     }
     
-    @objc func updateCollectionView(_: NotificationCenter) {
+    @objc func updateCollectionView(_ notification: Notification) {
         updateCollectionViewMethod()
     }
     
     func updateCollectionViewMethod() {
-        postCollectionView.rx.refreshControl.onNext(refreshControl)
-        
-        let refreshLoading = PublishRelay<Void>()
+        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
+        refreshControl.beginRefreshing()
         
         refreshControl.rx.controlEvent(.valueChanged)
             .bind(with: self) { owner, _ in
-                owner.refreshControl.rx.isRefreshing.onNext(true)
-                refreshLoading.accept(())
-                
                 DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
                     owner.fetchPost.accept(())
                     owner.refreshControl.endRefreshing()
-                    owner.refreshControl.rx.isRefreshing.onNext(false)
                 }
             }
             .disposed(by: disposeBag)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }

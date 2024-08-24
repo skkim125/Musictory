@@ -26,7 +26,7 @@ class CustomButton: UIButton {
     
     private func configureButton() {
         var configuration = UIButton.Configuration.bordered()
-        configuration.baseBackgroundColor = .systemGray6
+        configuration.baseBackgroundColor = .systemGray5
         configuration.titleAlignment = .leading
         
         self.configuration = configuration
