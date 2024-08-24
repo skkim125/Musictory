@@ -75,10 +75,11 @@ final class MusictoryHomeViewController: UIViewController {
             
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
+            cell.configureCell(post: item)
+            
             Task {
                 let song = try await MusicManager.shared.requsetMusicId(id: item.content1)
-                
-                cell.configureCell(post: item, song: song)
+                cell.songView.configureUI(song: song)
                 
                 cell.songView.rx
                     .tapGesture()
@@ -90,9 +91,6 @@ final class MusictoryHomeViewController: UIViewController {
                     }
                     .disposed(by: cell.disposeBag)
             }
-            
-            let post = item.likes.contains(where: { $0 == UserDefaultsManager.shared.userID })
-            cell.isLike = post
             
             cell.likeButton.rx.tap
                 .map({

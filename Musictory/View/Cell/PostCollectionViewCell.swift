@@ -53,7 +53,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    var isLike: Bool?
     var disposeBag = DisposeBag()
     
     override init(frame: CGRect) {
@@ -139,7 +138,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureCell(post: PostModel, song: Song) {
+    func configureCell(post: PostModel) {
         
         if let url = URL(string: post.creator.profileImage ?? "") {
             userImageView.kf.setImage(with: url)
@@ -154,10 +153,11 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
         likeCountLabel.text = post.likes.count.formatted(.number)
         commentCountLabel.text = post.comments.count.formatted(.number)
-        songView.configureUI(song: song)
         
-        configureLikeButton(isLike: isLike ?? false)
+        configureLikeButton(isLike: post.likes.contains(UserDefaultsManager.shared.userID))
     }
+    
+    
     
     private func configureLikeButton(isLike: Bool) {
         likeButton.isSelected = isLike

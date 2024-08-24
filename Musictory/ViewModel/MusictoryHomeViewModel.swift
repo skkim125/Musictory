@@ -72,37 +72,37 @@ final class MusictoryHomeViewModel: BaseViewModel {
         input.likePostIndex
             .bind(with: self) { owner, value in
                 var updatedPost = owner.originalPosts[value]
+                print(#function, 3, updatedPost.likes)
                 
-                let isLike = updatedPost.likes.contains(where: { $0 == UserDefaultsManager.shared.userID })
+                var isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
+                print(#function, 3, isLike)
                 
                 if isLike {
                     updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
                 } else {
                     updatedPost.likes.append(UserDefaultsManager.shared.userID)
                 }
-                
+                isLike.toggle()
+                print(#function, 33, isLike)
                 owner.originalPosts[value] = updatedPost
                 let likeQuery = LikeQuery(like_status: isLike)
                 
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
+                        print(#function, 3, success)
                         print(#function, 3, owner.originalPosts[value].postID)
-                        var currentPosts = owner.originalPosts
-                        currentPosts[value] = updatedPost
-                        posts.accept(currentPosts)
+                        owner.originalPosts[value] = updatedPost
+                        posts.accept(owner.originalPosts)
                         
                     case .failure(let error):
-                        if !isLike {
+                        if isLike {
                             updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
                         } else {
                             updatedPost.likes.append(UserDefaultsManager.shared.userID)
                         }
                         owner.originalPosts[value] = updatedPost
-                        
-                        var currentPosts = owner.originalPosts
-                        currentPosts[value] = updatedPost
-                        posts.accept(currentPosts)
+                        posts.accept(owner.originalPosts)
                         networkError.accept(error)
                         showErrorAlert.accept(())
                     }
