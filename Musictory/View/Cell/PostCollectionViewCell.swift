@@ -138,16 +138,35 @@ final class PostCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureCell(post: PostModel) {
+    func configureCell( _ viewType: ViewType, post: PostModel) {
         
-        if let url = URL(string: post.creator.profileImage ?? "") {
-            userImageView.kf.setImage(with: url)
-        } else {
-            userImageView.image = UIImage(systemName: "person.circle")
-            userImageView.tintColor = .systemRed
+        switch viewType {
+        case .home:
+            if let url = URL(string: post.creator.profileImage ?? "") {
+                userImageView.kf.setImage(with: url)
+            } else {
+                userImageView.image = UIImage(systemName: "person.circle")
+                userImageView.tintColor = .systemRed
+            }
+            userNicknameLabel.text = post.creator.nickname
+        case .myPage:
+            userImageView.isHidden = true
+            userNicknameLabel.isHidden = true
+            
+            postTitleLabel.snp.makeConstraints { make in
+                make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
+                make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+                make.height.equalTo(20)
+            }
+            
+            postCreateAtLabel.snp.remakeConstraints { make in
+                make.centerY.equalTo(postTitleLabel.snp.centerY)
+                make.leading.equalTo(postTitleLabel.snp.trailing).offset(10)
+                make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
+                make.width.equalTo(120)
+            }
         }
-
-        userNicknameLabel.text = post.creator.nickname
         postTitleLabel.text = post.title
         postContentLabel.text = post.content
         postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
@@ -184,10 +203,10 @@ final class PostCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        songView.songImageView.image = UIImage(systemName: "")
+//        songView.songImageView.image = UIImage(systemName: "")
         songView.songTitleLabel.text = nil
         songView.songArtistLabel.text = nil
-        songView.songPlayButton.imageView?.image = UIImage(systemName: "")
+//        songView.songPlayButton.imageView?.image = UIImage(systemName: "")
         userNicknameLabel.text = nil
         postTitleLabel.text = nil
         postContentLabel.text = nil

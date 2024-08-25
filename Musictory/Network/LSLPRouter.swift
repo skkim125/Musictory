@@ -15,6 +15,8 @@ enum LSLPRouter {
     case refresh
     case like(String, LikeQuery)
     case fetchProfile
+    case fetchMyPost(PostQuery)
+    case uploadImage(Data, String)
 }
 
 extension LSLPRouter {
@@ -25,9 +27,9 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost, .like:
+        case .login, .writePost, .like, .uploadImage:
             "POST"
-        case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
             "GET"
         }
     }
@@ -46,6 +48,10 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/\(id)"
         case .fetchProfile:
             APIPath.fetchProfile.rawValue
+        case .uploadImage:
+            APIPath.fetchPost.rawValue + "/files"
+        case .fetchMyPost:
+            APIPath.fetchPost.rawValue + "/users" + "/\(UserDefaultsManager.shared.userID)"
         }
     }
     
@@ -56,7 +62,7 @@ extension LSLPRouter {
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .fetchPost, .fetchPostOfReload, .fetchProfile:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .fetchMyPost:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT
@@ -74,12 +80,18 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
+        case .uploadImage(_, let boundary): // UUID().uuidString
+            [
+                APIHeader.sesac.rawValue: APIKey.key,
+                APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
+                APIHeader.contentType.rawValue: APIHeader.multipart.rawValue + "; boundaryBoundary-\(boundary)"
+            ]
         }
     }
     
     var parameters: [URLQueryItem]? {
         switch self {
-        case .fetchPost(let postQuery), .fetchPostOfReload(_, let postQuery):
+        case .fetchPost(let postQuery), .fetchPostOfReload(_, let postQuery), .fetchMyPost(let postQuery):
             return [
                 URLQueryItem(name: "product_id", value: postQuery.product_id),
                 URLQueryItem(name: "limit", value: postQuery.limit),
@@ -100,6 +112,17 @@ extension LSLPRouter {
             return try? encoder.encode(writePostQuery)
         case .like(_, let likeQuery):
             return try? encoder.encode(likeQuery)
+        case .uploadImage(let image, let boundary):
+            var body = Data()
+            
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+            body.append(image)
+            body.append("\r\n".data(using: .utf8)!)
+            body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+            
+            return body
         default:
             return nil
         }
@@ -155,9 +178,17 @@ extension LSLPRouter {
                 return NetworkError.custom("\(statusCode)")
             }
         case .fetchPostOfReload:
+            print(statusCode)
             return NetworkError.custom("\(statusCode)")
             
         case .fetchProfile:
+            print(statusCode)
+            return NetworkError.custom("\(statusCode)")
+            
+        case .uploadImage:
+            print(statusCode)
+            return NetworkError.custom("\(statusCode)")
+        case .fetchMyPost(_):
             print(statusCode)
             return NetworkError.custom("\(statusCode)")
         }
@@ -189,7 +220,7 @@ enum NetworkError: Equatable, Error {
     
     var alertMessage: String {
         switch self {
-        case .custom(let string):
+        case .custom:
             "새로고침해주세요"
         case .expiredAccessToken, .expiredRefreshToken:
             "로그인 화면으로 이동합니다."

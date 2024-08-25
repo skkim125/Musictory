@@ -15,7 +15,7 @@ import MusicKit
 import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
-    let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
+    let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.home))
     let viewModel = MusictoryHomeViewModel()
     let disposeBag = DisposeBag()
     
@@ -76,7 +76,7 @@ final class MusictoryHomeViewController: UIViewController {
             
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
-            cell.configureCell(post: item)
+            cell.configureCell(.home, post: item)
             
             Task {
                 let group = DispatchGroup()

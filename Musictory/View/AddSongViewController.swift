@@ -15,7 +15,7 @@ final class AddSongViewController: UIViewController {
     private let searchViewController = UISearchController(searchResultsController: nil)
     
     private let searchResultCollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout())
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.home))
         cv.register(SearchSongCollectionViewCell.self, forCellWithReuseIdentifier: SearchSongCollectionViewCell.identifier)
         
         return cv

@@ -9,7 +9,7 @@ import Foundation
 
 struct fetchPostModel: Decodable {
     let data: [PostModel]
-    let nextCursor: String?
+    let nextCursor: String
     
     enum CodingKeys: String, CodingKey {
         case data
