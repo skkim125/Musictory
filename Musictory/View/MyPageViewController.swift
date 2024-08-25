@@ -47,7 +47,8 @@ final class MyPageViewController: UIViewController {
         let loadMyProfile = PublishRelay<Void>()
         let loadMyPost = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
-        let input = MyPageViewModel.Input(loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex)
+        let prefetching = PublishRelay<Bool>()
+        let input = MyPageViewModel.Input(loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
 
         loadMyProfile.accept(())
@@ -107,6 +108,26 @@ final class MyPageViewController: UIViewController {
         
         output.myPageData
             .bind(to: myPostCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        let indexPaths = PublishRelay<[IndexPath]>()
+        myPostCollectionView.rx.prefetchItems
+            .bind(to: indexPaths)
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(indexPaths, output.myPosts)
+            .map { (indexPaths, posts) in
+                print("row = ", indexPaths.first?.row)
+                for indexPath in indexPaths {
+                    if posts.count - 6 == indexPath.item {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                return false
+            }
+            .bind(to: prefetching)
             .disposed(by: disposeBag)
         
         output.showErrorAlert

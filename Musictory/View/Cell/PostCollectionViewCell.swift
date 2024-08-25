@@ -203,10 +203,9 @@ final class PostCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-//        songView.songImageView.image = UIImage(systemName: "")
+        songView.songImageView.image = UIImage(systemName: "")
         songView.songTitleLabel.text = nil
         songView.songArtistLabel.text = nil
-//        songView.songPlayButton.imageView?.image = UIImage(systemName: "")
         userNicknameLabel.text = nil
         postTitleLabel.text = nil
         postContentLabel.text = nil

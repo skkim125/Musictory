@@ -18,6 +18,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let fetchPost: PublishRelay<Void>
         let checkRefreshToken: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
+        let prefetching: PublishRelay<Bool>
     }
     
     struct Output {
@@ -30,7 +31,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
     func transform(input: Input) -> Output {
         let showErrorAlert = PublishRelay<Void>()
         let fetchPost = input.fetchPost
-        var nextCursor = ""
+        var nextCursor = "0"
         let posts = BehaviorRelay<[PostModel]>(value: originalPosts)
         let fetchNewPost = PublishRelay<Void>()
         let newPost = PublishRelay<PostModel>()
@@ -41,11 +42,11 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
                     switch result {
                     case .success(let success):
-                        print(#function)
-                        print(#function, 1, UserDefaultsManager.shared.accessT)
+//                        print(#function)
+//                        print(#function, 1, UserDefaultsManager.shared.accessT)
                         UserDefaultsManager.shared.accessT = success.accessToken
-                        print(#function, 2, UserDefaultsManager.shared.accessT)
-                        print(#function, 2, UserDefaultsManager.shared.userID)
+//                        print(#function, 2, UserDefaultsManager.shared.accessT)
+//                        print(#function, 2, UserDefaultsManager.shared.userID)
                     case .failure(let error):
                         networkError.accept(error)
                         showErrorAlert.accept(())
@@ -56,12 +57,18 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         fetchPost
             .bind(with: self) { owner, _ in
+                nextCursor = "0"
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let success):
                         owner.originalPosts = success.data
                         posts.accept(owner.originalPosts)
-                        nextCursor = success.nextCursor ?? ""
+                        print(#function, 1, success.nextCursor)
+                        print(#function, 2, nextCursor)
+                        if success.nextCursor != "0" {
+                            nextCursor = success.nextCursor
+                            print(#function, 3, nextCursor)
+                        }
                     case .failure(let failure):
                         print(failure)
                     }
@@ -72,10 +79,10 @@ final class MusictoryHomeViewModel: BaseViewModel {
         input.likePostIndex
             .bind(with: self) { owner, value in
                 var updatedPost = owner.originalPosts[value]
-                print(#function, 3, updatedPost.likes)
+//                print(#function, 3, updatedPost.likes)
                 
                 var isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
-                print(#function, 3, isLike)
+//                print(#function, 3, isLike)
                 
                 if isLike {
                     updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
@@ -83,15 +90,15 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     updatedPost.likes.append(UserDefaultsManager.shared.userID)
                 }
                 isLike.toggle()
-                print(#function, 33, isLike)
+//                print(#function, 33, isLike)
                 owner.originalPosts[value] = updatedPost
                 let likeQuery = LikeQuery(like_status: isLike)
                 
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
-                        print(#function, 3, success)
-                        print(#function, 3, owner.originalPosts[value].postID)
+//                        print(#function, 3, success)
+//                        print(#function, 3, owner.originalPosts[value].postID)
                         owner.originalPosts[value] = updatedPost
                         posts.accept(owner.originalPosts)
                         
@@ -105,6 +112,28 @@ final class MusictoryHomeViewModel: BaseViewModel {
                         posts.accept(owner.originalPosts)
                         networkError.accept(error)
                         showErrorAlert.accept(())
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.prefetching
+            .bind(with: self) { owner, value in
+                if nextCursor != "0" {
+                    if value {
+                        owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
+                            switch result {
+                            case .success(let success):
+                                owner.originalPosts.append(contentsOf: success.data)
+                                posts.accept(owner.originalPosts)
+                                nextCursor = success.nextCursor
+                                print(#function, 4, success.nextCursor)
+                                print(#function, 5, nextCursor)
+                                input.prefetching.accept(false)
+                            case .failure(let failure):
+                                print(failure)
+                            }
+                        }
                     }
                 }
             }

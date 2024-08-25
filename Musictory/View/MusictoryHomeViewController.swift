@@ -50,7 +50,8 @@ final class MusictoryHomeViewController: UIViewController {
     private func bind() {
         let checkRefreshToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
-        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken, likePostIndex: likePostIndex)
+        let prefetching = PublishRelay<Bool>()
+        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
         fetchPost.accept(())
@@ -112,6 +113,33 @@ final class MusictoryHomeViewController: UIViewController {
             
             return cell
         })
+        
+        let indexPaths = PublishRelay<[IndexPath]>()
+        postCollectionView.rx.prefetchItems
+            .bind(to: indexPaths)
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(indexPaths, output.posts)
+            .map { (indexPaths, posts) in
+                print("row = ", indexPaths.first?.row)
+                for indexPath in indexPaths {
+                    if posts.count - 6 == indexPath.item {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                return false
+            }
+            .bind(to: prefetching)
+            .disposed(by: disposeBag)
+            
+//            .map { (prefetchItem, posts) in
+//                return  posts.count - prefetchItem == 6
+//            }
+//            .bind(to: prefetching)
+//            .disposed(by: disposeBag)
+            
         
         output.posts
             .map({ [SectionModel(model: "", items: $0)] })

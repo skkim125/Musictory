@@ -17,6 +17,7 @@ final class MyPageViewModel: BaseViewModel {
         let loadMyProfile: PublishRelay<Void>
         let loadMyPosts: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
+        let prefetching: PublishRelay<Bool>
     }
     
     struct Output {
@@ -50,12 +51,15 @@ final class MyPageViewModel: BaseViewModel {
         
         input.loadMyPosts
             .bind(with: self) { owner, _ in
+                nextCursor = "0"
                 LSLP_API.shared.callRequest(apiType: .fetchMyPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let posts):
                         owner.originalPosts = posts.data
                         myPosts.accept(owner.originalPosts)
-                        nextCursor = posts.nextCursor
+                        if posts.nextCursor != "0" {
+                            nextCursor = posts.nextCursor
+                        }
                         
                     case .failure(let error):
                         print("마이 포스트", error.localizedDescription)
@@ -109,6 +113,28 @@ final class MyPageViewModel: BaseViewModel {
                         myPosts.accept(owner.originalPosts)
                         networkError.accept(error)
                         showErrorAlert.accept(())
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.prefetching
+            .bind(with: self) { owner, value in
+                if nextCursor != "0" {
+                    if value {
+                        LSLP_API.shared.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
+                            switch result {
+                            case .success(let success):
+                                owner.originalPosts.append(contentsOf: success.data)
+                                myPosts.accept(owner.originalPosts)
+                                nextCursor = success.nextCursor
+                                print(#function, 4, success.nextCursor)
+                                print(#function, 5, nextCursor)
+                                input.prefetching.accept(false)
+                            case .failure(let failure):
+                                print(failure)
+                            }
+                        }
                     }
                 }
             }
