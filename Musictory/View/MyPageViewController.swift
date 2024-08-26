@@ -14,7 +14,7 @@ import RxDataSources
 
 final class MyPageViewController: UIViewController {
     private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
-    static let titleElementKind = "title-element-kind"
+//    static let titleElementKind = "title-element-kind"
     let disposeBag = DisposeBag()
     let viewModel = MyPageViewModel()
     
@@ -56,54 +56,57 @@ final class MyPageViewController: UIViewController {
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionMyPageData> (configureCell: { dataSource, collectionView, indexPath, item in
             
-            switch indexPath.row {
-            case 0:
+            switch item.type {
+            case .profile:
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCollectionViewCell.identifier, for: indexPath) as? ProfileCollectionViewCell else { return UICollectionViewCell() }
                 
-                let myPageData = dataSource[indexPath.section].header
-                let nickname = myPageData.nick + "님, 반가워요!"
+                guard let profile = item.data as? ProfileModel else { return UICollectionViewCell() }
+                
+                let nickname = profile.nick + "님, 반가워요!"
                 cell.configureUI(profileImage: "person.circle", nickname: nickname)
                 
                 return cell
-            default:
+                
+            case .post:
+                
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
-                cell.configureCell(.myPage, post: item)
+                guard let post = item.data as? PostModel else { return UICollectionViewCell() }
                 
+                cell.configureCell(.myPage, post: post)
+
                 Task {
                     let group = DispatchGroup()
-                    
+
                     group.enter()
-                    let song = try await MusicManager.shared.requsetMusicId(id: item.content1)
+                    let song = try await MusicManager.shared.requsetMusicId(id: post.content1)
                     group.leave()
-                    
+
                     group.notify(queue: .main) {
-                        cell.songView.configureUI(song: song)
-                    }
-                    
-                    cell.songView.rx
-                        .tapGesture()
-                        .when(.recognized)
-                        .bind(with: self) { owner, _ in
-                            owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                MusicManager.shared.playSong(song: song)
-                            }
+                        cell.configureSongView(song: song) { tapGesture in
+                            tapGesture
+                                .bind(with: self) { owner, _ in
+                                    owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                        MusicManager.shared.playSong(song: song)
+                                    }
+                                }
+                                .disposed(by: cell.disposeBag)
                         }
+                    }
+                }
+                
+                cell.configureLikeButtonTap { likeButtonTap in
+                    likeButtonTap
+                        .map({
+                            return indexPath.item
+                        })
+                        .bind(to: likePostIndex)
                         .disposed(by: cell.disposeBag)
                 }
                 
-                cell.likeButton.rx.tap
-                    .map({
-                        return indexPath.item
-                    })
-                    .bind(to: likePostIndex)
-                    .disposed(by: cell.disposeBag)
-                
-                cell.layer.cornerRadius = 12
-                cell.clipsToBounds = true
-                
                 return cell
             }
+
         })
         
         output.myPageData
@@ -160,15 +163,25 @@ final class MyPageViewController: UIViewController {
 }
 
 struct SectionMyPageData {
-    var header: ProfileModel
+    var header: String
     var items: [Item]
 }
 
 extension SectionMyPageData: SectionModelType {
-    typealias Item = PostModel
+    typealias Item = MyPageData
     
-    init(original: SectionMyPageData, items: [PostModel]) {
+    init(original: SectionMyPageData, items: [Item]) {
         self = original
         self.items = items
     }
+}
+
+struct MyPageData {
+    let type: DataType
+    let data: Any
+}
+
+enum DataType {
+    case profile
+    case post
 }

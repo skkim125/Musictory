@@ -9,7 +9,6 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
-import RxGesture
 import RxDataSources
 import MusicKit
 import MediaPlayer
@@ -51,7 +50,7 @@ final class MusictoryHomeViewController: UIViewController {
         let checkRefreshToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkRefreshToken: checkRefreshToken, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkAccessToken: checkRefreshToken, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
         fetchPost.accept(())
@@ -87,26 +86,26 @@ final class MusictoryHomeViewController: UIViewController {
                 group.leave()
                 
                 group.notify(queue: .main) {
-                    cell.songView.configureUI(song: song)
-                }
-                
-                cell.songView.rx
-                    .tapGesture()
-                    .when(.recognized)
-                    .bind(with: self) { owner, _ in
-                        owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                            MusicManager.shared.playSong(song: song)
-                        }
+                    cell.configureSongView(song: song) { tapGesture in
+                        tapGesture
+                            .bind(with: self) { owner, _ in
+                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                    MusicManager.shared.playSong(song: song)
+                                }
+                            }
+                            .disposed(by: cell.disposeBag)
                     }
-                    .disposed(by: cell.disposeBag)
+                }
             }
             
-            cell.likeButton.rx.tap
-                .map({
-                    return indexPath.item
-                })
-                .bind(to: likePostIndex)
-                .disposed(by: cell.disposeBag)
+            cell.configureLikeButtonTap { likeButtonTap in                
+                likeButtonTap
+                    .map({
+                        return indexPath.item
+                    })
+                    .bind(to: likePostIndex)
+                    .disposed(by: cell.disposeBag)
+            }
             
             cell.layer.cornerRadius = 12
             cell.clipsToBounds = true
@@ -133,13 +132,6 @@ final class MusictoryHomeViewController: UIViewController {
             }
             .bind(to: prefetching)
             .disposed(by: disposeBag)
-            
-//            .map { (prefetchItem, posts) in
-//                return  posts.count - prefetchItem == 6
-//            }
-//            .bind(to: prefetching)
-//            .disposed(by: disposeBag)
-            
         
         output.posts
             .map({ [SectionModel(model: "", items: $0)] })

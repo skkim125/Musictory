@@ -10,6 +10,8 @@ import SnapKit
 import MusicKit
 import Kingfisher
 import RxSwift
+import RxCocoa
+import RxGesture
 
 final class PostCollectionViewCell: UICollectionViewCell {
     static let identifier = "PostCollectionViewCell"
@@ -19,8 +21,8 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private let postTitleLabel = UILabel()
     private let postContentLabel = UILabel()
     private let postCreateAtLabel = UILabel()
-    let songView = CustomSongView()
-    let likeButton = {
+    private let songView = CustomSongView()
+    private let likeButton = {
         let button = UIButton()
         button.tintColor = .label
         button.imageView?.contentMode = .scaleAspectFill
@@ -176,7 +178,14 @@ final class PostCollectionViewCell: UICollectionViewCell {
         configureLikeButton(isLike: post.likes.contains(UserDefaultsManager.shared.userID))
     }
     
+    func configureSongView(song: Song, completionHandler: @escaping (Observable<UITapGestureRecognizer>)-> ()) {
+        songView.configureUI(song: song)
+        completionHandler(songView.rx.tapGesture().when(.recognized))
+    }
     
+    func configureLikeButtonTap(completionHandler: (ControlEvent<Void>)-> Void) {
+        completionHandler(likeButton.rx.tap)
+    }
     
     private func configureLikeButton(isLike: Bool) {
         likeButton.isSelected = isLike

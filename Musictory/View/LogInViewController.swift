@@ -167,7 +167,6 @@ final class LogInViewController: UIViewController {
             .bind(with: self) { owner, loginModel in
                 owner.view.endEditing(true)
                 let vc = MusictoryHomeViewController()
-                vc.viewModel.loginUser = loginModel
                 let nav = UINavigationController(rootViewController: vc)
                 owner.setRootViewController(nav)
             }

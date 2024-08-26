@@ -10,13 +10,12 @@ import RxCocoa
 
 final class MusictoryHomeViewModel: BaseViewModel {
     private var originalPosts: [PostModel] = []
-    var loginUser: LoginModel?
     private let lslp_API = LSLP_API.shared
     let disposeBag = DisposeBag()
     
     struct Input {
         let fetchPost: PublishRelay<Void>
-        let checkRefreshToken: PublishRelay<Void>
+        let checkAccessToken: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
     }
@@ -30,6 +29,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
     
     func transform(input: Input) -> Output {
         let showErrorAlert = PublishRelay<Void>()
+        let checkRefreshToken = PublishRelay<Void>()
         let fetchPost = input.fetchPost
         var nextCursor = "0"
         let posts = BehaviorRelay<[PostModel]>(value: originalPosts)
@@ -37,16 +37,41 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let newPost = PublishRelay<PostModel>()
         let networkError = PublishRelay<NetworkError>()
         
-        input.checkRefreshToken
+        input.checkAccessToken
+                    .bind(with: self) { owner, _ in
+                        var loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
+                        owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
+                            
+                            switch result {
+                            case .success(let success):
+                                UserDefaultsManager.shared.userNickname = success.nick
+                                UserDefaultsManager.shared.userID = success.userID
+                                UserDefaultsManager.shared.email = success.email
+                                UserDefaultsManager.shared.accessT = success.accessT
+                                UserDefaultsManager.shared.refreshT = success.refreshT
+                                UserDefaultsManager.shared.password = loginQuery.password
+                                
+                            case .failure(let failure):
+                                switch failure {
+                                case .expiredAccessToken:
+                                    checkRefreshToken.accept(())
+                                    
+                                default:
+                                    networkError.accept(failure)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                        }
+            }
+            .disposed(by: disposeBag)
+        
+        checkRefreshToken
             .bind(with: self) { owner, _ in
-                LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
                     switch result {
                     case .success(let success):
-//                        print(#function)
-//                        print(#function, 1, UserDefaultsManager.shared.accessT)
                         UserDefaultsManager.shared.accessT = success.accessToken
-//                        print(#function, 2, UserDefaultsManager.shared.accessT)
-//                        print(#function, 2, UserDefaultsManager.shared.userID)
+                        print(#function, 2, UserDefaultsManager.shared.accessT)
                     case .failure(let error):
                         networkError.accept(error)
                         showErrorAlert.accept(())
@@ -61,6 +86,9 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let success):
+                        print(#function, 1, success.data.map({ $0.creator.userID == UserDefaultsManager.shared.userID }))
+                        print(#function, 1, success.data.map({ $0.creator.userID == UserDefaultsManager.shared.userID }).count)
+                        print(#function, 1, success.data)
                         owner.originalPosts = success.data
                         posts.accept(owner.originalPosts)
                         print(#function, 1, success.nextCursor)
@@ -97,8 +125,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
-//                        print(#function, 3, success)
-//                        print(#function, 3, owner.originalPosts[value].postID)
+                        print(#function, 3, owner.originalPosts[value].postID)
                         owner.originalPosts[value] = updatedPost
                         posts.accept(owner.originalPosts)
                         

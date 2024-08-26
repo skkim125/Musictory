@@ -70,9 +70,9 @@ final class MyPageViewModel: BaseViewModel {
         
         Observable.combineLatest(myProfile, myPosts)
             .map { (profile, posts) -> [SectionMyPageData] in
-                print("마이페이지", profile.nick)
-                print("마이페이지", posts.count)
-                return [SectionMyPageData(header: profile, items: posts)]
+                let convertPosts = posts.map { MyPageData(type: .post, data: $0) }
+                
+                return [SectionMyPageData(header: "Profile", items: [MyPageData(type: .profile, data: profile)]), SectionMyPageData(header: "MyPosts", items: convertPosts) ]
             }
             .bind(to: myPageData)
             .disposed(by: disposeBag)
