@@ -25,7 +25,7 @@ final class MyPageViewController: UIViewController {
         bind()
     }
     
-    func configureView() {
+    private func configureView() {
         view.backgroundColor = .systemBackground
         
         navigationItem.title = "마이페이지"
@@ -34,7 +34,6 @@ final class MyPageViewController: UIViewController {
         
         view.addSubview(myPostCollectionView)
         
-        myPostCollectionView.backgroundColor = .lightGray
         myPostCollectionView.snp.makeConstraints { make in
             make.edges.equalTo(view.safeAreaLayoutGuide)
         }
@@ -43,7 +42,7 @@ final class MyPageViewController: UIViewController {
         myPostCollectionView.register(ProfileCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCollectionViewCell.identifier)
     }
     
-    func bind() {
+    private func bind() {
         let loadMyProfile = PublishRelay<Void>()
         let loadMyPost = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
@@ -150,7 +149,7 @@ final class MyPageViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    func configureMenuButton() -> UIMenu {
+    private func configureMenuButton() -> UIMenu {
         let editProfile = UIAction(title: "프로필 수정", image: UIImage(systemName: "pencil"), handler: { _ in
             print("프로필 수정")
         })

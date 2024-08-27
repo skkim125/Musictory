@@ -10,6 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class MyPageViewModel: BaseViewModel {
+    private var finalPosts: [ConvertPost] = []
     private var originalPosts: [PostModel] = []
     let disposeBag = DisposeBag()
     

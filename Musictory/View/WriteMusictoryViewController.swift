@@ -12,6 +12,7 @@ import RxCocoa
 import MusicKit
 
 final class WriteMusictoryViewController: UIViewController {
+    let scrollView = UIScrollView()
     private let postTitleTextField = {
         let tf = UITextField()
         tf.font = .systemFont(ofSize: 16)
@@ -86,15 +87,22 @@ final class WriteMusictoryViewController: UIViewController {
         navigationController?.navigationBar.tintColor = .systemRed
         
         view.backgroundColor = .systemBackground
+        view.addSubview(scrollView)
         
         let subViews = [postTitleTextField, dividerLine, addSongButton, addLocationButton, addPhotoButton, postContentTextView, postContentTextViewPlaceholder, writeMusictoryButton]
+        
         subViews.forEach { subView in
-            view.addSubview(subView)
+            scrollView.addSubview(subView)
+        }
+        
+        scrollView.snp.makeConstraints { make in
+            make.edges.equalTo(view.safeAreaLayoutGuide)
         }
         
         postTitleTextField.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).inset(30)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.centerX.equalTo(scrollView)
+            make.top.equalTo(scrollView.snp.top).offset(10)
+            make.horizontalEdges.equalTo(scrollView.snp.horizontalEdges).inset(20)
             make.height.equalTo(40)
         }
         
@@ -106,7 +114,7 @@ final class WriteMusictoryViewController: UIViewController {
         
         addSongButton.snp.makeConstraints { make in
             make.top.equalTo(dividerLine.snp.bottom).offset(20)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.horizontalEdges.equalTo(scrollView).inset(20)
             make.height.equalTo(50)
         }
         
@@ -126,8 +134,8 @@ final class WriteMusictoryViewController: UIViewController {
         
         postContentTextView.snp.makeConstraints { make in
             make.top.equalTo(addPhotoButton.snp.bottom).offset(20)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.height.equalTo(200)
+            make.horizontalEdges.equalTo(scrollView).inset(20)
+            make.height.equalTo(180)
         }
         
         postContentTextViewPlaceholder.snp.makeConstraints { make in
@@ -138,8 +146,8 @@ final class WriteMusictoryViewController: UIViewController {
         writeMusictoryButton.snp.makeConstraints { make in
             make.height.equalTo(50)
             make.top.equalTo(postContentTextView.snp.bottom).offset(20)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.bottom.lessThanOrEqualTo(view.safeAreaLayoutGuide).inset(20)
+            make.horizontalEdges.equalTo(scrollView).inset(20)
+            make.bottom.equalTo(scrollView.snp.bottom)
         }
     }
     

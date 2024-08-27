@@ -14,11 +14,12 @@ import MusicKit
 import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
-    let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.home))
-    let viewModel = MusictoryHomeViewModel()
-    let disposeBag = DisposeBag()
+    private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.home))
+    private var viewModel: MusictoryHomeViewModel!
+    private let disposeBag = DisposeBag()
     
-    let fetchPost = PublishRelay<Void>()
+    let checkAccessToken = PublishRelay<Void>()
+    let fetchPost = PublishRelay<Bool>()
     private var refreshControl = UIRefreshControl()
     private let refreshLoading = PublishRelay<Void>()
     
@@ -44,66 +45,75 @@ final class MusictoryHomeViewController: UIViewController {
         postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
+        
+        Task {
+            do {
+                await MusicAuthorization.request()
+            } catch {
+                
+            }
+        }
     }
     
     private func bind() {
-        let checkRefreshToken = PublishRelay<Void>()
+        viewModel = MusictoryHomeViewModel()
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MusictoryHomeViewModel.Input(fetchPost: fetchPost, checkAccessToken: checkRefreshToken, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MusictoryHomeViewModel.Input(checkAccessToken: checkAccessToken, fetchPost: fetchPost, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
-        fetchPost.accept(())
-        checkRefreshToken.accept(())
+        checkAccessToken.accept(())
+        fetchPost.accept(true)
         
         output.showErrorAlert
             .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
                 self.showAlert(title: error.title, message: error.alertMessage) {
-                    if error == NetworkError.expiredRefreshToken {
+                    
+                    switch error {
+                    case .expiredAccessToken:
+                        print(error, 1)
+                        
+                    case .expiredRefreshToken:
                         UserDefaultsManager.shared.accessT = ""
                         UserDefaultsManager.shared.refreshT = ""
                         UserDefaultsManager.shared.userID = ""
                         
                         let vc = LogInViewController()
                         self.setRootViewController(vc)
+                        
+                    default:
+                        print(error)
                     }
                 }
             }
             .disposed(by: disposeBag)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { _, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, ConvertPost>>(configureCell: { _, collectionView, indexPath, item in
             
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
-            cell.configureCell(.home, post: item)
-            
-            Task {
-                let group = DispatchGroup()
-                
-                group.enter()
-                let song = try await MusicManager.shared.requsetMusicId(id: item.content1)
-                group.leave()
-                
-                group.notify(queue: .main) {
-                    cell.configureSongView(song: song) { tapGesture in
-                        tapGesture
-                            .bind(with: self) { owner, _ in
-                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                    MusicManager.shared.playSong(song: song)
-                                }
+            cell.configureCell(.home, post: item.post)
+            if let song = item.song {
+                cell.configureSongView(song: song) { tapGesture in
+                    tapGesture
+                        .bind(with: self) { owner, _ in
+                            owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                MusicManager.shared.playSong(song: song)
                             }
-                            .disposed(by: cell.disposeBag)
-                    }
+                        }
+                        .disposed(by: cell.disposeBag)
                 }
             }
             
-            cell.configureLikeButtonTap { likeButtonTap in                
+            cell.configureLikeButtonTap { likeButtonTap in
                 likeButtonTap
                     .map({
                         return indexPath.item
                     })
-                    .bind(to: likePostIndex)
+                    .bind(with: self) { owner, value in
+                        likePostIndex.accept(value)
+                    }
                     .disposed(by: cell.disposeBag)
             }
             
@@ -118,11 +128,11 @@ final class MusictoryHomeViewController: UIViewController {
             .bind(to: indexPaths)
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(indexPaths, output.posts)
+        Observable.combineLatest(indexPaths, output.convertPosts)
             .map { (indexPaths, posts) in
-                print("row = ", indexPaths.first?.row)
                 for indexPath in indexPaths {
                     if posts.count - 6 == indexPath.item {
+                        print(indexPath.item)
                         return true
                     } else {
                         return false
@@ -133,9 +143,19 @@ final class MusictoryHomeViewController: UIViewController {
             .bind(to: prefetching)
             .disposed(by: disposeBag)
         
-        output.posts
+        output.convertPosts
             .map({ [SectionModel(model: "", items: $0)] })
             .bind(to: postCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        Observable.zip(input.likePostIndex, output.likeTogglePost)
+            .bind(with: self) { owner, value in
+                guard let cell = owner.postCollectionView.cellForItem(at: IndexPath(item: value.0, section: 0)) as? PostCollectionViewCell else {
+                    return
+                }
+                
+                cell.configureCell(.home, post: value.1.post)
+            }
             .disposed(by: disposeBag)
         
         navigationItem.rightBarButtonItem?.rx.tap
@@ -149,7 +169,11 @@ final class MusictoryHomeViewController: UIViewController {
         
         postCollectionView.rx.refreshControl.onNext(refreshControl)
         
-        updateCollectionViewMethod()
+        refreshControl.rx.controlEvent(.valueChanged)
+            .bind(with: self) { owner, _ in
+                owner.updateCollectionViewMethod()
+            }
+            .disposed(by: disposeBag)
     }
     
     @objc func updateCollectionView(_ notification: Notification) {
@@ -157,20 +181,13 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     func updateCollectionViewMethod() {
-        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         refreshControl.beginRefreshing()
+        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
+        checkAccessToken.accept(())
         
-        refreshControl.rx.controlEvent(.valueChanged)
-            .bind(with: self) { owner, _ in
-                DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
-                    owner.fetchPost.accept(())
-                    owner.refreshControl.endRefreshing()
-                }
-            }
-            .disposed(by: disposeBag)
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
+        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
+            self.fetchPost.accept(true)
+            self.refreshControl.endRefreshing()
+        }
     }
 }

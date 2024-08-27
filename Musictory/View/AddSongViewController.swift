@@ -20,8 +20,8 @@ final class AddSongViewController: UIViewController {
         
         return cv
     }()
-    let viewModel = AddSongViewModel()
-    let disposeBag = DisposeBag()
+    private let viewModel = AddSongViewModel()
+    private let disposeBag = DisposeBag()
     var bindData: ((Song)-> Void)?
     
     override func viewDidLoad() {

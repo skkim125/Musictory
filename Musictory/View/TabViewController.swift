@@ -29,7 +29,6 @@ final class TabViewController: UITabBarController {
 
         self.viewControllers = [homeViewController, writeView, myPageViewController]
 
-        // 커스텀 버튼 설정
         let writeButton = UIButton(type: .system)
         writeButton.frame = CGRect(x: (tabBar.frame.width / 2) - 15, y: 5, width: 30, height: 30)
         writeButton.tintColor = .white
@@ -44,7 +43,7 @@ final class TabViewController: UITabBarController {
         let vc = WriteMusictoryViewController()
         
         let nav = UINavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .pageSheet
+        nav.modalPresentationStyle = .formSheet
         self.present(nav, animated: true)
     }
 }

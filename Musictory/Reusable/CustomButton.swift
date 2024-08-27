@@ -119,7 +119,7 @@ class CustomButton: UIButton {
             case .photo:
                 "사진 추가"
             case .location:
-                "위치 표시"
+                "현재 위치 추가"
             }
         }
     }

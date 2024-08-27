@@ -166,9 +166,8 @@ final class LogInViewController: UIViewController {
         output.loginModel
             .bind(with: self) { owner, loginModel in
                 owner.view.endEditing(true)
-                let vc = MusictoryHomeViewController()
-                let nav = UINavigationController(rootViewController: vc)
-                owner.setRootViewController(nav)
+                let vc = TabViewController()
+                owner.setRootViewController(vc)
             }
             .disposed(by: disposeBag)
     }

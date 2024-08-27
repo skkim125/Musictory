@@ -50,7 +50,6 @@ final class LSLP_API {
                 default:
                     print(response.url)
                     let error = apiType.errorHandler(statusCode: response.statusCode)
-                    print(error, 1)
                     print(response.statusCode)
                     completionHandler?(.failure(error))
                 }
@@ -83,10 +82,11 @@ final class LSLP_API {
                     completionHandler?(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
                     return
                 }
-                
+
                 switch response.statusCode {
                 case 200 :
                     guard let data = data else { return }
+                    
                     do {
                         let result = try JSONDecoder().decode(decodingType.self, from: data)
                         return completionHandler?(.success(result)) ?? ()
@@ -94,6 +94,7 @@ final class LSLP_API {
                     } catch {
                         completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
+
                 default:
                     print(response.url)
                     let error = apiType.errorHandler(statusCode: response.statusCode)

@@ -13,7 +13,7 @@ import RxCocoa
 
 final class MusictoryMapViewController: UIViewController {
     private let mapView = MKMapView()
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,7 +22,7 @@ final class MusictoryMapViewController: UIViewController {
         bind()
     }
     
-    func configureView() {
+    private func configureView() {
         navigationItem.title = "Musictory Map"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
         navigationController?.navigationBar.tintColor = .label
@@ -36,7 +36,7 @@ final class MusictoryMapViewController: UIViewController {
         }
     }
     
-    func bind() {
+    private func bind() {
         navigationItem.leftBarButtonItem?.rx.tap
             .bind(with: self) { owner, _ in
                 owner.dismiss(animated: true)

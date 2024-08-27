@@ -553,6 +553,7 @@
 				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Musictory 앱은 애플 뮤직을 사용합니다. 라이브러리 권한을 허용해 주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -585,6 +586,7 @@
 				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Musictory/Info.plist;
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Musictory 앱은 애플 뮤직을 사용합니다. 라이브러리 권한을 허용해 주세요.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
