@@ -144,12 +144,12 @@ final class PostCollectionViewCell: UICollectionViewCell {
         
         switch viewType {
         case .home:
-            if let url = URL(string: post.creator.profileImage ?? "") {
-                userImageView.kf.setImage(with: url)
-            } else {
+//            if let url = URL(string: post.creator.profileImage ?? "") {
+//                userImageView.kf.setImage(with: url)
+//            } else {
                 userImageView.image = UIImage(systemName: "person.circle")
                 userImageView.tintColor = .systemRed
-            }
+//            }
             userNicknameLabel.text = post.creator.nickname
         case .myPage:
             userImageView.isHidden = true

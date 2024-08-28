@@ -13,11 +13,6 @@ import MusicKit
 struct ConvertPost {
     var post: PostModel
     let song: Song?
-    
-    init(post: PostModel, song: Song?) {
-        self.post = post
-        self.song = song
-    }
 }
 
 final class MusictoryHomeViewModel: BaseViewModel {
@@ -28,9 +23,11 @@ final class MusictoryHomeViewModel: BaseViewModel {
     
     struct Input {
         let checkAccessToken: PublishRelay<Void>
+        let checkRefreshToken: PublishRelay<Void>
         let fetchPost: PublishRelay<Bool>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
+        let prefetchIndexPatch: PublishRelay<[IndexPath]>
     }
     
     struct Output {
@@ -41,9 +38,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let checkRefreshToken = PublishRelay<Void>()
         let showErrorAlert = PublishRelay<Void>()
-        let fetchPost = input.fetchPost
         var nextCursor = "0"
         let posts = BehaviorRelay<[PostModel]>(value: [])
         let outputConvertPosts = PublishRelay<[ConvertPost]>()
@@ -70,7 +65,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     case .failure(let error):
                         switch error {
                         case .expiredAccessToken:
-                            checkRefreshToken.accept(())
+                            input.checkAccessToken.accept(())
                             print(#function, 1, "로그인 실패, 액세스 토큰 만료")
                         default:
                             print(#function, 1, "\(error)")
@@ -82,12 +77,12 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        checkRefreshToken
+        input.checkRefreshToken
             .bind(with: self) { owner, value in
                 owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
                     switch result {
                     case .success(let success):
-                        UserDefaultsManager.shared.accessT = success.accessToken
+                       UserDefaultsManager.shared.accessT = success.accessToken
                         print(#function, 2, UserDefaultsManager.shared.accessT)
                         print(#function, 2, "토큰 리프래시 완료")
                         input.checkAccessToken.accept(())
@@ -100,22 +95,23 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        fetchPost
+        input.fetchPost
             .bind(with: self) { owner, value in
-                checkRefreshToken.accept(())
                 guard value else { return }
                 nextCursor = "0"
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let success):
                         
-                        owner.originalPosts.append(contentsOf: success.data)
+                        owner.originalPosts = success.data
                         posts.accept(owner.originalPosts)
                         if success.nextCursor != "0" {
                             nextCursor = success.nextCursor
+                            print("nextCursor = \(nextCursor)")
                         }
 
                     case .failure(let error):
+                        input.checkAccessToken.accept(())
                         networkError.accept(error)
                         showErrorAlert.accept(())
                     }
@@ -133,8 +129,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.likePostIndex
             .bind(with: self) { owner, value in
-                checkRefreshToken.accept(())
-                //input.checkAccessToken.accept(())
+                input.checkAccessToken.accept(())
                 var updatedPost = owner.originalConvertPosts[value].post
                 
                 var isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
@@ -152,13 +147,13 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 
                 LSLP_API.shared.callRequest(apiType: .like(owner.originalConvertPosts[value].post.postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
-                    case .success(let success):
+                    case .success:
                         print(#function, 4, owner.originalConvertPosts[value])
                         owner.originalConvertPosts[value].post = updatedPost
                         newPost.accept(owner.originalConvertPosts[value])
                         
                     case .failure(let error):
-                        checkRefreshToken.accept(())
+                        input.checkRefreshToken.accept(())
                         if isLike {
                             updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
                         } else {
@@ -175,7 +170,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.prefetching
             .bind(with: self) { owner, value in
-                checkRefreshToken.accept(())
 //                input.checkAccessToken.accept(())
                 if nextCursor != "0" {
                     if value {
@@ -187,6 +181,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                                 nextCursor = success.nextCursor
                                 print(#function, 5, success.nextCursor)
                                 print(#function, 6, nextCursor)
+                                input.prefetching.accept(false)
                             case .failure(let error):
                                 networkError.accept(error)
                                 showErrorAlert.accept(())
@@ -226,6 +221,35 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
         }
         
+        Observable.combineLatest(input.prefetchIndexPatch, outputConvertPosts)
+//            .map { (indexPaths, posts) in
+//                print("indexPaths", indexPaths)
+//                indexPaths.forEach { indexPath in
+//                    if posts.count - 5 == indexPath.item, posts.count > indexPath.item {
+//                        print("indexPath", indexPath.item)
+//                        return true
+//                    } else {
+//                        return false
+//                    }
+//                }
+//            }
+            .bind(with: self, onNext: { owner, value in
+                
+                print("indexPaths", value.0)
+                value.0.forEach { indexPath in
+                    if value.1.count - 5 == indexPath.item && nextCursor != "0" {
+                        print("indexPath", indexPath.item)
+                        input.prefetching.accept(true)
+                    } else {
+                        input.prefetching.accept(false)
+                    }
+                }
+                
+                input.prefetching.accept(true)
+            })
+            .disposed(by: disposeBag)
+        
         return Output(convertPosts: outputConvertPosts, likeTogglePost: newPost, showErrorAlert: showErrorAlert, networkError: networkError)
     }
 }
+

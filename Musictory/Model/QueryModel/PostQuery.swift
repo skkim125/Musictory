@@ -9,6 +9,6 @@ import Foundation
 
 struct PostQuery {
     let product_id: String = "Musictory"
-    let limit: String = "15"
+    let limit: String = "18"
     let next: String
 }

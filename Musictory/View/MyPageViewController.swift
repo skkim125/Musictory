@@ -14,9 +14,12 @@ import RxDataSources
 
 final class MyPageViewController: UIViewController {
     private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
-//    static let titleElementKind = "title-element-kind"
-    let disposeBag = DisposeBag()
-    let viewModel = MyPageViewModel()
+    private let disposeBag = DisposeBag()
+    private let viewModel = MyPageViewModel()
+    private let checkAccessToken = PublishRelay<Void>()
+    private let loadMyProfile = PublishRelay<Bool>()
+    private let loadMyPost = PublishRelay<Bool>()
+    private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,54 +46,42 @@ final class MyPageViewController: UIViewController {
     }
     
     private func bind() {
-        let loadMyProfile = PublishRelay<Void>()
-        let loadMyPost = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MyPageViewModel.Input(loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MyPageViewModel.Input(checkAccessToken: checkAccessToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
-
-        loadMyProfile.accept(())
-        loadMyPost.accept(())
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionMyPageData> (configureCell: { dataSource, collectionView, indexPath, item in
+        checkAccessToken.accept(())
+        loadMyProfile.accept(true)
+        loadMyPost.accept(true)
+        
+        let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { dataSource, collectionView, indexPath, item in
             
-            switch item.type {
-            case .profile:
+            switch item {
+            case .profileItem(item: let profile):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCollectionViewCell.identifier, for: indexPath) as? ProfileCollectionViewCell else { return UICollectionViewCell() }
                 
-                guard let profile = item.data as? ProfileModel else { return UICollectionViewCell() }
                 
-                let nickname = profile.nick + "님, 반가워요!"
-                cell.configureUI(profileImage: "person.circle", nickname: nickname)
+                let nickname = profile.nick + "님,\n반가워요!"
+                print("profile =", profile.profileImage)
+                cell.configureUI(profileImage: profile.profileImage ?? "", nickname: nickname)
                 
                 return cell
-                
-            case .post:
+            case .postItem(item: let post):
                 
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
-                guard let post = item.data as? PostModel else { return UICollectionViewCell() }
+                cell.configureCell(.home, post: post.post)
                 
-                cell.configureCell(.myPage, post: post)
-
-                Task {
-                    let group = DispatchGroup()
-
-                    group.enter()
-                    let song = try await MusicManager.shared.requsetMusicId(id: post.content1)
-                    group.leave()
-
-                    group.notify(queue: .main) {
-                        cell.configureSongView(song: song) { tapGesture in
-                            tapGesture
-                                .bind(with: self) { owner, _ in
-                                    owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                        MusicManager.shared.playSong(song: song)
-                                    }
+                if let song = post.song {
+                    cell.configureSongView(song: song) { tapGesture in
+                        tapGesture
+                            .bind(with: self) { owner, _ in
+                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                    MusicManager.shared.playSong(song: song)
                                 }
-                                .disposed(by: cell.disposeBag)
-                        }
+                            }
+                            .disposed(by: cell.disposeBag)
                     }
                 }
                 
@@ -99,11 +90,17 @@ final class MyPageViewController: UIViewController {
                         .map({
                             return indexPath.item
                         })
-                        .bind(to: likePostIndex)
+                        .bind(with: self) { owner, value in
+                            likePostIndex.accept(value)
+                        }
                         .disposed(by: cell.disposeBag)
                 }
                 
+                cell.layer.cornerRadius = 12
+                cell.clipsToBounds = true
+                
                 return cell
+                
             }
 
         })
@@ -119,7 +116,6 @@ final class MyPageViewController: UIViewController {
         
         Observable.combineLatest(indexPaths, output.myPosts)
             .map { (indexPaths, posts) in
-                print("row = ", indexPaths.first?.row)
                 for indexPath in indexPaths {
                     if posts.count - 6 == indexPath.item {
                         return true
@@ -159,28 +155,42 @@ final class MyPageViewController: UIViewController {
         })
         return UIMenu(title: "설정", options: .displayInline, children: [editProfile, withdraw])
     }
-}
-
-struct SectionMyPageData {
-    var header: String
-    var items: [Item]
-}
-
-extension SectionMyPageData: SectionModelType {
-    typealias Item = MyPageData
     
-    init(original: SectionMyPageData, items: [Item]) {
-        self = original
-        self.items = items
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        checkAccessToken.accept(())
     }
 }
 
-struct MyPageData {
-    let type: DataType
-    let data: Any
+enum MyPageDataType {
+    case profile(items: [MyPageItem])
+    case post(items: [MyPageItem])
 }
 
-enum DataType {
-    case profile
-    case post
+extension MyPageDataType: SectionModelType {
+    typealias Item = MyPageItem
+    
+    var items: [MyPageItem] {
+        switch self {
+        case .profile(items: let items):
+            return items.map { $0 }
+        case .post(items: let items):
+            return items.map { $0 }
+        }
+    }
+    
+    init(original: MyPageDataType, items: [Item]) {
+        switch original {
+        case .profile(items: let items):
+            self = .post(items: items)
+        case .post(items: let items):
+            self = .post(items: items)
+        }
+    }
+}
+
+enum MyPageItem {
+    case profileItem(item: ProfileModel)
+    case postItem(item: ConvertPost)
 }

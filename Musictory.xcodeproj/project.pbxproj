@@ -61,6 +61,9 @@
 		04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306C2C6E1912007FA9C6 /* Toast */; };
 		04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */; };
 		04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430722C6E2142007FA9C6 /* MusadoraKit */; };
+		04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */; };
+		04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */; };
+		04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +113,9 @@
 		04E430582C6CF68F007FA9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		04E4305E2C6CF8B9007FA9C6 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		04E430622C6DCA4C007FA9C6 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
+		04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailView.swift; sourceTree = "<group>"; };
+		04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailViewModel.swift; sourceTree = "<group>"; };
+		04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCommentsCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,6 +145,7 @@
 				0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */,
 				045833C22C763EB2000D6E81 /* SearchSongCollectionViewCell.swift */,
 				0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */,
+				04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -173,6 +180,7 @@
 				045833D12C773B57000D6E81 /* AddPhotoViewController.swift */,
 				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
 				045833F02C7A3B36000D6E81 /* MusictoryMapViewController.swift */,
+				04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */,
 				0458338E2C74B016000D6E81 /* Cell */,
 			);
 			path = View;
@@ -186,6 +194,7 @@
 				045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */,
 				045833CB2C77264B000D6E81 /* AddSongViewModel.swift */,
 				045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */,
+				04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -371,12 +380,15 @@
 				048DFDEF2C722AE3000F5293 /* LoginQuery.swift in Sources */,
 				045833BB2C7620F6000D6E81 /* DateFormatter+Extension.swift in Sources */,
 				048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */,
+				04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */,
 				048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */,
 				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */,
+				04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,
 				0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */,
+				04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
 				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,

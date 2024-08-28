@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class ProfileCollectionViewCell: UICollectionViewCell {
-    static let identifier = "ProfileHeaderView"
+    static let identifier = "ProfileCollectionViewCell"
     
     private let userProfileImageView = UIImageView()
     private let userNicknameLabel = UILabel()
@@ -26,17 +26,16 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         
         userProfileImageView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(10)
-            make.centerX.equalTo(self)
-            make.width.equalTo(100)
-            make.height.equalTo(userProfileImageView.snp.width)
+            make.leading.equalTo(safeAreaLayoutGuide).offset(60)
+            make.size.equalTo(80)
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(20)
         }
         
         userNicknameLabel.snp.makeConstraints { make in
-            make.top.equalTo(userProfileImageView.snp.bottom).offset(10)
-            make.centerX.equalTo(userProfileImageView)
-            make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(80)
-            make.height.equalTo(40)
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(20)
+            make.centerY.equalTo(userProfileImageView.snp.centerY)
+            make.height.equalTo(50)
+            make.leading.equalTo(userProfileImageView.snp.trailing).offset(15)
+            make.trailing.equalTo(safeAreaLayoutGuide).offset(20)
         }
         
         userProfileImageView.contentMode = .scaleAspectFill
@@ -46,9 +45,16 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         userNicknameLabel.font = .boldSystemFont(ofSize: 20)
     }
     
-    func configureUI(profileImage: String, nickname: String) {
-        userProfileImageView.image = UIImage(systemName: profileImage)
+    func configureUI(profileImage: String?, nickname: String) {
+        if let profile = profileImage, let url = URL(string: profile) {
+            print("profile =", profile)
+            userProfileImageView.kf.setImage(with: url)
+        } else {
+            userProfileImageView.image = UIImage(systemName: "person.circle")
+        }
         userNicknameLabel.text = nickname
+        userNicknameLabel.numberOfLines = 2
+        userNicknameLabel.textAlignment = .left
     }
     
     @available(*, unavailable)

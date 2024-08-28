@@ -14,5 +14,5 @@ final class ProfileModel: Decodable {
     let followers: [User]
     let following: [User]
     let posts: [String]
-//    let profileImage: String?
+    let profileImage: String?
 }

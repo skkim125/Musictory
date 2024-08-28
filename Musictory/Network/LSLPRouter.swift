@@ -144,7 +144,7 @@ extension LSLPRouter {
             case 400:
                 return NetworkError.custom("잘못된 요청입니다.")
             case 401:
-                return NetworkError.custom("인증할 수 없는 액세스 토큰입니다.")
+                return NetworkError.expiredRefreshToken
             case 403:
                 return NetworkError.custom("접근 권한이 없습니다.")
             case 419:
@@ -155,7 +155,7 @@ extension LSLPRouter {
         case .refresh:
             switch statusCode {
             case 401:
-                return NetworkError.custom("인증할 수 없는 토큰입니다.")
+                return NetworkError.expiredRefreshToken
             case 418:
                 return NetworkError.expiredRefreshToken
             default:

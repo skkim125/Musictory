@@ -10,13 +10,15 @@ import RxSwift
 import RxCocoa
 
 final class MyPageViewModel: BaseViewModel {
-    private var finalPosts: [ConvertPost] = []
+    private let lslp_API = LSLP_API.shared
+    private var originalConvertPosts: [ConvertPost] = []
     private var originalPosts: [PostModel] = []
     let disposeBag = DisposeBag()
     
     struct Input {
-        let loadMyProfile: PublishRelay<Void>
-        let loadMyPosts: PublishRelay<Void>
+        let checkAccessToken: PublishRelay<Void>
+        let loadMyProfile: PublishRelay<Bool>
+        let loadMyPosts: PublishRelay<Bool>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
     }
@@ -24,22 +26,74 @@ final class MyPageViewModel: BaseViewModel {
     struct Output {
         let myProfile: PublishRelay<ProfileModel>
         let myPosts: PublishRelay<[PostModel]>
-        let myPageData: PublishRelay<[SectionMyPageData]>
+        let myPageData: PublishRelay<[MyPageDataType]>
         let showErrorAlert: PublishRelay<Void>
         let networkError: PublishRelay<NetworkError>
     }
     
     func transform(input: Input) -> Output {
         var nextCursor = ""
+        let checkRefreshToken = PublishRelay<Void>()
         let myProfile = PublishRelay<ProfileModel>()
         let myPosts = PublishRelay<[PostModel]>()
         let showErrorAlert = PublishRelay<Void>()
         let networkError = PublishRelay<NetworkError>()
-        let myPageData = PublishRelay<[SectionMyPageData]>()
+        let myPageData = PublishRelay<[MyPageDataType]>()
+        let outputConvertPosts = PublishRelay<[ConvertPost]>()
+        
+        input.checkAccessToken
+            .bind(with: self) { owner, _ in
+                let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
+                owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
+                    
+                    switch result {
+                    case .success(let success):
+                        UserDefaultsManager.shared.userNickname = success.nick
+                        UserDefaultsManager.shared.userID = success.userID
+                        UserDefaultsManager.shared.email = success.email
+                        UserDefaultsManager.shared.accessT = success.accessT
+                        UserDefaultsManager.shared.refreshT = success.refreshT
+                        UserDefaultsManager.shared.password = loginQuery.password
+                        print(#function, 1, UserDefaultsManager.shared.accessT)
+                        print(#function, 1, "로그인 성공")
+                        print(#function, 1, "액세스 토큰 갱신")
+                        
+                    case .failure(let error):
+                        switch error {
+                        case .expiredAccessToken:
+                            checkRefreshToken.accept(())
+                            print(#function, 1, "로그인 실패, 액세스 토큰 만료")
+                        default:
+                            print(#function, 1, "\(error)")
+                            networkError.accept(error)
+                            showErrorAlert.accept(())
+                        }
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        checkRefreshToken
+            .bind(with: self) { owner, value in
+                owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        UserDefaultsManager.shared.accessT = success.accessToken
+                        print(#function, 2, UserDefaultsManager.shared.accessT)
+                        print(#function, 2, "토큰 리프래시 완료")
+                        input.checkAccessToken.accept(())
+                    case .failure(let error):
+                        print(#function, 2, "리프래시 토큰 만료")
+                        networkError.accept(error)
+                        showErrorAlert.accept(())
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
         
         input.loadMyProfile
             .bind(with: self) { owner, _ in
-                LSLP_API.shared.callRequest(apiType: .fetchProfile, decodingType: ProfileModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .fetchProfile, decodingType: ProfileModel.self) { result in
                     switch result {
                     case .success(let profile):
                         myProfile.accept(profile)
@@ -53,7 +107,7 @@ final class MyPageViewModel: BaseViewModel {
         input.loadMyPosts
             .bind(with: self) { owner, _ in
                 nextCursor = "0"
-                LSLP_API.shared.callRequest(apiType: .fetchMyPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .fetchMyPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let posts):
                         owner.originalPosts = posts.data
@@ -69,11 +123,48 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(myProfile, myPosts)
-            .map { (profile, posts) -> [SectionMyPageData] in
-                let convertPosts = posts.map { MyPageData(type: .post, data: $0) }
+        @Sendable func convertPostFunction(posts: [PostModel]) async throws {
+            await withThrowingTaskGroup(of: ConvertPost.self) {  group in
+                var array: [ConvertPost] = []
+                for post in posts {
+                    group.addTask {
+                        do {
+                            let song = try await MusicManager.shared.requsetMusicId(id: post.content1)
+                            return ConvertPost(post: post, song: song)
+                        } catch {
+                            return ConvertPost(post: post, song: nil)
+                        }
+                    }
+                }
                 
-                return [SectionMyPageData(header: "Profile", items: [MyPageData(type: .profile, data: profile)]), SectionMyPageData(header: "MyPosts", items: convertPosts) ]
+                do {
+                    for try await post in group {
+                        array.append(post)
+                    }
+                } catch {
+                    print("Error: \(error.localizedDescription)")
+                }
+                
+                let recentArray = array.sorted(by: { $0.post.createdAt > $1.post.createdAt })
+                originalConvertPosts = recentArray
+                
+                outputConvertPosts.accept(originalConvertPosts)
+            }
+        }
+        
+        myPosts
+            .bind(with: self) { owner, value in
+                Task {
+                    try await convertPostFunction(posts: value)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(myProfile, outputConvertPosts)
+            .map { (profile, posts) -> [MyPageDataType] in
+                let convertPosts = posts.map { MyPageItem.postItem(item: $0) }
+                let result = MyPageDataType.post(items: convertPosts)
+                return [MyPageDataType.profile(items: [MyPageItem.profileItem(item: profile)]), result]
             }
             .bind(to: myPageData)
             .disposed(by: disposeBag)
@@ -96,7 +187,7 @@ final class MyPageViewModel: BaseViewModel {
                 owner.originalPosts[value] = updatedPost
                 let likeQuery = LikeQuery(like_status: isLike)
                 
-                LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success(let success):
                         print(#function, 3, success)
@@ -123,7 +214,7 @@ final class MyPageViewModel: BaseViewModel {
             .bind(with: self) { owner, value in
                 if nextCursor != "0" {
                     if value {
-                        LSLP_API.shared.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
+                        owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                             switch result {
                             case .success(let success):
                                 owner.originalPosts.append(contentsOf: success.data)

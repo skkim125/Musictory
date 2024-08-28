@@ -18,13 +18,14 @@ final class MusictoryHomeViewController: UIViewController {
     private var viewModel: MusictoryHomeViewModel!
     private let disposeBag = DisposeBag()
     
-    let checkAccessToken = PublishRelay<Void>()
-    let fetchPost = PublishRelay<Bool>()
+    private let checkAccessToken = PublishRelay<Void>()
+    private let checkRefreshToken = PublishRelay<Void>()
+    private let fetchPost = PublishRelay<Bool>()
     private var refreshControl = UIRefreshControl()
-    private let refreshLoading = PublishRelay<Void>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        checkAccessToken.accept(())
         configureView()
         bind()
     }
@@ -59,10 +60,10 @@ final class MusictoryHomeViewController: UIViewController {
         viewModel = MusictoryHomeViewModel()
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MusictoryHomeViewModel.Input(checkAccessToken: checkAccessToken, fetchPost: fetchPost, likePostIndex: likePostIndex, prefetching: prefetching)
+        let indexPaths = PublishRelay<[IndexPath]>()
+        let input = MusictoryHomeViewModel.Input(checkAccessToken: checkAccessToken, checkRefreshToken: checkRefreshToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetching: prefetching, prefetchIndexPatch: indexPaths)
         let output = viewModel.transform(input: input)
         
-        checkAccessToken.accept(())
         fetchPost.accept(true)
         
         output.showErrorAlert
@@ -72,7 +73,12 @@ final class MusictoryHomeViewController: UIViewController {
                     
                     switch error {
                     case .expiredAccessToken:
-                        print(error, 1)
+                        UserDefaultsManager.shared.accessT = ""
+                        UserDefaultsManager.shared.refreshT = ""
+                        UserDefaultsManager.shared.userID = ""
+                        
+                        let vc = LogInViewController()
+                        self.setRootViewController(vc)
                         
                     case .expiredRefreshToken:
                         UserDefaultsManager.shared.accessT = ""
@@ -123,24 +129,17 @@ final class MusictoryHomeViewController: UIViewController {
             return cell
         })
         
-        let indexPaths = PublishRelay<[IndexPath]>()
-        postCollectionView.rx.prefetchItems
-            .bind(to: indexPaths)
+        postCollectionView.rx.modelSelected(ConvertPost.self)
+            .bind(with: self) { owner, value in
+                let vc = MusictoryDetailView(/*post: value.0*/)
+                vc.currentPost = value
+                
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(indexPaths, output.convertPosts)
-            .map { (indexPaths, posts) in
-                for indexPath in indexPaths {
-                    if posts.count - 6 == indexPath.item {
-                        print(indexPath.item)
-                        return true
-                    } else {
-                        return false
-                    }
-                }
-                return false
-            }
-            .bind(to: prefetching)
+        postCollectionView.rx.prefetchItems
+            .bind(to: indexPaths)
             .disposed(by: disposeBag)
         
         output.convertPosts
@@ -181,12 +180,12 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     func updateCollectionViewMethod() {
-        refreshControl.beginRefreshing()
-        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         checkAccessToken.accept(())
+        fetchPost.accept(true)
+        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
+        refreshControl.beginRefreshing()
         
         DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
-            self.fetchPost.accept(true)
             self.refreshControl.endRefreshing()
         }
     }

@@ -37,6 +37,9 @@ final class LSLP_API {
                     return
                 }
                 
+                print("response.url =", response.url)
+                print("response.statusCode =", response.statusCode)
+                
                 switch response.statusCode {
                 case 200 :
                     guard let data = data else { return }

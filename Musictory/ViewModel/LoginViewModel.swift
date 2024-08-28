@@ -30,8 +30,16 @@ final class LoginViewModel: BaseViewModel {
         
         var loginQuery = LoginQuery(email: "", password: "")
         
-        Observable.combineLatest(input.email, input.password)
-            .map({ $0.0.trimmingCharacters(in: .whitespaces).count > 7 && $0.1.trimmingCharacters(in: .whitespaces).count > 7 })
+        let emailValidation = input.email
+            .map({ $0.trimmingCharacters(in: .whitespaces).count > 7 })
+            .share(replay: 1)
+        
+        let passwordValidation = input.password
+            .map({ $0.trimmingCharacters(in: .whitespaces).count > 7 })
+            .share(replay: 1)
+        
+        Observable.combineLatest(emailValidation, passwordValidation)
+            .map ({ $0 && $1 })
             .bind(with: self) { owner, value in
                 loginButtonEnable.accept(value)
             }
