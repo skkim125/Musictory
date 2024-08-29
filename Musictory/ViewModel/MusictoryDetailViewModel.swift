@@ -23,25 +23,54 @@ final class MusictoryDetailViewModel: BaseViewModel {
     private let disposeBag = DisposeBag()
     
     struct Input {
-        let checkAccessToken: PublishRelay<Void>
+        let checkRefreshToken: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
         let currentPost: PublishRelay<ConvertPost?>
+        let commentText: ControlProperty<String>
+        let sendCommendButtonTap: ControlEvent<Void>
     }
     
     struct Output {
         let postDetailData: BehaviorRelay<[PostDetailType]>
         let showErrorAlert: PublishRelay<Void>
         let networkError: PublishRelay<NetworkError>
+        let outputButtonEnable: Observable<Bool>
     }
     
     func transform(input: Input) -> Output {
+        var postID = ""
         let inputCurrentPost = input.currentPost
         let checkRefreshToken = PublishRelay<Void>()
         let showErrorAlert = PublishRelay<Void>()
         let networkError = PublishRelay<NetworkError>()
         let postData = BehaviorRelay<[PostDetailType]>(value: [])
         
-        input.checkAccessToken
+        let commentIsEmpty = input.commentText
+            .map({ !$0.trimmingCharacters(in: .whitespaces).isEmpty })
+        
+        input.sendCommendButtonTap
+            .withLatestFrom(input.commentText)
+            .bind(with: self) { owner, value in
+                let query = CommentsQuery(content: "\(value)")
+                owner.lslp_API.callRequest(apiType: .writeComment(postID, query), decodingType: CommentModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        print(success)
+                    case .failure(let error1):
+                        owner.lslp_API.updateRefresh { result in
+                            switch result {
+                            case .success(let success):
+                                owner.lslp_API.callRequest(apiType: .writeComment(value, query), decodingType: CommentModel.self)
+                            case .failure(let error2):
+                                print(error2)
+                            }
+                        }
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.checkRefreshToken
             .bind(with: self) { owner, _ in
                 let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
                 owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
@@ -64,28 +93,9 @@ final class MusictoryDetailViewModel: BaseViewModel {
                             checkRefreshToken.accept(())
                             print(#function, 1, "로그인 실패, 액세스 토큰 만료")
                         default:
-                            print(#function, 1, "\(error)")
                             networkError.accept(error)
                             showErrorAlert.accept(())
                         }
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-        
-        checkRefreshToken
-            .bind(with: self) { owner, value in
-                owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
-                    switch result {
-                    case .success(let success):
-                        UserDefaultsManager.shared.accessT = success.accessToken
-                        print(#function, 2, UserDefaultsManager.shared.accessT)
-                        print(#function, 2, "토큰 리프래시 완료")
-                        input.checkAccessToken.accept(())
-                    case .failure(let error):
-                        print(#function, 2, "리프래시 토큰 만료")
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
                     }
                 }
             }
@@ -96,7 +106,9 @@ final class MusictoryDetailViewModel: BaseViewModel {
                 post in
                 guard let post = post else { return []}
                 let convertComments = post.post.comments.map { PostDetailItem.commentItem(item: $0) }
-                
+                print(111111,postID)
+                postID = post.post.postID
+                print(111111,postID)
                 let result = PostDetailType.post(items: convertComments)
                 
                 let data = [PostDetailType.post(items: [PostDetailItem.postItem(item: post)]), result]
@@ -149,6 +161,6 @@ final class MusictoryDetailViewModel: BaseViewModel {
 //            }
 //            .disposed(by: disposeBag)
         
-        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, networkError: networkError)
+        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, networkError: networkError, outputButtonEnable: commentIsEmpty)
     }
 }

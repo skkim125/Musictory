@@ -14,6 +14,10 @@ import MusicKit
 
 final class MusictoryDetailView: UIViewController {
     private let musictoryDetailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
+    private let commentTFBackgroundView = UIView()
+    private let commentTextField = UITextField()
+    private let sendCommentButton = UIButton(type: .system)
+    private let divider = UIView()
     var viewModel = MusictoryDetailViewModel()
     var currentPost: ConvertPost?
     private let disposeBag = DisposeBag()
@@ -31,24 +35,75 @@ final class MusictoryDetailView: UIViewController {
         view.backgroundColor = .systemBackground
         
         view.addSubview(musictoryDetailCollectionView)
+        view.addSubview(commentTFBackgroundView)
+        view.addSubview(divider)
+        commentTFBackgroundView.addSubview(commentTextField)
+        commentTFBackgroundView.addSubview(sendCommentButton)
         
         musictoryDetailCollectionView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        commentTFBackgroundView.snp.makeConstraints { make in
+            make.height.equalTo(60)
+            make.top.equalTo(musictoryDetailCollectionView.snp.bottom)
+            make.bottom.equalTo(view.keyboardLayoutGuide.snp.top).inset(2)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        divider.snp.makeConstraints { make in
+            make.height.equalTo(1)
+            make.top.equalTo(commentTFBackgroundView.snp.top)
+            make.horizontalEdges.equalToSuperview()
+        }
+        
+        commentTextField.snp.makeConstraints { make in
+            make.verticalEdges.equalTo(commentTFBackgroundView).inset(10)
+            make.leading.equalTo(commentTFBackgroundView).inset(15)
+        }
+        
+        sendCommentButton.snp.makeConstraints { make in
+            make.height.equalTo(commentTextField.snp.height)
+            make.width.equalTo(sendCommentButton.snp.height)
+            make.centerY.equalTo(commentTextField)
+            make.leading.equalTo(commentTextField.snp.trailing).offset(15)
+            make.trailing.equalTo(commentTFBackgroundView.snp.trailing).inset(15)
         }
         
         musictoryDetailCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         musictoryDetailCollectionView.register(PostDetailCommentsCollectionViewCell.self, forCellWithReuseIdentifier: PostDetailCommentsCollectionViewCell.identifier)
+        
+        divider.backgroundColor = .systemGray5
+        
+        commentTFBackgroundView.backgroundColor = .systemBackground
+        
+        commentTextField.borderStyle = .none
+        commentTextField.layer.cornerRadius = 15
+        commentTextField.clipsToBounds = true
+        commentTextField.backgroundColor = .systemGray5
+        commentTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
+        commentTextField.leftViewMode = .always
+        commentTextField.rightView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
+        commentTextField.rightViewMode = .always
+        commentTextField.font = .systemFont(ofSize: 15)
+        
+        sendCommentButton.setImage(UIImage(systemName: "paperplane.fill"), for: .normal)
+        sendCommentButton.imageView?.contentMode = .scaleAspectFit
+        sendCommentButton.tintColor = .white
+        sendCommentButton.layer.cornerRadius = sendCommentButton.bounds.width / 2
+        sendCommentButton.clipsToBounds = true
+        sendCommentButton.backgroundColor = .systemRed
     }
     
     private func bind(currentPost: ConvertPost?) {
-        let checkAccessToken = PublishRelay<Void>()
+        let checkRefreshToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
         let post = PublishRelay<ConvertPost?>()
         
-        let input = MusictoryDetailViewModel.Input(checkAccessToken: checkAccessToken , likePostIndex: likePostIndex, currentPost: post)
+        let input = MusictoryDetailViewModel.Input(checkRefreshToken: checkRefreshToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap)
         let output = viewModel.transform(input: input)
-        checkAccessToken.accept(())
         
+        checkRefreshToken.accept(())
         post.accept(currentPost)
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailType> (configureCell: { dataSource, collectionView, indexPath, item in
@@ -60,7 +115,7 @@ final class MusictoryDetailView: UIViewController {
                 cell.configureCell(.home, post: post.post)
                 
                 if let song = post.song {
-                    cell.configureSongView(song: song) { tapGesture in
+                    cell.configureSongView(song: song, viewType: .home) { tapGesture in
                         tapGesture
                             .bind(with: self) { owner, _ in
                                 owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
@@ -101,21 +156,6 @@ final class MusictoryDetailView: UIViewController {
             .bind(to: musictoryDetailCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-//        if let currentPost = currentPost {
-//            let test = BehaviorRelay<[PostDetailType]>(value: [])
-//            let convertComments = currentPost.post.comments.map { PostDetailItem.commentItem(item: $0) }
-//            let result = PostDetailType.post(items: convertComments)
-//            
-//            let testData = [PostDetailType.post(items: [PostDetailItem.postItem(item: currentPost)]), result]
-//            test.accept(testData)
-//            
-//            test
-//                .bind(to: musictoryDetailCollectionView.rx.items(dataSource: dataSource))
-//                .disposed(by: disposeBag)
-//            
-//            
-//        }
-        
         let indexPaths = PublishRelay<[IndexPath]>()
         musictoryDetailCollectionView.rx.prefetchItems
             .bind(to: indexPaths)
@@ -135,6 +175,10 @@ final class MusictoryDetailView: UIViewController {
                     }
                 }
             }
+            .disposed(by: disposeBag)
+        
+        output.outputButtonEnable
+            .bind(to: sendCommentButton.rx.isEnabled)
             .disposed(by: disposeBag)
     }
 }

@@ -55,40 +55,69 @@ final class CustomSongView: UIView {
         songSubView.forEach { subView in
             addSubview(subView)
         }
-        
-        configureView()
     }
     
-    private func configureView() {
-        songImageView.snp.makeConstraints { make in
-            make.leading.verticalEdges.equalTo(self).inset(7)
-            make.width.equalTo(songImageView.snp.height)
-        }
+    private func configureView(viewType: ViewType) {
         
-        songTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(songImageView.snp.top).offset(5)
-            make.leading.equalTo(songImageView.snp.trailing).offset(10)
-        }
-        
-        songPlayButton.snp.makeConstraints { make in
-            make.leading.equalTo(songTitleLabel.snp.trailing).offset(10)
-            make.trailing.equalTo(self.snp.trailing).inset(10)
-            make.size.equalTo(30)
-            make.centerY.equalTo(songImageView)
-        }
-        
-        songArtistLabel.snp.makeConstraints { make in
-            make.leading.equalTo(songTitleLabel)
-            make.trailing.equalTo(songPlayButton.snp.leading).inset(-10)
-            make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
+        switch viewType {
+        case .home:
+            songImageView.snp.makeConstraints { make in
+                make.leading.verticalEdges.equalTo(self).inset(7)
+                make.width.equalTo(songImageView.snp.height)
+            }
+            
+            songTitleLabel.snp.makeConstraints { make in
+                make.top.equalTo(songImageView.snp.top).offset(5)
+                make.leading.equalTo(songImageView.snp.trailing).offset(10)
+            }
+            
+            songPlayButton.snp.makeConstraints { make in
+                make.leading.equalTo(songTitleLabel.snp.trailing).offset(10)
+                make.trailing.equalTo(self.snp.trailing).inset(10)
+                make.size.equalTo(30)
+                make.centerY.equalTo(songImageView)
+            }
+            
+            songArtistLabel.snp.makeConstraints { make in
+                make.leading.equalTo(songTitleLabel)
+                make.trailing.equalTo(songPlayButton.snp.leading).inset(-10)
+                make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
+            }
+        case .myPage:
+            songTitleLabel.snp.makeConstraints { make in
+                make.top.equalTo(self).offset(5)
+                make.leading.equalTo(self).offset(10)
+            }
+            
+            songPlayButton.snp.makeConstraints { make in
+                make.leading.equalTo(songTitleLabel.snp.trailing).offset(5)
+                make.trailing.equalTo(self.snp.trailing).inset(5)
+                make.size.equalTo(30)
+                make.centerY.equalTo(self)
+            }
+            
+            songArtistLabel.snp.makeConstraints { make in
+                make.leading.equalTo(songTitleLabel)
+                make.trailing.equalTo(songPlayButton.snp.leading).inset(-10)
+                make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
+            }
         }
     }
     
-    func configureUI(song: Song) {
+    func configureUI(song: Song, viewType: ViewType) {
+        configureView(viewType: viewType)
+        
+        switch viewType {
+        case .home:
+            guard let url = song.artwork?.url(width: 80, height: 80) else { return }
+            songImageView.kf.setImage(with: url)
+        case .myPage:
+            songImageView.isHidden = true
+//            guard let url = song.artwork?.url(width: 150, height: 150) else { return }
+//            songImageView.kf.setImage(with: url)
+        }
         songTitleLabel.text = song.title
         songArtistLabel.text = song.artistName
-        guard let url = song.artwork?.url(width: 80, height: 80) else { return }
-        songImageView.kf.setImage(with: url)
     }
     
     required init?(coder: NSCoder) {

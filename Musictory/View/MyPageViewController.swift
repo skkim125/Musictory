@@ -13,12 +13,12 @@ import RxGesture
 import RxDataSources
 
 final class MyPageViewController: UIViewController {
-    private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
+    private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionView())
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageViewModel()
-    private let checkAccessToken = PublishRelay<Void>()
-    private let loadMyProfile = PublishRelay<Bool>()
-    private let loadMyPost = PublishRelay<Bool>()
+    private let checkRefreshToken = PublishRelay<Void>()
+    private let loadMyProfile = PublishRelay<Void>()
+    private let loadMyPost = PublishRelay<Void>()
     private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
@@ -48,12 +48,12 @@ final class MyPageViewController: UIViewController {
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MyPageViewModel.Input(checkAccessToken: checkAccessToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MyPageViewModel.Input(checkRefreshToken: checkRefreshToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
-        checkAccessToken.accept(())
-        loadMyProfile.accept(true)
-        loadMyPost.accept(true)
+        checkRefreshToken.accept(())
+        loadMyProfile.accept(())
+        loadMyPost.accept(())
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { dataSource, collectionView, indexPath, item in
             
@@ -63,18 +63,18 @@ final class MyPageViewController: UIViewController {
                 
                 
                 let nickname = profile.nick + "님,\n반가워요!"
-                print("profile =", profile.profileImage)
                 cell.configureUI(profileImage: profile.profileImage ?? "", nickname: nickname)
                 
                 return cell
             case .postItem(item: let post):
+                self.view.addSubview(UIImageView(image: UIImage(systemName: "pin")))
                 
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
-                cell.configureCell(.home, post: post.post)
+                cell.configureCell(.myPage, post: post.post)
                 
                 if let song = post.song {
-                    cell.configureSongView(song: song) { tapGesture in
+                    cell.configureSongView(song: song, viewType: .myPage) { tapGesture in
                         tapGesture
                             .bind(with: self) { owner, _ in
                                 owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
@@ -96,14 +96,31 @@ final class MyPageViewController: UIViewController {
                         .disposed(by: cell.disposeBag)
                 }
                 
+                cell.backgroundColor = .systemBackground
                 cell.layer.cornerRadius = 12
-                cell.clipsToBounds = true
+                cell.layer.shadowRadius = 1.5
+                cell.layer.shadowColor = UIColor.opaqueSeparator.cgColor
+                cell.layer.shadowOffset = CGSize(width: 0, height: 0)
+                cell.layer.shadowOpacity = 0.9
                 
                 return cell
-                
             }
 
         })
+        
+        myPostCollectionView.rx.modelSelected(MyPageDataType.Item.self)
+            .bind(with: self) { owner, value in
+                switch value {
+                case.postItem(item: let item):
+                    let vc = MusictoryDetailView()
+                    vc.currentPost = item
+                    
+                    owner.navigationController?.pushViewController(vc, animated: true)
+                default:
+                    break
+                }
+            }
+            .disposed(by: disposeBag)
         
         output.myPageData
             .bind(to: myPostCollectionView.rx.items(dataSource: dataSource))
@@ -159,7 +176,7 @@ final class MyPageViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        checkAccessToken.accept(())
+        checkRefreshToken.accept(())
     }
 }
 

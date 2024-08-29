@@ -17,6 +17,20 @@ final class TabViewController: UITabBarController {
 
         tabBar.tintColor = .systemRed
         
+        tabBar.isTranslucent = true
+
+        tabBar.layer.shadowColor = UIColor.label.cgColor
+        tabBar.layer.shadowOpacity = 0.3
+        tabBar.layer.shadowOffset = CGSize(width: 0, height: 0)
+        tabBar.layer.shadowRadius = 0.3
+        
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+
+        tabBar.standardAppearance = appearance
+        tabBar.scrollEdgeAppearance = appearance
+        
+        
         homeViewController = UINavigationController(rootViewController: MusictoryHomeViewController())
         homeViewController.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "house"), tag: 0)
 

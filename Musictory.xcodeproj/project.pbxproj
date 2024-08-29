@@ -61,6 +61,7 @@
 		04E4306D2C6E1912007FA9C6 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306C2C6E1912007FA9C6 /* Toast */; };
 		04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */; };
 		04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430722C6E2142007FA9C6 /* MusadoraKit */; };
+		04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1829A2C80A1A10073B882 /* CommentsQuery.swift */; };
 		04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */; };
 		04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */; };
 		04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */; };
@@ -113,6 +114,7 @@
 		04E430582C6CF68F007FA9C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		04E4305E2C6CF8B9007FA9C6 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		04E430622C6DCA4C007FA9C6 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
+		04F1829A2C80A1A10073B882 /* CommentsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsQuery.swift; sourceTree = "<group>"; };
 		04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailView.swift; sourceTree = "<group>"; };
 		04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailViewModel.swift; sourceTree = "<group>"; };
 		04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCommentsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -241,6 +243,7 @@
 				045833882C74AF14000D6E81 /* PostQuery.swift */,
 				045833D52C774F3E000D6E81 /* WritePostQuery.swift */,
 				045833D72C786FE1000D6E81 /* LikeQuery.swift */,
+				04F1829A2C80A1A10073B882 /* CommentsQuery.swift */,
 			);
 			path = QueryModel;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
 				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,
+				04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */,
 				045833C12C763CC9000D6E81 /* AddSongViewController.swift in Sources */,
 				045833B92C75E536000D6E81 /* WriteMusictoryViewController.swift in Sources */,
 				048DFE092C738E33000F5293 /* MusictoryHomeViewController.swift in Sources */,

@@ -35,10 +35,10 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
             make.centerY.equalTo(userProfileImageView.snp.centerY)
             make.height.equalTo(50)
             make.leading.equalTo(userProfileImageView.snp.trailing).offset(15)
-            make.trailing.equalTo(safeAreaLayoutGuide).offset(20)
+            make.trailing.equalTo(safeAreaLayoutGuide).inset(20)
         }
         
-        userProfileImageView.contentMode = .scaleAspectFill
+        userProfileImageView.contentMode = .scaleAspectFit
         userProfileImageView.tintColor = .systemRed
         
         userNicknameLabel.textAlignment = .center

@@ -17,6 +17,7 @@ enum LSLPRouter {
     case fetchProfile
     case fetchMyPost(PostQuery)
     case uploadImage(Data, String)
+    case writeComment(String, CommentsQuery)
 }
 
 extension LSLPRouter {
@@ -27,7 +28,7 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost, .like, .uploadImage:
+        case .login, .writePost, .like, .uploadImage, .writeComment:
             "POST"
         case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
             "GET"
@@ -52,6 +53,8 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/files"
         case .fetchMyPost:
             APIPath.fetchPost.rawValue + "/users" + "/\(UserDefaultsManager.shared.userID)"
+        case .writeComment(let id, _):
+            APIPath.fetchPost.rawValue + "/\(id)" + "/comments"
         }
     }
     
@@ -74,7 +77,7 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.refresh.rawValue: UserDefaultsManager.shared.refreshT
             ]
-        case .writePost, .like:
+        case .writePost, .like, .writeComment:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
@@ -123,6 +126,8 @@ extension LSLPRouter {
             body.append("--\(boundary)--\r\n".data(using: .utf8)!)
             
             return body
+        case .writeComment( _, let commentQuery):
+            return try? encoder.encode(commentQuery)
         default:
             return nil
         }
@@ -174,23 +179,48 @@ extension LSLPRouter {
             switch statusCode {
             case 410:
                 return NetworkError.custom("삭제된 게시물입니다.")
+            case 419:
+                return NetworkError.expiredAccessToken
             default:
                 return NetworkError.custom("\(statusCode)")
             }
         case .fetchPostOfReload:
-            print(statusCode)
-            return NetworkError.custom("\(statusCode)")
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
             
         case .fetchProfile:
-            print(statusCode)
-            return NetworkError.custom("\(statusCode)")
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
             
         case .uploadImage:
-            print(statusCode)
-            return NetworkError.custom("\(statusCode)")
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
         case .fetchMyPost(_):
-            print(statusCode)
-            return NetworkError.custom("\(statusCode)")
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
+        case .writeComment(_, _):
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
         }
     }
 }

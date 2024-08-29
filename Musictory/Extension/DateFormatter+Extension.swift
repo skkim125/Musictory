@@ -17,7 +17,7 @@ extension DateFormatter {
         if let date = dateFormatter.date(from: isoDate) {
             
             let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "MM월 dd일 HH시 mm분"
+            outputFormatter.dateFormat = "MM월 dd일"// HH시"
             let formattedDate = outputFormatter.string(from: date)
             
             return formattedDate

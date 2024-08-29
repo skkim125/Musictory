@@ -16,9 +16,9 @@ final class MyPageViewModel: BaseViewModel {
     let disposeBag = DisposeBag()
     
     struct Input {
-        let checkAccessToken: PublishRelay<Void>
-        let loadMyProfile: PublishRelay<Bool>
-        let loadMyPosts: PublishRelay<Bool>
+        let checkRefreshToken: PublishRelay<Void>
+        let loadMyProfile: PublishRelay<Void>
+        let loadMyPosts: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
     }
@@ -41,50 +41,14 @@ final class MyPageViewModel: BaseViewModel {
         let myPageData = PublishRelay<[MyPageDataType]>()
         let outputConvertPosts = PublishRelay<[ConvertPost]>()
         
-        input.checkAccessToken
+        input.checkRefreshToken
             .bind(with: self) { owner, _ in
-                let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
-                owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
-                    
-                    switch result {
-                    case .success(let success):
-                        UserDefaultsManager.shared.userNickname = success.nick
-                        UserDefaultsManager.shared.userID = success.userID
-                        UserDefaultsManager.shared.email = success.email
-                        UserDefaultsManager.shared.accessT = success.accessT
-                        UserDefaultsManager.shared.refreshT = success.refreshT
-                        UserDefaultsManager.shared.password = loginQuery.password
-                        print(#function, 1, UserDefaultsManager.shared.accessT)
-                        print(#function, 1, "로그인 성공")
-                        print(#function, 1, "액세스 토큰 갱신")
-                        
-                    case .failure(let error):
-                        switch error {
-                        case .expiredAccessToken:
-                            checkRefreshToken.accept(())
-                            print(#function, 1, "로그인 실패, 액세스 토큰 만료")
-                        default:
-                            print(#function, 1, "\(error)")
-                            networkError.accept(error)
-                            showErrorAlert.accept(())
-                        }
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-        
-        checkRefreshToken
-            .bind(with: self) { owner, value in
-                owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+                owner.lslp_API.updateRefresh { result in
                     switch result {
                     case .success(let success):
                         UserDefaultsManager.shared.accessT = success.accessToken
-                        print(#function, 2, UserDefaultsManager.shared.accessT)
-                        print(#function, 2, "토큰 리프래시 완료")
-                        input.checkAccessToken.accept(())
-                    case .failure(let error):
-                        print(#function, 2, "리프래시 토큰 만료")
-                        networkError.accept(error)
+                    case .failure(let error2):
+                        networkError.accept(error2)
                         showErrorAlert.accept(())
                     }
                 }
@@ -97,8 +61,24 @@ final class MyPageViewModel: BaseViewModel {
                     switch result {
                     case .success(let profile):
                         myProfile.accept(profile)
-                    case .failure(let error):
-                        print("마이페이지", error.localizedDescription)
+                    case .failure(let error1):
+                        switch error1 {
+                        case .expiredAccessToken, .expiredRefreshToken:
+                            owner.lslp_API.updateRefresh { result in
+                                switch result {
+                                case .success(let success):
+                                    UserDefaultsManager.shared.accessT = success.accessToken
+                                    input.loadMyProfile.accept(())
+                                case .failure(let error2):
+                                    networkError.accept(error2)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                            
+                        default:
+                            networkError.accept(error1)
+                            showErrorAlert.accept(())
+                        }
                     }
                 }
             }
@@ -116,8 +96,24 @@ final class MyPageViewModel: BaseViewModel {
                             nextCursor = posts.nextCursor
                         }
                         
-                    case .failure(let error):
-                        print("마이 포스트", error.localizedDescription)
+                    case .failure(let error1):
+                        switch error1 {
+                        case .expiredAccessToken, .expiredRefreshToken:
+                            owner.lslp_API.updateRefresh { result in
+                                switch result {
+                                case .success(let success):
+                                    UserDefaultsManager.shared.accessT = success.accessToken
+                                    input.loadMyPosts.accept(())
+                                case .failure(let error2):
+                                    networkError.accept(error2)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                            
+                        default:
+                            networkError.accept(error1)
+                            showErrorAlert.accept(())
+                        }
                     }
                 }
             }
@@ -195,16 +191,32 @@ final class MyPageViewModel: BaseViewModel {
                         owner.originalPosts[value] = updatedPost
                         myPosts.accept(owner.originalPosts)
                         
-                    case .failure(let error):
-                        if isLike {
-                            updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
-                        } else {
-                            updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                    case .failure(let error1):
+                        switch error1 {
+                        case .expiredAccessToken, .expiredRefreshToken:
+                            owner.lslp_API.updateRefresh { result in
+                                switch result {
+                                case .success(let success):
+                                    UserDefaultsManager.shared.accessT = success.accessToken
+                                    input.likePostIndex.accept(value)
+                                case .failure(let error2):
+                                    
+                                    if isLike {
+                                        updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
+                                    } else {
+                                        updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                                    }
+                                    owner.originalPosts[value] = updatedPost
+                                    myPosts.accept(owner.originalPosts)
+                                    outputConvertPosts.accept(owner.originalConvertPosts)
+                                    networkError.accept(error2)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                        default:
+                            networkError.accept(error1)
+                            showErrorAlert.accept(())
                         }
-                        owner.originalPosts[value] = updatedPost
-                        myPosts.accept(owner.originalPosts)
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
                     }
                 }
             }

@@ -15,19 +15,20 @@ import MediaPlayer
 
 final class MusictoryHomeViewController: UIViewController {
     private let postCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.home))
-    private var viewModel: MusictoryHomeViewModel!
+    private var viewModel: MusictoryHomeViewModel = MusictoryHomeViewModel()
     private let disposeBag = DisposeBag()
     
-    private let checkAccessToken = PublishRelay<Void>()
-    private let checkRefreshToken = PublishRelay<Void>()
-    private let fetchPost = PublishRelay<Bool>()
+    private let checkAccessToken = PublishSubject<Void>()
+    private let checkRefreshToken = PublishSubject<Void>()
+    private let fetchPost = PublishSubject<Void>()
     private var refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        checkAccessToken.accept(())
         configureView()
         bind()
+        
+        fetchPost.onNext(())
     }
     
     private func configureView() {
@@ -57,14 +58,13 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     private func bind() {
-        viewModel = MusictoryHomeViewModel()
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
         let indexPaths = PublishRelay<[IndexPath]>()
         let input = MusictoryHomeViewModel.Input(checkAccessToken: checkAccessToken, checkRefreshToken: checkRefreshToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetching: prefetching, prefetchIndexPatch: indexPaths)
         let output = viewModel.transform(input: input)
         
-        fetchPost.accept(true)
+//        fetchPost.onNext(())
         
         output.showErrorAlert
             .withLatestFrom(output.networkError)
@@ -72,15 +72,7 @@ final class MusictoryHomeViewController: UIViewController {
                 self.showAlert(title: error.title, message: error.alertMessage) {
                     
                     switch error {
-                    case .expiredAccessToken:
-                        UserDefaultsManager.shared.accessT = ""
-                        UserDefaultsManager.shared.refreshT = ""
-                        UserDefaultsManager.shared.userID = ""
-                        
-                        let vc = LogInViewController()
-                        self.setRootViewController(vc)
-                        
-                    case .expiredRefreshToken:
+                    case .expiredRefreshToken, .expiredAccessToken:
                         UserDefaultsManager.shared.accessT = ""
                         UserDefaultsManager.shared.refreshT = ""
                         UserDefaultsManager.shared.userID = ""
@@ -101,7 +93,7 @@ final class MusictoryHomeViewController: UIViewController {
             
             cell.configureCell(.home, post: item.post)
             if let song = item.song {
-                cell.configureSongView(song: song) { tapGesture in
+                cell.configureSongView(song: song, viewType: .home) { tapGesture in
                     tapGesture
                         .bind(with: self) { owner, _ in
                             owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
@@ -176,16 +168,16 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     @objc func updateCollectionView(_ notification: Notification) {
+        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         updateCollectionViewMethod()
+        NotificationCenter.default.removeObserver(self, name: Notification.Name("updatePost"), object: nil)
     }
     
     func updateCollectionViewMethod() {
-        checkAccessToken.accept(())
-        fetchPost.accept(true)
-        postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         refreshControl.beginRefreshing()
         
-        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 2) {
+        DispatchQueue.main.asyncAfter(wallDeadline: .now() + 1.5) {
+            self.fetchPost.onNext(())
             self.refreshControl.endRefreshing()
         }
     }

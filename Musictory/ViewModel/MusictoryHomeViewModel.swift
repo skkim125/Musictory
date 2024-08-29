@@ -22,16 +22,16 @@ final class MusictoryHomeViewModel: BaseViewModel {
     let disposeBag = DisposeBag()
     
     struct Input {
-        let checkAccessToken: PublishRelay<Void>
-        let checkRefreshToken: PublishRelay<Void>
-        let fetchPost: PublishRelay<Bool>
+        let checkAccessToken: PublishSubject<Void>
+        let checkRefreshToken: PublishSubject<Void>
+        let fetchPost: PublishSubject<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
         let prefetchIndexPatch: PublishRelay<[IndexPath]>
     }
     
     struct Output {
-        let convertPosts: PublishRelay<[ConvertPost]>
+        let convertPosts: BehaviorRelay<[ConvertPost]>
         let likeTogglePost: PublishRelay<ConvertPost>
         let showErrorAlert: PublishRelay<Void>
         let networkError: PublishRelay<NetworkError>
@@ -41,63 +41,27 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let showErrorAlert = PublishRelay<Void>()
         var nextCursor = "0"
         let posts = BehaviorRelay<[PostModel]>(value: [])
-        let outputConvertPosts = PublishRelay<[ConvertPost]>()
+        let outputConvertPosts = BehaviorRelay<[ConvertPost]>(value: [])
         let networkError = PublishRelay<NetworkError>()
         let newPost = PublishRelay<ConvertPost>()
         
-        input.checkAccessToken
-            .bind(with: self) { owner, _ in
-                let loginQuery = LoginQuery(email: UserDefaultsManager.shared.email, password: UserDefaultsManager.shared.password)
-                owner.lslp_API.callRequest(apiType: .login(loginQuery), decodingType: LoginModel.self) { result  in
-                    
-                    switch result {
-                    case .success(let success):
-                        UserDefaultsManager.shared.userNickname = success.nick
-                        UserDefaultsManager.shared.userID = success.userID
-                        UserDefaultsManager.shared.email = success.email
-                        UserDefaultsManager.shared.accessT = success.accessT
-                        UserDefaultsManager.shared.refreshT = success.refreshT
-                        UserDefaultsManager.shared.password = loginQuery.password
-                        print(#function, 1, UserDefaultsManager.shared.accessT)
-                        print(#function, 1, "로그인 성공")
-                        print(#function, 1, "액세스 토큰 갱신")
-                        
-                    case .failure(let error):
-                        switch error {
-                        case .expiredAccessToken:
-                            input.checkAccessToken.accept(())
-                            print(#function, 1, "로그인 실패, 액세스 토큰 만료")
-                        default:
-                            print(#function, 1, "\(error)")
-                            networkError.accept(error)
-                            showErrorAlert.accept(())
-                        }
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-        
         input.checkRefreshToken
-            .bind(with: self) { owner, value in
-                owner.lslp_API.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+            .bind(with: self) { owner, _ in
+                owner.lslp_API.updateRefresh { result in
                     switch result {
                     case .success(let success):
-                       UserDefaultsManager.shared.accessT = success.accessToken
-                        print(#function, 2, UserDefaultsManager.shared.accessT)
-                        print(#function, 2, "토큰 리프래시 완료")
-                        input.checkAccessToken.accept(())
-                    case .failure(let error):
-                        print(#function, 2, "리프래시 토큰 만료")
-                        networkError.accept(error)
+                        UserDefaultsManager.shared.accessT = success.accessToken
+                    case .failure(let error2):
+                        networkError.accept(error2)
                         showErrorAlert.accept(())
                     }
                 }
             }
             .disposed(by: disposeBag)
         
+        
         input.fetchPost
-            .bind(with: self) { owner, value in
-                guard value else { return }
+            .bind(with: self) { owner, _ in
                 nextCursor = "0"
                 owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
@@ -110,10 +74,24 @@ final class MusictoryHomeViewModel: BaseViewModel {
                             print("nextCursor = \(nextCursor)")
                         }
 
-                    case .failure(let error):
-                        input.checkAccessToken.accept(())
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
+                    case .failure(let error1):
+                        switch error1 {
+                        case .expiredAccessToken, .expiredRefreshToken:
+                            owner.lslp_API.updateRefresh { result in
+                                switch result {
+                                case .success(let success):
+                                    UserDefaultsManager.shared.accessT = success.accessToken
+                                    input.fetchPost.onNext(())
+                                case .failure(let error2):
+                                    networkError.accept(error2)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                            
+                        default:
+                            networkError.accept(error1)
+                            showErrorAlert.accept(())
+                        }
                     }
                 }
             }
@@ -129,7 +107,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.likePostIndex
             .bind(with: self) { owner, value in
-                input.checkAccessToken.accept(())
+                input.checkAccessToken.onNext(())
                 var updatedPost = owner.originalConvertPosts[value].post
                 
                 var isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
@@ -151,18 +129,32 @@ final class MusictoryHomeViewModel: BaseViewModel {
                         print(#function, 4, owner.originalConvertPosts[value])
                         owner.originalConvertPosts[value].post = updatedPost
                         newPost.accept(owner.originalConvertPosts[value])
-                        
-                    case .failure(let error):
-                        input.checkRefreshToken.accept(())
-                        if isLike {
-                            updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
-                        } else {
-                            updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                        outputConvertPosts.accept(owner.originalConvertPosts)
+                    case .failure(let error1):
+                        switch error1 {
+                        case .expiredAccessToken, .expiredRefreshToken:
+                            owner.lslp_API.updateRefresh { result in
+                                switch result {
+                                case .success(let success):
+                                    UserDefaultsManager.shared.accessT = success.accessToken
+                                    input.likePostIndex.accept(value)
+                                case .failure(let error2):
+                                    if isLike {
+                                        updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
+                                    } else {
+                                        updatedPost.likes.append(UserDefaultsManager.shared.userID)
+                                    }
+                                    owner.originalConvertPosts[value].post = updatedPost
+                                    newPost.accept(owner.originalConvertPosts[value])
+                                    outputConvertPosts.accept(owner.originalConvertPosts)
+                                    networkError.accept(error2)
+                                    showErrorAlert.accept(())
+                                }
+                            }
+                        default:
+                            networkError.accept(error1)
+                            showErrorAlert.accept(())
                         }
-                        owner.originalConvertPosts[value].post = updatedPost
-                        newPost.accept(owner.originalConvertPosts[value])
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
                     }
                 }
             }
@@ -170,7 +162,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.prefetching
             .bind(with: self) { owner, value in
-//                input.checkAccessToken.accept(())
                 if nextCursor != "0" {
                     if value {
                         owner.lslp_API.callRequest(apiType: .fetchPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
@@ -182,9 +173,24 @@ final class MusictoryHomeViewModel: BaseViewModel {
                                 print(#function, 5, success.nextCursor)
                                 print(#function, 6, nextCursor)
                                 input.prefetching.accept(false)
-                            case .failure(let error):
-                                networkError.accept(error)
-                                showErrorAlert.accept(())
+                            case .failure(let error1):
+                                switch error1 {
+                                case .expiredAccessToken, .expiredRefreshToken:
+                                    owner.lslp_API.updateRefresh { result in
+                                        switch result {
+                                        case .success(let success):
+                                            UserDefaultsManager.shared.accessT = success.accessToken
+                                            input.fetchPost.onNext(())
+                                        case .failure(let error2):
+                                            networkError.accept(error2)
+                                            showErrorAlert.accept(())
+                                        }
+                                    }
+                                    
+                                default:
+                                    networkError.accept(error1)
+                                    showErrorAlert.accept(())
+                                }
                             }
                         }
                     }
@@ -222,17 +228,6 @@ final class MusictoryHomeViewModel: BaseViewModel {
         }
         
         Observable.combineLatest(input.prefetchIndexPatch, outputConvertPosts)
-//            .map { (indexPaths, posts) in
-//                print("indexPaths", indexPaths)
-//                indexPaths.forEach { indexPath in
-//                    if posts.count - 5 == indexPath.item, posts.count > indexPath.item {
-//                        print("indexPath", indexPath.item)
-//                        return true
-//                    } else {
-//                        return false
-//                    }
-//                }
-//            }
             .bind(with: self, onNext: { owner, value in
                 
                 print("indexPaths", value.0)

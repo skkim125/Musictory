@@ -50,6 +50,21 @@ final class LSLP_API {
                     } catch {
                         completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
+                case 419:
+                    self.updateRefresh() { [weak self] result in
+                        guard let self = self else { return }
+                        switch result {
+                        case .success(let success):
+                            UserDefaultsManager.shared.accessT = success.accessToken
+                            print(#function, 2, UserDefaultsManager.shared.accessT)
+                            self.callRequest(apiType: apiType, decodingType: decodingType)
+                        case .failure(let error):
+                            print(response.url)
+                            let error = apiType.errorHandler(statusCode: response.statusCode)
+                            print(response.statusCode)
+                            completionHandler?(.failure(error))
+                        }
+                    }
                 default:
                     print(response.url)
                     let error = apiType.errorHandler(statusCode: response.statusCode)
@@ -107,5 +122,11 @@ final class LSLP_API {
                 }
             }
         }.resume()
+    }
+    
+    func updateRefresh(completionHandler: ((Result<RefreshModel, NetworkError>) -> Void)? = nil) {
+        self.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+            completionHandler?(result)
+        }
     }
 }

@@ -60,77 +60,130 @@ final class PostCollectionViewCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: .zero)
         
-        configureView()
+        configureUI()
     }
     
-    private func configureView() {
+    private func configureView(type: ViewType) {
         let subViews = [userImageView, userNicknameLabel, postTitleLabel, postContentLabel, postCreateAtLabel, songView, likeButton, likeCountLabel, commentImageView, commentCountLabel]
 
         subViews.forEach { subView in
             contentView.addSubview(subView)
         }
         
-        userImageView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
-            make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
-            make.size.equalTo(30)
-        }
-        
-        userNicknameLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(userImageView)
-            make.leading.equalTo(userImageView.snp.trailing).offset(5)
-        }
-        
-        postCreateAtLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(userNicknameLabel)
-            make.leading.equalTo(userNicknameLabel.snp.trailing).offset(10)
-            make.width.equalTo(120)
-            make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
-        }
-        
-        postTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(userImageView.snp.bottom).offset(10)
-            make.leading.equalTo(userImageView.snp.leading).offset(5)
-            make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
-            make.height.equalTo(20)
-        }
-        
-        postContentLabel.snp.makeConstraints { make in
-            make.top.equalTo(postTitleLabel.snp.bottom).offset(5)
-            make.leading.equalTo(postTitleLabel.snp.leading)
-            make.trailing.equalTo(contentView.safeAreaLayoutGuide).offset(20)
-            make.height.equalTo(15)
-        }
-        
-        songView.snp.makeConstraints { make in
-            make.top.equalTo(postContentLabel.snp.bottom).offset(5)
-            make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(10)
-            make.height.equalTo(70)
-        }
-        
-        likeButton.snp.makeConstraints { make in
-            make.top.equalTo(songView.snp.bottom).offset(5)
-            make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
-            make.size.equalTo(30)
-        }
-        
-        likeCountLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(likeButton)
-            make.leading.equalTo(likeButton.snp.trailing).offset(5)
-        }
-        
-        commentImageView.snp.makeConstraints { make in
-            make.top.equalTo(songView.snp.bottom).offset(5)
-            make.leading.equalTo(likeCountLabel.snp.trailing).offset(20)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
-            make.size.equalTo(25)
-        }
-        
-        commentCountLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(commentImageView)
-            make.leading.equalTo(commentImageView.snp.trailing).offset(5)
-            make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+        switch type {
+        case .home:
+            userImageView.snp.makeConstraints { make in
+                make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
+                make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
+                make.size.equalTo(30)
+            }
+            
+            userNicknameLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(userImageView)
+                make.leading.equalTo(userImageView.snp.trailing).offset(5)
+            }
+            
+            postCreateAtLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(userNicknameLabel)
+                make.leading.equalTo(userNicknameLabel.snp.trailing).offset(10)
+                make.width.equalTo(120)
+                make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
+            }
+            
+            postTitleLabel.snp.makeConstraints { make in
+                make.top.equalTo(userImageView.snp.bottom).offset(10)
+                make.leading.equalTo(userImageView.snp.leading).offset(5)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+                make.height.equalTo(20)
+            }
+            
+            postContentLabel.snp.makeConstraints { make in
+                make.top.equalTo(postTitleLabel.snp.bottom).offset(5)
+                make.leading.equalTo(postTitleLabel.snp.leading)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).offset(20)
+                make.height.equalTo(15)
+            }
+            
+            songView.snp.makeConstraints { make in
+                make.top.equalTo(postContentLabel.snp.bottom).offset(5)
+                make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.height.equalTo(70)
+            }
+            
+            likeButton.snp.makeConstraints { make in
+                make.top.equalTo(songView.snp.bottom).offset(5)
+                make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
+                make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.size.equalTo(30)
+            }
+            
+            likeCountLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(likeButton)
+                make.leading.equalTo(likeButton.snp.trailing).offset(5)
+            }
+            
+            commentImageView.snp.makeConstraints { make in
+                make.top.equalTo(songView.snp.bottom).offset(5)
+                make.leading.equalTo(likeCountLabel.snp.trailing).offset(20)
+                make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.size.equalTo(25)
+            }
+            
+            commentCountLabel.snp.makeConstraints { make in
+                make.centerY.equalTo(commentImageView)
+                make.leading.equalTo(commentImageView.snp.trailing).offset(5)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            }
+            
+        case .myPage:
+            userImageView.isHidden = true
+            userNicknameLabel.isHidden = true
+            
+            postCreateAtLabel.snp.makeConstraints { make in
+                make.top.equalTo(safeAreaLayoutGuide).offset(10)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            }
+            
+            postTitleLabel.snp.makeConstraints { make in
+                make.top.equalTo(postCreateAtLabel.snp.bottom).offset(5)
+                make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(20)
+                make.height.equalTo(50)
+            }
+            
+            postContentLabel.snp.makeConstraints { make in
+                make.top.equalTo(postTitleLabel.snp.bottom).offset(10)
+                make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+                make.height.equalTo(20)
+            }
+            
+            songView.snp.makeConstraints { make in
+                make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(5)
+                make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
+                make.height.equalTo(50)
+            }
+            
+//            likeButton.snp.makeConstraints { make in
+//                make.top.equalTo(songView.snp.bottom)
+//                make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
+//                make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+//                make.size.equalTo(30)
+//            }
+//            
+//            likeCountLabel.snp.makeConstraints { make in
+//                make.centerY.equalTo(likeButton)
+//                make.leading.equalTo(likeButton.snp.trailing).offset(5)
+//            }
+//            
+//            commentImageView.snp.makeConstraints { make in
+//                make.centerY.equalTo(likeButton)
+//                make.size.equalTo(25)
+//            }
+//            
+//            commentCountLabel.snp.makeConstraints { make in
+//                make.centerY.equalTo(commentImageView)
+//                make.leading.equalTo(commentImageView.snp.trailing).offset(5)
+//                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+//            }
         }
         
         configureUI()
@@ -141,34 +194,23 @@ final class PostCollectionViewCell: UICollectionViewCell {
     }
     
     func configureCell( _ viewType: ViewType, post: PostModel) {
+        configureView(type: viewType)
         
         switch viewType {
+            
         case .home:
-//            if let url = URL(string: post.creator.profileImage ?? "") {
-//                userImageView.kf.setImage(with: url)
-//            } else {
-                userImageView.image = UIImage(systemName: "person.circle")
-                userImageView.tintColor = .systemRed
-//            }
+            userImageView.image = UIImage(systemName: "person.circle")
+            userImageView.tintColor = .systemRed
             userNicknameLabel.text = post.creator.nickname
+            
         case .myPage:
             userImageView.isHidden = true
             userNicknameLabel.isHidden = true
-            
-            postTitleLabel.snp.makeConstraints { make in
-                make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
-                make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
-                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
-                make.height.equalTo(20)
-            }
-            
-            postCreateAtLabel.snp.remakeConstraints { make in
-                make.centerY.equalTo(postTitleLabel.snp.centerY)
-                make.leading.equalTo(postTitleLabel.snp.trailing).offset(10)
-                make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
-                make.width.equalTo(120)
-            }
+            postTitleLabel.numberOfLines = 2
+            postCreateAtLabel.font = .systemFont(ofSize: 12)
+            songView.layer.cornerRadius = 12
         }
+        
         postTitleLabel.text = post.title
         postContentLabel.text = post.content
         postCreateAtLabel.text = DateFormatter.convertDateString(post.createdAt)
@@ -178,8 +220,8 @@ final class PostCollectionViewCell: UICollectionViewCell {
         configureLikeButton(isLike: post.likes.contains(UserDefaultsManager.shared.userID))
     }
     
-    func configureSongView(song: Song, completionHandler: @escaping (Observable<UITapGestureRecognizer>)-> ()) {
-        songView.configureUI(song: song)
+    func configureSongView(song: Song, viewType: ViewType, completionHandler: @escaping (Observable<UITapGestureRecognizer>)-> ()) {
+        songView.configureUI(song: song, viewType: viewType)
         completionHandler(songView.rx.tapGesture().when(.recognized))
     }
     
@@ -206,7 +248,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postCreateAtLabel.textAlignment = .left
         
         commentImageView.image = UIImage(systemName: "bubble.right")
-        
     }
     
     override func prepareForReuse() {
