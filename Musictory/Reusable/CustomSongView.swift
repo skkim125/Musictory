@@ -84,22 +84,8 @@ final class CustomSongView: UIView {
                 make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
             }
         case .myPage:
-            songTitleLabel.snp.makeConstraints { make in
-                make.top.equalTo(self).offset(5)
-                make.leading.equalTo(self).offset(10)
-            }
-            
             songPlayButton.snp.makeConstraints { make in
-                make.leading.equalTo(songTitleLabel.snp.trailing).offset(5)
-                make.trailing.equalTo(self.snp.trailing).inset(5)
-                make.size.equalTo(30)
-                make.centerY.equalTo(self)
-            }
-            
-            songArtistLabel.snp.makeConstraints { make in
-                make.leading.equalTo(songTitleLabel)
-                make.trailing.equalTo(songPlayButton.snp.leading).inset(-10)
-                make.top.equalTo(songTitleLabel.snp.bottom).offset(3)
+                make.edges.equalTo(self)
             }
         }
     }
@@ -112,9 +98,23 @@ final class CustomSongView: UIView {
             guard let url = song.artwork?.url(width: 80, height: 80) else { return }
             songImageView.kf.setImage(with: url)
         case .myPage:
-            songImageView.isHidden = true
-//            guard let url = song.artwork?.url(width: 150, height: 150) else { return }
-//            songImageView.kf.setImage(with: url)
+            songTitleLabel.isHidden = true
+            songArtistLabel.isHidden = true
+            
+            guard let albumImageUrl = song.artwork?.url(width: 300, height: 300) else { return }
+            songImageView.kf.setImage(with: albumImageUrl)
+            songImageView.clipsToBounds = true
+            songImageView.layer.borderWidth = 0.3
+            songImageView.layer.borderColor = UIColor.systemGray6.cgColor
+            
+            var image = UIImage(systemName: "play.circle.fill")?.withRenderingMode(.alwaysOriginal)
+            image = image?.applyingSymbolConfiguration(.init(font: .boldSystemFont(ofSize: 18), scale: .large))
+            image = image?.applyingSymbolConfiguration(.init(paletteColors: [.white, .systemRed]))
+            
+            songPlayButton.setImage(image, for: .normal)
+            songPlayButton.tintColor = .systemRed
+            songPlayButton.imageView?.contentMode = .scaleAspectFill
+
         }
         songTitleLabel.text = song.title
         songArtistLabel.text = song.artistName

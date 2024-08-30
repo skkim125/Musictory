@@ -51,17 +51,14 @@ final class LSLP_API {
                         completionHandler?(.failure(.decodingError("디코딩 에러")))
                     }
                 case 419:
-                    self.updateRefresh() { [weak self] result in
-                        guard let self = self else { return }
+                    self.updateRefresh { result in
                         switch result {
-                        case .success(let success):
-                            UserDefaultsManager.shared.accessT = success.accessToken
-                            print(#function, 2, UserDefaultsManager.shared.accessT)
-                            self.callRequest(apiType: apiType, decodingType: decodingType)
+                        case .success(let refresh):
+                            UserDefaultsManager.shared.accessT = refresh.accessToken
+                            self.callRequest(apiType: apiType, decodingType: decodingType) { result2 in
+                                completionHandler?(result2)
+                            }
                         case .failure(let error):
-                            print(response.url)
-                            let error = apiType.errorHandler(statusCode: response.statusCode)
-                            print(response.statusCode)
                             completionHandler?(.failure(error))
                         }
                     }

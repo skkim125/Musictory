@@ -30,7 +30,7 @@ final class MusictoryDetailView: UIViewController {
     }
     
     private func configureView() {
-        navigationItem.title = "뮤직 토리"
+        navigationItem.title = "Musictory"
         
         view.backgroundColor = .systemBackground
         

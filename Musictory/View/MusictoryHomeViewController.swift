@@ -18,11 +18,9 @@ final class MusictoryHomeViewController: UIViewController {
     private var viewModel: MusictoryHomeViewModel = MusictoryHomeViewModel()
     private let disposeBag = DisposeBag()
     
-    private let checkAccessToken = PublishSubject<Void>()
-    private let checkRefreshToken = PublishSubject<Void>()
+    private let updateAccessToken = PublishSubject<Void>()
     private let fetchPost = PublishSubject<Void>()
     private var refreshControl = UIRefreshControl()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
@@ -59,30 +57,19 @@ final class MusictoryHomeViewController: UIViewController {
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
-        let prefetching = PublishRelay<Bool>()
         let indexPaths = PublishRelay<[IndexPath]>()
-        let input = MusictoryHomeViewModel.Input(checkAccessToken: checkAccessToken, checkRefreshToken: checkRefreshToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetching: prefetching, prefetchIndexPatch: indexPaths)
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths)
         let output = viewModel.transform(input: input)
         
-//        fetchPost.onNext(())
-        
         output.showErrorAlert
-            .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
                 self.showAlert(title: error.title, message: error.alertMessage) {
+                    UserDefaultsManager.shared.accessT = ""
+                    UserDefaultsManager.shared.refreshT = ""
+                    UserDefaultsManager.shared.userID = ""
                     
-                    switch error {
-                    case .expiredRefreshToken, .expiredAccessToken:
-                        UserDefaultsManager.shared.accessT = ""
-                        UserDefaultsManager.shared.refreshT = ""
-                        UserDefaultsManager.shared.userID = ""
-                        
-                        let vc = LogInViewController()
-                        self.setRootViewController(vc)
-                        
-                    default:
-                        print(error)
-                    }
+                    let vc = LogInViewController()
+                    self.setRootViewController(vc)
                 }
             }
             .disposed(by: disposeBag)
@@ -160,6 +147,29 @@ final class MusictoryHomeViewController: UIViewController {
         
         postCollectionView.rx.refreshControl.onNext(refreshControl)
         
+        output.paginating
+            .bind(with: self) { owner, value in
+                if value {
+                    hideLoadingIndicator()
+                } else {
+                    showLoadingIndicator()
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        func showLoadingIndicator() {
+            DispatchQueue.main.async {
+                let loadIndicator = UIActivityIndicatorView(style: .medium)
+                loadIndicator.startAnimating()
+                
+                self.postCollectionView.backgroundView = loadIndicator
+            }
+        }
+
+        func hideLoadingIndicator() {
+            postCollectionView.backgroundView = nil
+        }
+        
         refreshControl.rx.controlEvent(.valueChanged)
             .bind(with: self) { owner, _ in
                 owner.updateCollectionViewMethod()
@@ -180,5 +190,11 @@ final class MusictoryHomeViewController: UIViewController {
             self.fetchPost.onNext(())
             self.refreshControl.endRefreshing()
         }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateAccessToken.onNext(())
+        
     }
 }

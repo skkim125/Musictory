@@ -31,7 +31,7 @@ final class MyPageViewController: UIViewController {
     private func configureView() {
         view.backgroundColor = .systemBackground
         
-        navigationItem.title = "마이페이지"
+        navigationItem.title = "My Page"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), menu: configureMenuButton())
         navigationItem.rightBarButtonItem?.tintColor = .label
         
@@ -60,15 +60,18 @@ final class MyPageViewController: UIViewController {
             switch item {
             case .profileItem(item: let profile):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ProfileCollectionViewCell.identifier, for: indexPath) as? ProfileCollectionViewCell else { return UICollectionViewCell() }
+
+                output.myGetLiked
+                    .bind(with: self) { owner, value in
+                        cell.configureLikedLabel(likeCount: value)
+                    }
+                    .disposed(by: self.disposeBag)
                 
-                
-                let nickname = profile.nick + "님,\n반가워요!"
-                cell.configureUI(profileImage: profile.profileImage ?? "", nickname: nickname)
+                print(profile.posts)
+                cell.configureUI(profile: profile)
                 
                 return cell
             case .postItem(item: let post):
-                self.view.addSubview(UIImageView(image: UIImage(systemName: "pin")))
-                
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
                 cell.configureCell(.myPage, post: post.post)
@@ -96,12 +99,12 @@ final class MyPageViewController: UIViewController {
                         .disposed(by: cell.disposeBag)
                 }
                 
-                cell.backgroundColor = .systemBackground
+                cell.backgroundColor = .systemBackground.withAlphaComponent(0.95)
                 cell.layer.cornerRadius = 12
                 cell.layer.shadowRadius = 1.5
-                cell.layer.shadowColor = UIColor.opaqueSeparator.cgColor
+                cell.layer.shadowColor = UIColor.systemGray.cgColor
                 cell.layer.shadowOffset = CGSize(width: 0, height: 0)
-                cell.layer.shadowOpacity = 0.9
+                cell.layer.shadowOpacity = 3
                 
                 return cell
             }
@@ -177,6 +180,8 @@ final class MyPageViewController: UIViewController {
         super.viewWillAppear(animated)
         
         checkRefreshToken.accept(())
+        loadMyProfile.accept(())
+        loadMyPost.accept(())
     }
 }
 

@@ -29,17 +29,18 @@ final class MyPageViewModel: BaseViewModel {
         let myPageData: PublishRelay<[MyPageDataType]>
         let showErrorAlert: PublishRelay<Void>
         let networkError: PublishRelay<NetworkError>
+        let myGetLiked: BehaviorRelay<Int>
     }
     
     func transform(input: Input) -> Output {
         var nextCursor = ""
-        let checkRefreshToken = PublishRelay<Void>()
         let myProfile = PublishRelay<ProfileModel>()
         let myPosts = PublishRelay<[PostModel]>()
         let showErrorAlert = PublishRelay<Void>()
         let networkError = PublishRelay<NetworkError>()
         let myPageData = PublishRelay<[MyPageDataType]>()
         let outputConvertPosts = PublishRelay<[ConvertPost]>()
+        let outputGetLiked = BehaviorRelay(value: originalPosts.count)
         
         input.checkRefreshToken
             .bind(with: self) { owner, _ in
@@ -47,6 +48,7 @@ final class MyPageViewModel: BaseViewModel {
                     switch result {
                     case .success(let success):
                         UserDefaultsManager.shared.accessT = success.accessToken
+                        print(success.accessToken)
                     case .failure(let error2):
                         networkError.accept(error2)
                         showErrorAlert.accept(())
@@ -60,6 +62,9 @@ final class MyPageViewModel: BaseViewModel {
                 owner.lslp_API.callRequest(apiType: .fetchProfile, decodingType: ProfileModel.self) { result in
                     switch result {
                     case .success(let profile):
+                        dump(profile)
+                        print("마이페이지", profile.posts.count)
+                        print("마이페이지 userdefaults id", UserDefaultsManager.shared.userID)
                         myProfile.accept(profile)
                     case .failure(let error1):
                         switch error1 {
@@ -83,6 +88,8 @@ final class MyPageViewModel: BaseViewModel {
                 }
             }
             .disposed(by: disposeBag)
+        
+        
         
         input.loadMyPosts
             .bind(with: self) { owner, _ in
@@ -153,6 +160,15 @@ final class MyPageViewModel: BaseViewModel {
                 Task {
                     try await convertPostFunction(posts: value)
                 }
+                
+//                DispatchQueue.main.async {
+                    var like = 0
+                    value.forEach { post in
+                        like += post.likes.count
+                    }
+                    
+                    outputGetLiked.accept(like)
+//                }
             }
             .disposed(by: disposeBag)
         
@@ -160,6 +176,7 @@ final class MyPageViewModel: BaseViewModel {
             .map { (profile, posts) -> [MyPageDataType] in
                 let convertPosts = posts.map { MyPageItem.postItem(item: $0) }
                 let result = MyPageDataType.post(items: convertPosts)
+                print("마이페이지", convertPosts.count)
                 return [MyPageDataType.profile(items: [MyPageItem.profileItem(item: profile)]), result]
             }
             .bind(to: myPageData)
@@ -244,6 +261,6 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(myProfile: myProfile, myPosts: myPosts, myPageData: myPageData, showErrorAlert: showErrorAlert, networkError: networkError)
+        return Output(myProfile: myProfile, myPosts: myPosts, myPageData: myPageData, showErrorAlert: showErrorAlert, networkError: networkError, myGetLiked: outputGetLiked)
     }
 }

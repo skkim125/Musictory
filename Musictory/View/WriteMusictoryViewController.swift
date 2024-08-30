@@ -82,7 +82,7 @@ final class WriteMusictoryViewController: UIViewController {
     }
     
     private func configureView() {
-        navigationItem.title = "뮤직토리 남기기"
+        navigationItem.title = "Write Musictory"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: nil, action: nil)
         navigationController?.navigationBar.tintColor = .systemRed
         
