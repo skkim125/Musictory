@@ -8,16 +8,17 @@
 import UIKit
 
 extension UICollectionViewLayout {
-    static func postCollectionViewLayout(_ type: ViewType) -> UICollectionViewLayout {
+    static func postCollectionViewLayout(_ type: ViewType) -> UICollectionViewCompositionalLayout {
         
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .plain)
         listConfiguration.showsSeparators = true
-        listConfiguration.separatorConfiguration.topSeparatorVisibility = .hidden
-        let isHomeView = (type == .home)
-        let insetSize: CGFloat = isHomeView ? 10 : 0
+        
+        listConfiguration.separatorConfiguration.bottomSeparatorVisibility = .visible
+        
+        let insetValue: CGFloat = type == .home ? 15: 0
         
         listConfiguration.separatorConfiguration.topSeparatorVisibility = .hidden
-        listConfiguration.separatorConfiguration.bottomSeparatorInsets = .init(top: 0, leading: insetSize, bottom: 0, trailing: insetSize)
+        listConfiguration.separatorConfiguration.bottomSeparatorInsets = .init(top: 0, leading: insetValue, bottom: 0, trailing: insetValue)
         
         let layout = UICollectionViewCompositionalLayout.list(using: listConfiguration)
         

@@ -16,8 +16,9 @@ enum LSLPRouter {
     case like(String, LikeQuery)
     case fetchProfile
     case fetchMyPost(PostQuery)
-    case uploadImage(Data, String)
+//    case uploadImage(Data?, String)
     case writeComment(String, CommentsQuery)
+    case editMyProfile
 }
 
 extension LSLPRouter {
@@ -28,17 +29,19 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost, .like, .uploadImage, .writeComment:
+        case .login, .writePost, .like,/* .uploadImage,*/ .writeComment:
             "POST"
         case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
             "GET"
+        case .editMyProfile:
+            "PUT"
         }
     }
     
     var path: String {
         switch self {
         case .login:
-            APIPath.login.rawValue
+            APIPath.my.rawValue + "/login"
         case .fetchPost, .writePost:
             APIPath.fetchPost.rawValue
         case .refresh:
@@ -49,12 +52,14 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/\(id)"
         case .fetchProfile:
             APIPath.fetchProfile.rawValue
-        case .uploadImage:
-            APIPath.fetchPost.rawValue + "/files"
+//        case .uploadImage:
+//            APIPath.fetchPost.rawValue + "/files"
         case .fetchMyPost:
             APIPath.fetchPost.rawValue + "/users" + "/\(UserDefaultsManager.shared.userID)"
         case .writeComment(let id, _):
             APIPath.fetchPost.rawValue + "/\(id)" + "/comments"
+        case .editMyProfile:
+            APIPath.fetchProfile.rawValue
         }
     }
     
@@ -83,11 +88,11 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .uploadImage(_, let boundary): // UUID().uuidString
+        case /*.uploadImage,*/ .editMyProfile:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
-                APIHeader.contentType.rawValue: APIHeader.multipart.rawValue + "; boundaryBoundary-\(boundary)"
+                APIHeader.contentType.rawValue: APIHeader.multipart.rawValue
             ]
         }
     }
@@ -115,19 +120,22 @@ extension LSLPRouter {
             return try? encoder.encode(writePostQuery)
         case .like(_, let likeQuery):
             return try? encoder.encode(likeQuery)
-        case .uploadImage(let image, let boundary):
-            var body = Data()
-            
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
-            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-            body.append(image)
-            body.append("\r\n".data(using: .utf8)!)
-            body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-            
-            return body
+//        case .uploadImage(let image, let boundary):
+//            var body = Data()
+//            let boundaryPrefix = "--\(boundary)\r\n"
+//            
+//            body.append(boundaryPrefix.data(using: .utf8)!)
+//            body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+//            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+//            body.append(image ?? Data())
+//            body.append("\r\n".data(using: .utf8)!)
+//            body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+//            
+//            return body
         case .writeComment( _, let commentQuery):
             return try? encoder.encode(commentQuery)
+//        case .editMyProfile(let editProfile):
+//            return try? encoder.encode(editProfile)
         default:
             return nil
         }
@@ -200,26 +208,35 @@ extension LSLPRouter {
                 return NetworkError.custom("\(statusCode)")
             }
             
-        case .uploadImage:
+//        case .uploadImage:
+//            switch statusCode {
+//            case 419:
+//                return NetworkError.expiredAccessToken
+//            default:
+//                return NetworkError.custom("\(statusCode)")
+//            }
+        case .fetchMyPost:
             switch statusCode {
             case 419:
                 return NetworkError.expiredAccessToken
             default:
                 return NetworkError.custom("\(statusCode)")
             }
-        case .fetchMyPost(_):
+        case .writeComment:
             switch statusCode {
             case 419:
                 return NetworkError.expiredAccessToken
             default:
                 return NetworkError.custom("\(statusCode)")
             }
-        case .writeComment(_, _):
+        case .editMyProfile:
             switch statusCode {
+            case 401:
+                return NetworkError.custom("유효하지 않은 계정입니다.")
             case 419:
                 return NetworkError.expiredAccessToken
             default:
-                return NetworkError.custom("\(statusCode)")
+                return NetworkError.custom("알 수 없는 에러입니다.")
             }
         }
     }

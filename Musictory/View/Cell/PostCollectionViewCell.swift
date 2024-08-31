@@ -76,7 +76,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             songImageView.isHidden = true
             userImageView.snp.makeConstraints { make in
                 make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
-                make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(15)
+                make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(20)
                 make.size.equalTo(30)
             }
             
@@ -89,7 +89,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
                 make.centerY.equalTo(userNicknameLabel)
                 make.leading.equalTo(userNicknameLabel.snp.trailing).offset(10)
                 make.width.equalTo(120)
-                make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(15)
+                make.trailing.lessThanOrEqualTo(contentView.safeAreaLayoutGuide).inset(20)
             }
             
             postTitleLabel.snp.makeConstraints { make in
@@ -108,13 +108,13 @@ final class PostCollectionViewCell: UICollectionViewCell {
             
             songView.snp.makeConstraints { make in
                 make.top.equalTo(postContentLabel.snp.bottom).offset(5)
-                make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(15)
                 make.height.equalTo(70)
             }
             
             likeButton.snp.makeConstraints { make in
                 make.top.equalTo(songView.snp.bottom).offset(5)
-                make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
+                make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(15)
                 make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
                 make.size.equalTo(30)
             }
@@ -134,7 +134,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             commentCountLabel.snp.makeConstraints { make in
                 make.centerY.equalTo(commentImageView)
                 make.leading.equalTo(commentImageView.snp.trailing).offset(5)
-                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(15)
             }
             
         case .myPage:

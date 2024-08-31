@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Kingfisher
 
 final class LSLP_API {
     static let shared = LSLP_API()
@@ -55,6 +56,7 @@ final class LSLP_API {
                         switch result {
                         case .success(let refresh):
                             UserDefaultsManager.shared.accessT = refresh.accessToken
+                            KingfisherManager.shared.setHeaders()
                             self.callRequest(apiType: apiType, decodingType: decodingType) { result2 in
                                 completionHandler?(result2)
                             }
@@ -72,54 +74,69 @@ final class LSLP_API {
         }.resume()
     }
     
-    func uploadImageRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
-        
-        let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        var component = URLComponents(string: encodingUrl)
-        component?.queryItems = apiType.parameters
+    func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, nick: String, image: Data, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
+        let component = URLComponents(string: apiType.baseURL)
         
         guard let url = component?.url else { return }
         var request = URLRequest(url: url.appendingPathComponent(apiType.path))
-        request.httpMethod = apiType.method
-        request.allHTTPHeaderFields = apiType.header
-        request.httpBody = apiType.httpBody
+        request.httpMethod = "PUT"
         
-        URLSession.shared.uploadTask(with: request, from: apiType.httpBody) { data, response, error in
+        let boundary = UUID().uuidString
+        
+        let contentType = "multipart/form-data; boundary=\(boundary)"
+        
+        request.allHTTPHeaderFields = [
+            APIHeader.sesac.rawValue: APIKey.key,
+            APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
+            "Content-Type": contentType
+        ]
+        
+        var body = Data()
+        
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"nick\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
+        body.append(nick.data(using: .utf8)!)
+        body.append("\r\n".data(using: .utf8)!)
+        
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"profile\"; filename=\"image.png\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
+        body.append(image)
+        body.append("\r\n".data(using: .utf8)!)
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        
+        request.httpBody = body
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                guard error == nil else {
-                    print(error?.localizedDescription)
-                    
+                if let error = error {
+                    print("Error: \(error.localizedDescription)")
                     return
                 }
                 
-                guard let response = response as? HTTPURLResponse else {
-                    print("response error")
-                    completionHandler?(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
-                    return
-                }
-
-                switch response.statusCode {
-                case 200 :
-                    guard let data = data else { return }
-                    
-                    do {
-                        let result = try JSONDecoder().decode(decodingType.self, from: data)
-                        return completionHandler?(.success(result)) ?? ()
-                        
-                    } catch {
-                        completionHandler?(.failure(.decodingError("디코딩 에러")))
+                if let response = response as? HTTPURLResponse {
+                    print("Status Code: \(response.statusCode)")
+                    if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+                        print("Response Body: \(responseBody)")
                     }
-
-                default:
-                    print(response.url)
-                    let error = apiType.errorHandler(statusCode: response.statusCode)
-                    print(error, 1)
-                    print(response.statusCode)
-                    completionHandler?(.failure(error))
+                    
+                    if response.statusCode == 200 {
+                        do {
+                            let result = try JSONDecoder().decode(decodingType.self, from: data!)
+                            completionHandler?(.success(result))
+                            print(result)
+                        } catch {
+                            completionHandler?(.failure(.decodingError("Decoding error: \(error)")))
+                        }
+                    } else {
+                        completionHandler?(.failure(.responseError("HTTP Error: \(response.statusCode)")))
+                    }
                 }
             }
         }.resume()
     }
+
     
     func updateRefresh(completionHandler: ((Result<RefreshModel, NetworkError>) -> Void)? = nil) {
         self.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in

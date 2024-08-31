@@ -13,6 +13,7 @@ final class MyPageViewModel: BaseViewModel {
     private let lslp_API = LSLP_API.shared
     private var originalConvertPosts: [ConvertPost] = []
     private var originalPosts: [PostModel] = []
+    var toUseEditMyProfile: ProfileModel?
     let disposeBag = DisposeBag()
     
     struct Input {
@@ -161,19 +162,22 @@ final class MyPageViewModel: BaseViewModel {
                     try await convertPostFunction(posts: value)
                 }
                 
-//                DispatchQueue.main.async {
+                DispatchQueue.main.async {
                     var like = 0
                     value.forEach { post in
                         like += post.likes.count
                     }
                     
                     outputGetLiked.accept(like)
-//                }
+                }
             }
             .disposed(by: disposeBag)
         
         Observable.combineLatest(myProfile, outputConvertPosts)
-            .map { (profile, posts) -> [MyPageDataType] in
+            .map { [weak self] (profile, posts) -> [MyPageDataType] in
+                if let self = self {
+                    self.toUseEditMyProfile = profile
+                }
                 let convertPosts = posts.map { MyPageItem.postItem(item: $0) }
                 let result = MyPageDataType.post(items: convertPosts)
                 print("마이페이지", convertPosts.count)

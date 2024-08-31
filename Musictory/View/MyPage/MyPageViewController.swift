@@ -13,6 +13,9 @@ import RxGesture
 import RxDataSources
 
 final class MyPageViewController: UIViewController {
+    deinit {
+        print("\(self)deinit됨")
+    }
     private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionView())
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageViewModel()
@@ -20,6 +23,8 @@ final class MyPageViewController: UIViewController {
     private let loadMyProfile = PublishRelay<Void>()
     private let loadMyPost = PublishRelay<Void>()
     private var refreshControl = UIRefreshControl()
+    private var profile = PublishRelay<ProfileModel>()
+    var image = UIImage()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -166,12 +171,25 @@ final class MyPageViewController: UIViewController {
     }
     
     private func configureMenuButton() -> UIMenu {
-        let editProfile = UIAction(title: "프로필 수정", image: UIImage(systemName: "pencil"), handler: { _ in
-            print("프로필 수정")
+        let editProfile = UIAction(title: "프로필 수정", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
+            guard let self = self else { return }
+            guard let cell = self.myPostCollectionView.cellForItem(at: IndexPath(row: 0, section: 0)) as? ProfileCollectionViewCell else { return }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                let vc = EditProfileViewController()
+                vc.profile = self.viewModel.toUseEditMyProfile
+                vc.image = cell.userProfileImageView.image
+                vc.moveData = { profile in
+                    cell.configureUI(profile: profile)
+                }
+                
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
         })
         
         let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { _ in
-            print("탈퇴")
+            self.showTwoButtonAlert(title: "탈퇴하시겠습니까?", message: "탈퇴 이후 유저 정보를 복구할 수 없습니다.") {
+                print("탈퇴")
+            }
         })
         return UIMenu(title: "설정", options: .displayInline, children: [editProfile, withdraw])
     }

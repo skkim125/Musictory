@@ -35,8 +35,8 @@ final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
         }
         
         userImageView.snp.makeConstraints { make in
-            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(10)
-            make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
+            make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(20)
             make.size.equalTo(30)
         }
         
@@ -54,10 +54,10 @@ final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
         
         commentsLabel.snp.makeConstraints { make in
             make.top.equalTo(userImageView.snp.bottom).offset(10)
-            make.leading.equalTo(userImageView.snp.leading).offset(5)
+            make.leading.equalTo(userImageView.snp.centerX)
             make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(20)
             make.height.equalTo(20)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(25)
         }
         
         configureUI()
@@ -84,7 +84,7 @@ final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
     private func configureUI() {
         userImageView.contentMode = .scaleAspectFill
         userNicknameLabel.font = .boldSystemFont(ofSize: 16)
-        commentsLabel.font = .boldSystemFont(ofSize: 16)
+        commentsLabel.font = .systemFont(ofSize: 14)
         
         postCreateAtLabel.font = .systemFont(ofSize: 12)
         postCreateAtLabel.textColor = .systemGray

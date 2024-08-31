@@ -13,6 +13,9 @@ import RxDataSources
 import MusicKit
 
 final class MusictoryDetailView: UIViewController {
+    deinit {
+        print("\(self)deinit됨")
+    }
     private let musictoryDetailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
     private let commentTFBackgroundView = UIView()
     private let commentTextField = UITextField()

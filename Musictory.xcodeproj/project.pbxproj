@@ -62,6 +62,7 @@
 		04E430702C6E1A2A007FA9C6 /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 04E4306F2C6E1A2A007FA9C6 /* IQKeyboardManagerSwift */; };
 		04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430722C6E2142007FA9C6 /* MusadoraKit */; };
 		04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1829A2C80A1A10073B882 /* CommentsQuery.swift */; };
+		04F182A52C81BD720073B882 /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F182A42C81BD720073B882 /* EditProfileViewController.swift */; };
 		04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */; };
 		04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */; };
 		04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */; };
@@ -115,6 +116,7 @@
 		04E4305E2C6CF8B9007FA9C6 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		04E430622C6DCA4C007FA9C6 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
 		04F1829A2C80A1A10073B882 /* CommentsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsQuery.swift; sourceTree = "<group>"; };
+		04F182A42C81BD720073B882 /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailView.swift; sourceTree = "<group>"; };
 		04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailViewModel.swift; sourceTree = "<group>"; };
 		04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCommentsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -175,14 +177,11 @@
 			isa = PBXGroup;
 			children = (
 				045833DB2C78F86C000D6E81 /* TabViewController.swift */,
-				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
-				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
-				045833B82C75E536000D6E81 /* WriteMusictoryViewController.swift */,
-				045833C02C763CC9000D6E81 /* AddSongViewController.swift */,
-				045833D12C773B57000D6E81 /* AddPhotoViewController.swift */,
-				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
-				045833F02C7A3B36000D6E81 /* MusictoryMapViewController.swift */,
-				04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */,
+				04F1829F2C81BCF50073B882 /* Login */,
+				04F1829E2C81BCED0073B882 /* Home */,
+				04F182A02C81BD090073B882 /* Write */,
+				04F182A12C81BD260073B882 /* MyPage */,
+				04F182A32C81BD370073B882 /* PostDetail */,
 				0458338E2C74B016000D6E81 /* Cell */,
 			);
 			path = View;
@@ -191,12 +190,11 @@
 		048DFDDE2C70F008000F5293 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				048DFDDF2C70F012000F5293 /* LoginViewModel.swift */,
-				048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */,
-				045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */,
-				045833CB2C77264B000D6E81 /* AddSongViewModel.swift */,
-				045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */,
-				04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */,
+				04F182A62C81D04D0073B882 /* Login */,
+				04F182A72C81D0560073B882 /* Home */,
+				04F182A82C81D0650073B882 /* Write */,
+				04F182A92C81D0750073B882 /* MyPage */,
+				04F182AA2C81D08C0073B882 /* PostDetail */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -283,6 +281,91 @@
 				04E430622C6DCA4C007FA9C6 /* APIKey.swift */,
 			);
 			path = Musictory;
+			sourceTree = "<group>";
+		};
+		04F1829E2C81BCED0073B882 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
+				045833F02C7A3B36000D6E81 /* MusictoryMapViewController.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		04F1829F2C81BCF50073B882 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDD62C6F9BC5000F5293 /* LogInViewController.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		04F182A02C81BD090073B882 /* Write */ = {
+			isa = PBXGroup;
+			children = (
+				045833B82C75E536000D6E81 /* WriteMusictoryViewController.swift */,
+				045833C02C763CC9000D6E81 /* AddSongViewController.swift */,
+				045833D12C773B57000D6E81 /* AddPhotoViewController.swift */,
+			);
+			path = Write;
+			sourceTree = "<group>";
+		};
+		04F182A12C81BD260073B882 /* MyPage */ = {
+			isa = PBXGroup;
+			children = (
+				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
+				04F182A42C81BD720073B882 /* EditProfileViewController.swift */,
+			);
+			path = MyPage;
+			sourceTree = "<group>";
+		};
+		04F182A32C81BD370073B882 /* PostDetail */ = {
+			isa = PBXGroup;
+			children = (
+				04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */,
+			);
+			path = PostDetail;
+			sourceTree = "<group>";
+		};
+		04F182A62C81D04D0073B882 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDDF2C70F012000F5293 /* LoginViewModel.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		04F182A72C81D0560073B882 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		04F182A82C81D0650073B882 /* Write */ = {
+			isa = PBXGroup;
+			children = (
+				045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */,
+				045833CB2C77264B000D6E81 /* AddSongViewModel.swift */,
+			);
+			path = Write;
+			sourceTree = "<group>";
+		};
+		04F182A92C81D0750073B882 /* MyPage */ = {
+			isa = PBXGroup;
+			children = (
+				045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */,
+			);
+			path = MyPage;
+			sourceTree = "<group>";
+		};
+		04F182AA2C81D08C0073B882 /* PostDetail */ = {
+			isa = PBXGroup;
+			children = (
+				04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */,
+			);
+			path = PostDetail;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,6 +471,7 @@
 				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */,
+				04F182A52C81BD720073B882 /* EditProfileViewController.swift in Sources */,
 				04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,
 				0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */,

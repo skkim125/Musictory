@@ -7,11 +7,12 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ProfileCollectionViewCell: UICollectionViewCell {
     static let identifier = "ProfileCollectionViewCell"
     
-    private let userProfileImageView = UIImageView()
+    let userProfileImageView = UIImageView()
     private let userNicknameLabel = UILabel()
     private let userPostLabel = UILabel()
     private let userLikedLabel = UILabel()
@@ -30,15 +31,15 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         
         userProfileImageView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).offset(15)
-            make.leading.equalTo(safeAreaLayoutGuide).offset(50)
-            make.width.equalTo(100)
+            make.leading.equalTo(safeAreaLayoutGuide).offset(30)
+            make.width.equalTo(120)
             make.height.equalTo(userProfileImageView.snp.width)
             make.bottom.equalTo(safeAreaLayoutGuide).inset(15)
         }
         
         userNicknameLabel.snp.makeConstraints { make in
             make.bottom.equalTo(userProfileImageView.snp.centerY).inset(20)
-            make.leading.equalTo(userProfileImageView.snp.trailing).offset(10)
+            make.leading.equalTo(userProfileImageView.snp.trailing).offset(20)
             make.trailing.equalTo(safeAreaLayoutGuide).inset(20)
             make.height.equalTo(50)
         }
@@ -65,9 +66,13 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
     
     func configureUI(profile: ProfileModel)//  profileImage: String?, nickname: String)
     {
-        if let profile = profile.profileImage, let url = URL(string: profile) {
+        if let profile = profile.profileImage, let url = URL(string: APIURL.baseURL + "v1/" + profile) {
             print("profile =", profile)
+            print("url = \(url)")
+            KingfisherManager.shared.setHeaders()
             userProfileImageView.kf.setImage(with: url)
+            userProfileImageView.contentMode = .scaleToFill
+            userProfileImageView.clipsToBounds = true
         } else {
             userProfileImageView.image = UIImage(systemName: "person.circle")
         }
@@ -86,4 +91,27 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        userProfileImageView.layer.cornerRadius = userProfileImageView.bounds.width / 2
+        
+    }
+    
+}
+
+extension KingfisherManager {
+    func setHeaders() {
+        let modifier = AnyModifier { request in
+            var req = request
+            req.addValue(UserDefaultsManager.shared.accessT, forHTTPHeaderField: APIHeader.authorization.rawValue)
+            req.addValue(APIKey.key, forHTTPHeaderField: APIHeader.sesac.rawValue)
+
+            return req
+        }
+
+        KingfisherManager.shared.defaultOptions = [
+            .requestModifier(modifier)
+        ]
+    }
 }
