@@ -26,6 +26,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let fetchPost: PublishSubject<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetchIndexPatch: PublishRelay<[IndexPath]>
+        let updatePosts: PublishRelay<(Int, ConvertPost)>
+        let updateLikePostFromMyPage: PublishSubject<PostModel>
     }
     
     struct Output {
@@ -183,6 +185,22 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     prefetching.accept(())
                 }
             })
+            .disposed(by: disposeBag)
+        
+        input.updatePosts
+            .bind(with: self) { owner, value in
+                owner.originalConvertPosts[value.0] = value.1
+                outputConvertPosts.accept(owner.originalConvertPosts)
+            }
+            .disposed(by: disposeBag)
+        
+        input.updateLikePostFromMyPage
+            .bind(with: self) { owner, value in
+                guard let index = owner.originalPosts.firstIndex(where: { $0.postID == value.postID }) else { return }
+                owner.originalPosts[index] = value
+                owner.originalConvertPosts[index].post = owner.originalPosts[index]
+                outputConvertPosts.accept(owner.originalConvertPosts)
+            }
             .disposed(by: disposeBag)
         
         return Output(convertPosts: outputConvertPosts, likeTogglePost: newPost, showErrorAlert: showErrorAlert, paginating: paginating)

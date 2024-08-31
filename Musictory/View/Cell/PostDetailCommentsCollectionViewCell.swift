@@ -69,11 +69,19 @@ final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
     
     func configureCell(comment: CommentModel) {
         
-//            if let url = URL(string: post.creator.profileImage ?? "") {
-//                userImageView.kf.setImage(with: url)
-//            } else {
-        userImageView.image = UIImage(systemName: "person.circle")
-        userImageView.tintColor = .systemRed
+        if let profile = comment.creator.profileImage, let url = URL(string: APIURL.baseURL + "v1/" + profile) {
+            print("profile =", profile)
+            print("url = \(url)")
+            KingfisherManager.shared.setHeaders()
+            userImageView.kf.setImage(with: url)
+            userImageView.clipsToBounds = true
+            DispatchQueue.main.async {
+                self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2
+            }
+        } else {
+            userImageView.image = UIImage(systemName: "person.circle")
+            userImageView.tintColor = .systemRed
+        }
         
         userNicknameLabel.text = comment.creator.nickname
             

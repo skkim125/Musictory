@@ -90,8 +90,6 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        
-        
         input.loadMyPosts
             .bind(with: self) { owner, _ in
                 nextCursor = "0"
@@ -211,6 +209,7 @@ final class MyPageViewModel: BaseViewModel {
                         print(#function, 3, owner.originalPosts[value].postID)
                         owner.originalPosts[value] = updatedPost
                         myPosts.accept(owner.originalPosts)
+                        NotificationCenter.default.post(name: Notification.Name("changeLikePost"), object: nil, userInfo: ["post": updatedPost])
                         
                     case .failure(let error1):
                         switch error1 {

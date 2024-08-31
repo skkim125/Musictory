@@ -77,7 +77,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             userImageView.snp.makeConstraints { make in
                 make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
                 make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(20)
-                make.size.equalTo(30)
+                make.size.equalTo(40)
             }
             
             userNicknameLabel.snp.makeConstraints { make in
@@ -107,7 +107,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             }
             
             songView.snp.makeConstraints { make in
-                make.top.equalTo(postContentLabel.snp.bottom).offset(5)
+                make.top.equalTo(postContentLabel.snp.bottom).offset(10)
                 make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(15)
                 make.height.equalTo(70)
             }
@@ -204,8 +204,19 @@ final class PostCollectionViewCell: UICollectionViewCell {
             
         case .home:
             songImageView.isHidden = true
-            userImageView.image = UIImage(systemName: "person.circle")
-            userImageView.tintColor = .systemRed
+            if let profile = post.creator.profileImage, let url = URL(string: APIURL.baseURL + "v1/" + profile) {
+                print("profile =", profile)
+                print("url = \(url)")
+                KingfisherManager.shared.setHeaders()
+                userImageView.kf.setImage(with: url)
+                userImageView.clipsToBounds = true
+                DispatchQueue.main.async {
+                    self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2
+                }
+            } else {
+                userImageView.image = UIImage(systemName: "person.circle")
+                userImageView.tintColor = .systemRed
+            }
             userNicknameLabel.text = post.creator.nickname
             
         case .myPage:
@@ -230,7 +241,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         songImageView.kf.setImage(with: albumImageUrl)
         songImageView.clipsToBounds = true
         songImageView.layer.borderWidth = 0.3
-        songImageView.layer.borderColor = UIColor.systemGray6.cgColor
+        songImageView.layer.borderColor = UIColor.systemGray5.cgColor
         
         completionHandler(songView.rx.tapGesture().when(.recognized))
     }
@@ -250,7 +261,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private func configureUI() {
         userImageView.contentMode = .scaleAspectFill
         userNicknameLabel.font = .boldSystemFont(ofSize: 16)
-        postTitleLabel.font = .boldSystemFont(ofSize: 15)
+        postTitleLabel.font = .boldSystemFont(ofSize: 16)
         postContentLabel.font = .systemFont(ofSize: 13)
         
         postCreateAtLabel.font = .systemFont(ofSize: 12)
@@ -262,7 +273,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        
+        userImageView.layer.cornerRadius = userImageView.bounds.width / 2
         songImageView.layer.cornerRadius = songImageView.bounds.width / 2
     }
     
@@ -270,6 +281,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
         
         songView.songImageView.image = UIImage(systemName: "")
+        songView.songImageView.tintColor = .clear
         songView.songTitleLabel.text = nil
         songView.songArtistLabel.text = nil
         userNicknameLabel.text = nil

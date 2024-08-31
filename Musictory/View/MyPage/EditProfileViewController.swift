@@ -40,6 +40,7 @@ final class EditProfileViewController: UIViewController {
     private func configureView() {
         view.backgroundColor = .systemBackground
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: nil)
         navigationItem.title = "Edit Profile"
         
         view.addSubview(editMyProfileImageView)
@@ -51,7 +52,8 @@ final class EditProfileViewController: UIViewController {
         editMyProfileImageView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
                 .offset(30)
-            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(80)
+            make.centerX.equalTo(view)
+            make.width.equalTo(150)
             make.height.equalTo(editMyProfileImageView.snp.width)
         }
         
@@ -88,10 +90,10 @@ final class EditProfileViewController: UIViewController {
         guard let myProfile = profile else { return }
         
         editMyProfileImageView.image = image
-//        DispatchQueue.main.async {
-//            self.editMyProfileImageView.layer.cornerRadius = self.editMyProfileImageView.bounds.width / 2
-            editMyProfileImageView.clipsToBounds = true
-//        }
+        editMyProfileImageView.tintColor = .systemRed
+        editMyProfileImageView.contentMode = .scaleAspectFill
+        
+        editMyProfileImageView.clipsToBounds = true
         editMyProfileImageButton.setTitle("프로필 사진 변경하기", for: .normal)
         editMyProfileImageButton.setTitleColor(.systemBlue, for: .normal)
         
@@ -130,7 +132,9 @@ final class EditProfileViewController: UIViewController {
                             switch result {
                             case .success(let editedProfile):
                                 owner.moveData?(editedProfile)
-                                owner.navigationController?.popViewController(animated: true)
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    owner.navigationController?.popViewController(animated: true)
+                                }
                                 
                             case .failure(let error):
                                 print(error)
@@ -140,6 +144,12 @@ final class EditProfileViewController: UIViewController {
                 } else {
                     owner.showAlert(title: "작성하신 닉네임이 조건에 맞지 않습니다.", message: "다시 작성해주세요")
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        navigationItem.leftBarButtonItem?.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }
@@ -176,6 +186,7 @@ extension EditProfileViewController: PHPickerViewControllerDelegate {
                     self.editMyProfileImageView.image = image
                     self.editMyProfileImageView.layer.cornerRadius = self.editMyProfileImageView.bounds.width / 2
                     self.editMyProfileImageView.clipsToBounds = true
+                    self.editMyProfileImageView.contentMode = .scaleAspectFill
                     
                     picker.dismiss(animated: true)
                 }

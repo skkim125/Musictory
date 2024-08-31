@@ -30,22 +30,21 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         addSubview(userLikedLabel)
         
         userProfileImageView.snp.makeConstraints { make in
-            make.top.equalTo(safeAreaLayoutGuide).offset(15)
-            make.leading.equalTo(safeAreaLayoutGuide).offset(30)
-            make.width.equalTo(120)
-            make.height.equalTo(userProfileImageView.snp.width)
-            make.bottom.equalTo(safeAreaLayoutGuide).inset(15)
+            make.top.equalTo(safeAreaLayoutGuide).offset(20)
+            make.leading.equalTo(safeAreaLayoutGuide).offset(20)
+            make.width.equalTo(userProfileImageView.snp.height)
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(20)
         }
         
         userNicknameLabel.snp.makeConstraints { make in
-            make.bottom.equalTo(userProfileImageView.snp.centerY).inset(20)
-            make.leading.equalTo(userProfileImageView.snp.trailing).offset(20)
-            make.trailing.equalTo(safeAreaLayoutGuide).inset(20)
-            make.height.equalTo(50)
+            make.bottom.equalTo(userProfileImageView.snp.centerY).inset(10)
+            make.leading.equalTo(userProfileImageView.snp.trailing).offset(30)
+            make.trailing.lessThanOrEqualTo(safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(40)
         }
         
         userPostLabel.snp.makeConstraints { make in
-            make.centerX.equalTo(safeAreaLayoutGuide)
+            make.leading.equalTo(userNicknameLabel.snp.leading)
             make.top.equalTo(userProfileImageView.snp.centerY)
             make.height.equalTo(30)
         }
@@ -64,14 +63,14 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         userNicknameLabel.font = .boldSystemFont(ofSize: 20)
     }
     
-    func configureUI(profile: ProfileModel)//  profileImage: String?, nickname: String)
+    func configureUI(profile: ProfileModel)
     {
         if let profile = profile.profileImage, let url = URL(string: APIURL.baseURL + "v1/" + profile) {
             print("profile =", profile)
             print("url = \(url)")
             KingfisherManager.shared.setHeaders()
             userProfileImageView.kf.setImage(with: url)
-            userProfileImageView.contentMode = .scaleToFill
+            userProfileImageView.contentMode = .scaleAspectFill
             userProfileImageView.clipsToBounds = true
         } else {
             userProfileImageView.image = UIImage(systemName: "person.circle")
@@ -94,8 +93,7 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        userProfileImageView.layer.cornerRadius = userProfileImageView.bounds.width / 2
-        
+        userProfileImageView.layer.cornerRadius = userProfileImageView.bounds.height/2
     }
     
 }

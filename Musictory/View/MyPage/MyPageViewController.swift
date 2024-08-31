@@ -39,6 +39,7 @@ final class MyPageViewController: UIViewController {
         navigationItem.title = "My Page"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), menu: configureMenuButton())
         navigationItem.rightBarButtonItem?.tintColor = .label
+        navigationController?.navigationBar.tintColor = .systemRed
         
         view.addSubview(myPostCollectionView)
         

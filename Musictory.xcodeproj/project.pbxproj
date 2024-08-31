@@ -183,7 +183,6 @@
 				04F1829E2C81BCED0073B882 /* Home */,
 				04F182A02C81BD090073B882 /* Write */,
 				04F182A12C81BD260073B882 /* MyPage */,
-				04F182A32C81BD370073B882 /* PostDetail */,
 				0458338E2C74B016000D6E81 /* Cell */,
 			);
 			path = View;
@@ -196,7 +195,6 @@
 				04F182A72C81D0560073B882 /* Home */,
 				04F182A82C81D0650073B882 /* Write */,
 				04F182A92C81D0750073B882 /* MyPage */,
-				04F182AA2C81D08C0073B882 /* PostDetail */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -291,6 +289,7 @@
 			children = (
 				048DFE082C738E33000F5293 /* MusictoryHomeViewController.swift */,
 				045833F02C7A3B36000D6E81 /* MusictoryMapViewController.swift */,
+				04F182A32C81BD370073B882 /* PostDetail */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -342,6 +341,7 @@
 			isa = PBXGroup;
 			children = (
 				048DFE022C736670000F5293 /* MusictoryHomeViewModel.swift */,
+				04F182AA2C81D08C0073B882 /* PostDetail */,
 			);
 			path = Home;
 			sourceTree = "<group>";

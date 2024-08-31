@@ -21,6 +21,9 @@ final class MusictoryHomeViewController: UIViewController {
     private let updateAccessToken = PublishSubject<Void>()
     private let fetchPost = PublishSubject<Void>()
     private var refreshControl = UIRefreshControl()
+    private let updateLikePostFromMyPage = PublishSubject<PostModel>()
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureView()
@@ -46,6 +49,8 @@ final class MusictoryHomeViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+        
         Task {
             do {
                 await MusicAuthorization.request()
@@ -58,7 +63,8 @@ final class MusictoryHomeViewController: UIViewController {
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let indexPaths = PublishRelay<[IndexPath]>()
-        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths)
+        let updatePosts = PublishRelay<(Int, ConvertPost)>()
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updateLikePostFromMyPage: updateLikePostFromMyPage)
         let output = viewModel.transform(input: input)
         
         output.showErrorAlert
@@ -79,6 +85,7 @@ final class MusictoryHomeViewController: UIViewController {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
             cell.configureCell(.home, post: item.post)
+            
             if let song = item.song {
                 cell.configureSongView(song: song, viewType: .home) { tapGesture in
                     tapGesture
@@ -108,10 +115,16 @@ final class MusictoryHomeViewController: UIViewController {
             return cell
         })
         
-        postCollectionView.rx.modelSelected(ConvertPost.self)
+        Observable.zip(postCollectionView.rx.itemSelected, postCollectionView.rx.modelSelected(ConvertPost.self))
             .bind(with: self) { owner, value in
-                let vc = MusictoryDetailView(/*post: value.0*/)
-                vc.currentPost = value
+                let vc = MusictoryDetailView()
+                vc.currentPost = value.1
+                vc.moveData = { post in
+                    guard let post = post else { return }
+                    guard let cell = owner.postCollectionView.cellForItem(at: IndexPath(item: value.0.item, section: 0)) as? PostCollectionViewCell else { return }
+                    updatePosts.accept((value.0.item, post))
+                    cell.configureCell(.home, post: post.post)
+                }
                 
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
@@ -177,12 +190,19 @@ final class MusictoryHomeViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    @objc func updateLikePost(_ notification: Notification) {
+        guard let post = notification.userInfo?["post"] as? PostModel else {
+                return
+            }
+        print(post)
+        updateLikePostFromMyPage.onNext(post)
+    }
+    
     @objc func updateCollectionView(_ notification: Notification) {
         makeToast(message: "뮤직토리를 기록하였습니다", presentTime: 2)
         
         postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         updateCollectionViewMethod()
-        NotificationCenter.default.removeObserver(self, name: Notification.Name("updatePost"), object: nil)
     }
     
     func updateCollectionViewMethod() {

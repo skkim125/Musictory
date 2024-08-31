@@ -9,7 +9,7 @@ import Foundation
 import MusicKit
 
 // 게시물 모델
-struct PostModel: Decodable {
+struct PostModel: Decodable, Hashable {
     let postID: String
     let title: String // 게시물 제목
     let content: String // 게시물 내용

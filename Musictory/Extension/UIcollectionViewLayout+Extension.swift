@@ -14,6 +14,7 @@ extension UICollectionViewLayout {
         listConfiguration.showsSeparators = true
         
         listConfiguration.separatorConfiguration.bottomSeparatorVisibility = .visible
+        listConfiguration.separatorConfiguration.color = .systemGray2
         
         let insetValue: CGFloat = type == .home ? 15: 0
         
@@ -37,7 +38,7 @@ extension UICollectionViewLayout {
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                    heightDimension: .fractionalHeight(1/5)
+                    heightDimension: .absolute(150)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
                 
@@ -54,7 +55,6 @@ extension UICollectionViewLayout {
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-//                    heightDimension: .fractionalWidth(1)
                      heightDimension: .absolute(250)
                 )
                 

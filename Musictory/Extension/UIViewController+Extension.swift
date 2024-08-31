@@ -48,7 +48,6 @@ extension UIViewController {
     
     func makeToast(message: String, presentTime: TimeInterval) {
         view.isUserInteractionEnabled = false
-        view.makeToast(message, duration: presentTime)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + presentTime) {
             self.view.isUserInteractionEnabled = true

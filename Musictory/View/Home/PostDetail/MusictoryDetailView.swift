@@ -22,7 +22,9 @@ final class MusictoryDetailView: UIViewController {
     private let sendCommentButton = UIButton(type: .system)
     private let divider = UIView()
     var viewModel = MusictoryDetailViewModel()
+    var currentPostIndex: Int?
     var currentPost: ConvertPost?
+    var moveData: ((ConvertPost?)->Void)?
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -33,6 +35,7 @@ final class MusictoryDetailView: UIViewController {
     }
     
     private func configureView() {
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: nil)
         navigationItem.title = "Musictory"
         
         view.backgroundColor = .systemBackground
@@ -99,14 +102,14 @@ final class MusictoryDetailView: UIViewController {
     }
     
     private func bind(currentPost: ConvertPost?) {
-        let checkRefreshToken = PublishRelay<Void>()
+        let updateAccessToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
         let post = PublishRelay<ConvertPost?>()
+        let backButtonTap = PublishRelay<Void>()
         
-        let input = MusictoryDetailViewModel.Input(checkRefreshToken: checkRefreshToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap)
+        let input = MusictoryDetailViewModel.Input(updateAccessToken: updateAccessToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap, backButtonTap: backButtonTap)
         let output = viewModel.transform(input: input)
-        
-        checkRefreshToken.accept(())
+        updateAccessToken.accept(())
         post.accept(currentPost)
         
         let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailType> (configureCell: { dataSource, collectionView, indexPath, item in
@@ -182,6 +185,21 @@ final class MusictoryDetailView: UIViewController {
         
         output.outputButtonEnable
             .bind(to: sendCommentButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        navigationItem.leftBarButtonItem?.rx.tap
+            .bind(with: self, onNext: { owner, _ in
+                backButtonTap.accept(())
+            })
+            .disposed(by: disposeBag)
+        
+        output.backButtonTapAction
+            .withLatestFrom(output.finalPost)
+            .bind(with: self) { owner, value in
+                print(value)
+                owner.moveData?(value)
+                owner.navigationController?.popViewController(animated: true)
+            }
             .disposed(by: disposeBag)
     }
 }

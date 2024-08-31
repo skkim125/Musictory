@@ -95,17 +95,11 @@ final class CustomSongView: UIView {
         
         switch viewType {
         case .home:
-            guard let url = song.artwork?.url(width: 80, height: 80) else { return }
+            guard let url = song.artwork?.url(width: 150, height: 150) else { return }
             songImageView.kf.setImage(with: url)
         case .myPage:
             songTitleLabel.isHidden = true
             songArtistLabel.isHidden = true
-            
-            guard let albumImageUrl = song.artwork?.url(width: 300, height: 300) else { return }
-            songImageView.kf.setImage(with: albumImageUrl)
-            songImageView.clipsToBounds = true
-            songImageView.layer.borderWidth = 0.3
-            songImageView.layer.borderColor = UIColor.systemGray6.cgColor
             
             var image = UIImage(systemName: "play.circle.fill")?.withRenderingMode(.alwaysOriginal)
             image = image?.applyingSymbolConfiguration(.init(font: .boldSystemFont(ofSize: 18), scale: .large))
