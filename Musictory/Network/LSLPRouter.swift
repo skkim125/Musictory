@@ -18,7 +18,7 @@ enum LSLPRouter {
     case fetchMyPost(PostQuery)
 //    case uploadImage(Data?, String)
     case writeComment(String, CommentsQuery)
-    case editMyProfile
+    case editMyProfile(EditProfileQuery)
 }
 
 extension LSLPRouter {
@@ -134,10 +134,36 @@ extension LSLPRouter {
 //            return body
         case .writeComment( _, let commentQuery):
             return try? encoder.encode(commentQuery)
-//        case .editMyProfile(let editProfile):
-//            return try? encoder.encode(editProfile)
+        case .editMyProfile(let editProfile):
+            
+            var body = Data()
+            
+            body.append("--\(editProfile.boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"nick\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
+            body.append(editProfile.nick.data(using: .utf8)!)
+            body.append("\r\n".data(using: .utf8)!)
+            
+            body.append("--\(editProfile.boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"profile\"; filename=\"image.png\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
+            body.append(editProfile.profile)
+            body.append("\r\n".data(using: .utf8)!)
+            body.append("--\(editProfile.boundary)--\r\n".data(using: .utf8)!)
+            
+            return body
+            
         default:
             return nil
+        }
+    }
+    
+    var boundary: String? {
+        switch self {
+        case .editMyProfile(let editProfileQuery):
+            editProfileQuery.boundary
+        default:
+            nil
         }
     }
     

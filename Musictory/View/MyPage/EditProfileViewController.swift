@@ -122,10 +122,11 @@ final class EditProfileViewController: UIViewController {
                 if !nickname.trimmingCharacters(in: .whitespaces).isEmpty && !nickname.hasSuffix(" ") {
                     owner.showTwoButtonAlert(title: "프로필을 수정하시겠습니까?", message: nil) {
                         
-                        let image = owner.editMyProfileImageView.image?.jpegData(compressionQuality: 0.5)
-                        guard let imageData = image else { return }
+                        guard let imageData = owner.editMyProfileImageView.image?.jpegData(compressionQuality: 0.5) else { return }
+                        
+                        let query = EditProfileQuery(nick: nickname, profile: imageData)
 
-                        LSLP_API.shared.uploadRequest(apiType: .editMyProfile, decodingType: ProfileModel.self, nick: nickname, image: imageData) { result in
+                        LSLP_API.shared.uploadRequest(apiType: .editMyProfile(query), decodingType: ProfileModel.self) { result in
                             switch result {
                             case .success(let editedProfile):
                                 owner.moveData?(editedProfile)

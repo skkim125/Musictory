@@ -178,6 +178,8 @@ final class MusictoryHomeViewController: UIViewController {
     }
     
     @objc func updateCollectionView(_ notification: Notification) {
+        makeToast(message: "뮤직토리를 기록하였습니다", presentTime: 2)
+        
         postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         updateCollectionViewMethod()
         NotificationCenter.default.removeObserver(self, name: Notification.Name("updatePost"), object: nil)

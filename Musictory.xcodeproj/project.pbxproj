@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */; };
 		0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */; };
 		045833892C74AF14000D6E81 /* PostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833882C74AF14000D6E81 /* PostQuery.swift */; };
 		0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */; };
@@ -69,6 +70,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileQuery.swift; sourceTree = "<group>"; };
 		0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		045833882C74AF14000D6E81 /* PostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostQuery.swift; sourceTree = "<group>"; };
 		0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 				045833D52C774F3E000D6E81 /* WritePostQuery.swift */,
 				045833D72C786FE1000D6E81 /* LikeQuery.swift */,
 				04F1829A2C80A1A10073B882 /* CommentsQuery.swift */,
+				04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */,
 			);
 			path = QueryModel;
 			sourceTree = "<group>";
@@ -461,6 +464,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */,
 				045833BD2C762F1A000D6E81 /* CustomButton.swift in Sources */,
 				045833B12C75A192000D6E81 /* RefreshModel.swift in Sources */,
 				048DFDEF2C722AE3000F5293 /* LoginQuery.swift in Sources */,

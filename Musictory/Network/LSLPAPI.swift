@@ -74,15 +74,14 @@ final class LSLP_API {
         }.resume()
     }
     
-    func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, nick: String, image: Data, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
+    func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
         let component = URLComponents(string: apiType.baseURL)
         
         guard let url = component?.url else { return }
         var request = URLRequest(url: url.appendingPathComponent(apiType.path))
-        request.httpMethod = "PUT"
+        request.httpMethod = apiType.method
         
-        let boundary = UUID().uuidString
-        
+        guard let boundary = apiType.boundary else { return }
         let contentType = "multipart/form-data; boundary=\(boundary)"
         
         request.allHTTPHeaderFields = [
@@ -91,22 +90,7 @@ final class LSLP_API {
             "Content-Type": contentType
         ]
         
-        var body = Data()
-        
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"nick\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
-        body.append(nick.data(using: .utf8)!)
-        body.append("\r\n".data(using: .utf8)!)
-        
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"profile\"; filename=\"image.png\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
-        body.append(image)
-        body.append("\r\n".data(using: .utf8)!)
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-        
-        request.httpBody = body
+        request.httpBody = apiType.httpBody
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {

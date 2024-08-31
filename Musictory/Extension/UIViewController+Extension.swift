@@ -45,4 +45,13 @@ extension UIViewController {
             UIView.transition(with: window, duration: 0.2, options: [.transitionCrossDissolve], animations: nil, completion: nil)
         }
     }
+    
+    func makeToast(message: String, presentTime: TimeInterval) {
+        view.isUserInteractionEnabled = false
+        view.makeToast(message, duration: presentTime)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + presentTime) {
+            self.view.isUserInteractionEnabled = true
+        }
+    }
 }

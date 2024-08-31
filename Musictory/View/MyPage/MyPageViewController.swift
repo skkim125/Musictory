@@ -186,12 +186,18 @@ final class MyPageViewController: UIViewController {
             }
         })
         
-        let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { _ in
+        let donation = UIAction(title: "개발자 후원하기", image: UIImage(systemName: "dollarsign.circle"), handler: { _ in
+
+        })
+        
+        let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { [weak self] _ in
+            guard let self = self else { return }
+
             self.showTwoButtonAlert(title: "탈퇴하시겠습니까?", message: "탈퇴 이후 유저 정보를 복구할 수 없습니다.") {
                 print("탈퇴")
             }
         })
-        return UIMenu(title: "설정", options: .displayInline, children: [editProfile, withdraw])
+        return UIMenu(title: "설정", options: .displayInline, children: [editProfile, donation, withdraw])
     }
     
     override func viewWillAppear(_ animated: Bool) {

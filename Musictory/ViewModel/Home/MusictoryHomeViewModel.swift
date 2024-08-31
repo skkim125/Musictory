@@ -50,6 +50,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                     switch result {
                     case .success(let success):
                         UserDefaultsManager.shared.accessT = success.accessToken
+                        print(#function, "UserDefaultsManager.shared.accessT = \(UserDefaultsManager.shared.accessT)")
                     case .failure(let error):
                         showErrorAlert.accept(error)
                     }
