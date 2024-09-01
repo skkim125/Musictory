@@ -14,6 +14,8 @@
 		04157A7E2C842C1B0007BC58 /* DonationWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A7D2C842C1B0007BC58 /* DonationWebViewModel.swift */; };
 		04157A802C842C610007BC58 /* DonationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A7F2C842C610007BC58 /* DonationQuery.swift */; };
 		04157A822C8432100007BC58 /* DonationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A812C8432100007BC58 /* DonationModel.swift */; };
+		04157A852C84680E0007BC58 /* PostDetailDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A842C84680E0007BC58 /* PostDetailDataType.swift */; };
+		04157A872C84686A0007BC58 /* MyPageDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A862C84686A0007BC58 /* MyPageDataType.swift */; };
 		0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */; };
 		045833892C74AF14000D6E81 /* PostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833882C74AF14000D6E81 /* PostQuery.swift */; };
 		0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */; };
@@ -82,6 +84,8 @@
 		04157A7D2C842C1B0007BC58 /* DonationWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewModel.swift; sourceTree = "<group>"; };
 		04157A7F2C842C610007BC58 /* DonationQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationQuery.swift; sourceTree = "<group>"; };
 		04157A812C8432100007BC58 /* DonationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationModel.swift; sourceTree = "<group>"; };
+		04157A842C84680E0007BC58 /* PostDetailDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailDataType.swift; sourceTree = "<group>"; };
+		04157A862C84686A0007BC58 /* MyPageDataType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyPageDataType.swift; sourceTree = "<group>"; };
 		0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		045833882C74AF14000D6E81 /* PostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostQuery.swift; sourceTree = "<group>"; };
 		0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -157,6 +161,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		04157A832C8467EE0007BC58 /* SectionModel */ = {
+			isa = PBXGroup;
+			children = (
+				04157A842C84680E0007BC58 /* PostDetailDataType.swift */,
+				04157A862C84686A0007BC58 /* MyPageDataType.swift */,
+			);
+			path = SectionModel;
+			sourceTree = "<group>";
+		};
 		0458338E2C74B016000D6E81 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
@@ -182,6 +195,7 @@
 		045833B72C75D042000D6E81 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				04157A832C8467EE0007BC58 /* SectionModel */,
 				048DFDED2C722ACC000F5293 /* QueryModel */,
 				048DFDEA2C722A92000F5293 /* ResponseModel */,
 			);
@@ -529,7 +543,9 @@
 				0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */,
 				048DFDE72C71D1F7000F5293 /* LSLPAPI.swift in Sources */,
 				048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */,
+				04157A852C84680E0007BC58 /* PostDetailDataType.swift in Sources */,
 				045833C32C763EB2000D6E81 /* SearchSongCollectionViewCell.swift in Sources */,
+				04157A872C84686A0007BC58 /* MyPageDataType.swift in Sources */,
 				045833F92C7AF99E000D6E81 /* ImageFileModel.swift in Sources */,
 				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,
 				045833DA2C787125000D6E81 /* LikeModel.swift in Sources */,

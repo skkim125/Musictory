@@ -13,9 +13,6 @@ import RxDataSources
 import MusicKit
 
 final class MusictoryDetailView: UIViewController {
-    deinit {
-        print("\(self)deinit됨")
-    }
     private let musictoryDetailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
     private let commentTFBackgroundView = UIView()
     private let commentTextField = UITextField()
@@ -112,7 +109,7 @@ final class MusictoryDetailView: UIViewController {
         updateAccessToken.accept(())
         post.accept(currentPost)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailType> (configureCell: { dataSource, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailDataType> (configureCell: { dataSource, collectionView, indexPath, item in
             
             switch item {
             case .postItem(item: let post):
@@ -168,7 +165,6 @@ final class MusictoryDetailView: UIViewController {
             .disposed(by: disposeBag)
         
         output.showErrorAlert
-            .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
                 owner.showAlert(title: error.title, message: error.alertMessage) {
                     if error == NetworkError.expiredRefreshToken {
@@ -196,37 +192,11 @@ final class MusictoryDetailView: UIViewController {
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
+        
+        output.commentSendEnd
+            .bind(with: self) { owner, _ in
+                owner.commentTextField.rx.text.onNext(nil)
+            }
+            .disposed(by: disposeBag)
     }
-}
-
-enum PostDetailType {
-    case post(items: [PostDetailItem])
-    case comments(items: [PostDetailItem])
-}
-
-extension PostDetailType: SectionModelType {
-    typealias Item = PostDetailItem
-    
-    var items: [PostDetailItem] {
-        switch self {
-        case .post(items: let items):
-            return items.map { $0 }
-        case .comments(items: let items):
-            return items.map { $0 }
-        }
-    }
-    
-    init(original: PostDetailType, items: [Item]) {
-        switch original {
-        case .post(items: let items):
-            self = .post(items: items)
-        case .comments(items: let items):
-            self = .comments(items: items)
-        }
-    }
-}
-
-enum PostDetailItem {
-    case postItem(item: ConvertPost)
-    case commentItem(item: CommentModel)
 }

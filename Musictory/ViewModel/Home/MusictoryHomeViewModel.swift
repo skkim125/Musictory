@@ -27,7 +27,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let likePostIndex: PublishRelay<Int>
         let prefetchIndexPatch: PublishRelay<[IndexPath]>
         let updatePosts: PublishRelay<(Int, ConvertPost)>
-        let updateLikePostFromMyPage: PublishSubject<PostModel>
+        let updatePostActionOfNoti: PublishSubject<PostModel>
     }
     
     struct Output {
@@ -194,7 +194,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        input.updateLikePostFromMyPage
+        input.updatePostActionOfNoti
             .bind(with: self) { owner, value in
                 guard let index = owner.originalPosts.firstIndex(where: { $0.postID == value.postID }) else { return }
                 owner.originalPosts[index] = value

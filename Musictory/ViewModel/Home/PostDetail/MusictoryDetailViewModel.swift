@@ -33,61 +33,38 @@ final class MusictoryDetailViewModel: BaseViewModel {
     }
     
     struct Output {
-        let postDetailData: BehaviorRelay<[PostDetailType]>
-        let showErrorAlert: PublishRelay<Void>
-        let networkError: PublishRelay<NetworkError>
+        let postDetailData: BehaviorRelay<[PostDetailDataType]>
+        let showErrorAlert: PublishRelay<NetworkError>
         let outputButtonEnable: Observable<Bool>
         let finalPost: PublishRelay<ConvertPost>
         let backButtonTapAction: PublishRelay<Void>
+        let commentSendEnd: PublishRelay<Void>
     }
     
     func transform(input: Input) -> Output {
         var postID = ""
-        let inputCurrentPost = input.currentPost
-        let showErrorAlert = PublishRelay<Void>()
-        let networkError = PublishRelay<NetworkError>()
-        let postData = BehaviorRelay<[PostDetailType]>(value: [])
+        let inputCurrentPost = PublishRelay<ConvertPost?>()
+        let showErrorAlert = PublishRelay<NetworkError>()
+        let postData = BehaviorRelay<[PostDetailDataType]>(value: [])
         let finalPost = PublishRelay<ConvertPost>()
         let backButtonTapAction = PublishRelay<Void>()
+        let sendEnd = PublishRelay<Void>()
         
         let commentIsEmpty = input.commentText
             .map({ !$0.trimmingCharacters(in: .whitespaces).isEmpty })
         
-        input.sendCommendButtonTap
-            .withLatestFrom(input.commentText)
+        input.currentPost
             .bind(with: self) { owner, value in
-                let query = CommentsQuery(content: "\(value)")
-                owner.lslp_API.callRequest(apiType: .writeComment(postID, query), decodingType: CommentModel.self) { result in
+                guard let post = value else { return }
+                
+                owner.lslp_API.callRequest(apiType: .fetchPostOfReload(post.post.postID, PostQuery()), decodingType: PostModel.self) { result in
                     switch result {
                     case .success(let success):
-                        print(success)
-                    case .failure(let error1):
-                        owner.lslp_API.updateRefresh { result in
-                            switch result {
-                            case .success:
-                                owner.lslp_API.callRequest(apiType: .writeComment(value, query), decodingType: CommentModel.self)
-                            case .failure(let error2):
-                                networkError.accept(error2)
-                                showErrorAlert.accept(())
-                            }
-                        }
-                        networkError.accept(error1)
-                        showErrorAlert.accept(())
-                    }
-                }
-            }
-            .disposed(by: disposeBag)
-        
-        input.updateAccessToken
-            .bind(with: self) { owner, _ in
-                owner.lslp_API.updateRefresh { result in
-                    switch result {
-                    case .success(let success):
-                        UserDefaultsManager.shared.accessT = success.accessToken
-                        print(#function, "UserDefaultsManager.shared.accessT = \(UserDefaultsManager.shared.accessT)")
+                        var convert = post
+                        convert.post = success
+                        inputCurrentPost.accept(convert)
                     case .failure(let error):
-                        showErrorAlert.accept(())
-                        networkError.accept(error)
+                        showErrorAlert.accept(error)
                     }
                 }
             }
@@ -103,15 +80,66 @@ final class MusictoryDetailViewModel: BaseViewModel {
                 print(111111,postID)
                 postID = post.post.postID
                 print(111111,postID)
-                let result = PostDetailType.post(items: convertComments)
+                let result = PostDetailDataType.post(items: convertComments)
                 
-                let data = [PostDetailType.post(items: [PostDetailItem.postItem(item: post)]), result]
+                let data = [PostDetailDataType.post(items: [PostDetailItem.postItem(item: post)]), result]
 
                 return data
             }
             .bind(with: self, onNext: { owner, value in
                 postData.accept(value)
             })
+            .disposed(by: disposeBag)
+        
+        
+        input.sendCommendButtonTap
+            .withLatestFrom(input.commentText)
+            .bind(with: self) { owner, value in
+                let query = CommentsQuery(content: "\(value)")
+                owner.lslp_API.callRequest(apiType: .writeComment(postID, query), decodingType: CommentModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        guard let before = owner.currentPost else { return }
+                        var afterPost = before
+                        afterPost.post.comments.insert(success, at: 0)
+                        
+                        owner.lslp_API.callRequest(apiType: .fetchPostOfReload(postID, PostQuery()), decodingType: PostModel.self) { result in
+                            switch result {
+                            case .success(let success):
+                                var convert = afterPost
+                                convert.post = success
+                                inputCurrentPost.accept(convert)
+                            case .failure(let error):
+                                showErrorAlert.accept(error)
+                            }
+                        }
+                        
+                        sendEnd.accept(())
+                        inputCurrentPost.accept(afterPost)
+                        
+                        
+                        
+                        NotificationCenter.default.post(name: Notification.Name("updateOfComment"), object: nil, userInfo: ["updateOfComment": afterPost.post])
+                        
+                    case .failure(let error1):
+                        showErrorAlert.accept(error1)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.updateAccessToken
+            .bind(with: self) { owner, _ in
+                owner.lslp_API.updateRefresh { result in
+                    switch result {
+                    case .success(let success):
+                        UserDefaultsManager.shared.accessT = success.accessToken
+                        print(#function, "UserDefaultsManager.shared.accessT = \(UserDefaultsManager.shared.accessT)")
+                    case .failure(let error):
+                        showErrorAlert.accept(error)
+                    }
+                }
+            }
             .disposed(by: disposeBag)
         
         input.likePostIndex
@@ -142,19 +170,29 @@ final class MusictoryDetailViewModel: BaseViewModel {
                 owner.lslp_API.callRequest(apiType: .like(value.post.postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success:
-                        finalPost.accept(value)
-                        backButtonTapAction.accept(())
+                        
+                        owner.lslp_API.callRequest(apiType: .fetchPostOfReload(value.post.postID, PostQuery()), decodingType: PostModel.self) { result in
+                            switch result {
+                            case .success(let success):
+                                var convert = value
+                                convert.post = success
+                                finalPost.accept(convert)
+                                
+                                backButtonTapAction.accept(())
+                            case .failure(let error):
+                                showErrorAlert.accept(error)
+                            }
+                        }
                         
                     case .failure(let error):
                         guard let beforePost = owner.currentPost else { return }
                         finalPost.accept(beforePost)
-                        networkError.accept(error)
-                        showErrorAlert.accept(())
+                        showErrorAlert.accept(error)
                     }
                 }
             }
             .disposed(by: disposeBag)
         
-        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, networkError: networkError, outputButtonEnable: commentIsEmpty, finalPost: finalPost, backButtonTapAction: backButtonTapAction)
+        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, outputButtonEnable: commentIsEmpty, finalPost: finalPost, backButtonTapAction: backButtonTapAction, commentSendEnd: sendEnd)
     }
 }

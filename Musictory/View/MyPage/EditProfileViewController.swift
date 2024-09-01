@@ -178,7 +178,7 @@ final class EditProfileViewController: UIViewController {
 extension EditProfileViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         
-        picker.dismiss(animated: true)
+        dismiss(animated: true)
         
         guard let select = results.first else { return }
         select.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] (object, error) in

@@ -21,7 +21,7 @@ struct PostModel: Decodable, Hashable {
     var likes: [String] // 좋아요한 사람 id(좋아요 개수로 만들기)
     let hashTags: [String] // 해시태그(해시태그로 검색하기 기능)
     let createdAt: String // 게시물 생성 날짜
-    let comments: [CommentModel] // 댓글 모음(댓글 구조체 만들기)
+    var comments: [CommentModel] // 댓글 모음(댓글 구조체 만들기)
     
     enum CodingKeys: String, CodingKey {
         case postID = "post_id"

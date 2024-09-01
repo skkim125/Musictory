@@ -21,7 +21,7 @@ final class MusictoryHomeViewController: UIViewController {
     private let updateAccessToken = PublishSubject<Void>()
     private let fetchPost = PublishSubject<Void>()
     private var refreshControl = UIRefreshControl()
-    private let updateLikePostFromMyPage = PublishSubject<PostModel>()
+    private let updatePostActionOfNoti = PublishSubject<PostModel>()
     
     
     override func viewDidLoad() {
@@ -62,13 +62,15 @@ final class MusictoryHomeViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCommentPost(_: )), name: Notification.Name("updateOfComment"), object: nil)
     }
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let indexPaths = PublishRelay<[IndexPath]>()
         let updatePosts = PublishRelay<(Int, ConvertPost)>()
-        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updateLikePostFromMyPage: updateLikePostFromMyPage)
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updatePostActionOfNoti: updatePostActionOfNoti)
         let output = viewModel.transform(input: input)
         
         output.showErrorAlert
@@ -194,7 +196,7 @@ final class MusictoryHomeViewController: UIViewController {
                 return
             }
         print(post)
-        updateLikePostFromMyPage.onNext(post)
+        updatePostActionOfNoti.onNext(post)
         NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
     
@@ -203,6 +205,13 @@ final class MusictoryHomeViewController: UIViewController {
         
         postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         updateCollectionViewMethod()
+        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
+    }
+    @objc private func updateCommentPost(_ notification: Notification) {
+        guard let post = notification.userInfo?["updateOfComment"] as? PostModel else {
+                return
+            }
+        updatePostActionOfNoti.onNext(post)
         NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
     
