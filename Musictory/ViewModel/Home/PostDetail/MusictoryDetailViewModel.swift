@@ -117,9 +117,7 @@ final class MusictoryDetailViewModel: BaseViewModel {
                         sendEnd.accept(())
                         inputCurrentPost.accept(afterPost)
                         
-                        
-                        
-                        NotificationCenter.default.post(name: Notification.Name("updateOfComment"), object: nil, userInfo: ["updateOfComment": afterPost.post])
+//                        NotificationCenter.default.post(name: Notification.Name("updateOfComment"), object: nil, userInfo: ["updateOfComment": afterPost.post])
                         
                     case .failure(let error1):
                         showErrorAlert.accept(error1)
@@ -170,14 +168,13 @@ final class MusictoryDetailViewModel: BaseViewModel {
                 owner.lslp_API.callRequest(apiType: .like(value.post.postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success:
-                        
-                        owner.lslp_API.callRequest(apiType: .fetchPostOfReload(value.post.postID, PostQuery()), decodingType: PostModel.self) { result in
+                        owner.lslp_API.callRequest(apiType: .fetchPostOfReload(postID, PostQuery()), decodingType: PostModel.self) { result in
                             switch result {
                             case .success(let success):
                                 var convert = value
                                 convert.post = success
                                 finalPost.accept(convert)
-                                
+                                NotificationCenter.default.post(name: Notification.Name("updatePostOfDetailView"), object: nil, userInfo: ["updatePostOfDetailView": success])
                                 backButtonTapAction.accept(())
                             case .failure(let error):
                                 showErrorAlert.accept(error)

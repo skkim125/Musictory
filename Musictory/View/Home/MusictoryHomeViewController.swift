@@ -35,7 +35,7 @@ final class MusictoryHomeViewController: UIViewController {
     private func configureView() {
         self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.label, .font: UIFont.boldSystemFont(ofSize: 25)]
         navigationItem.title = "Musictory"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "map.fill"), style: .plain, target: nil, action: nil)
         navigationController?.navigationBar.tintColor = .systemRed
         
         view.backgroundColor = .systemBackground
@@ -61,9 +61,12 @@ final class MusictoryHomeViewController: UIViewController {
     private func notificationCenterObserver() {
         NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+//        
+//        NotificationCenter.default.addObserver(self, selector: #selector(updateCommentPost(_: )), name: Notification.Name("updateOfComment"), object: nil)
+//        
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePostOfDetailView(_: )), name: Notification.Name("updatePostOfDetailView"), object: nil)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCommentPost(_: )), name: Notification.Name("updateOfComment"), object: nil)
     }
     
     private func bind() {
@@ -191,14 +194,14 @@ final class MusictoryHomeViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-    @objc func updateLikePost(_ notification: Notification) {
-        guard let post = notification.userInfo?["post"] as? PostModel else {
-                return
-            }
-        print(post)
-        updatePostActionOfNoti.onNext(post)
-        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
-    }
+//    @objc func updateLikePost(_ notification: Notification) {
+//        guard let post = notification.userInfo?["post"] as? PostModel else {
+//                return
+//            }
+//        print(post)
+//        updatePostActionOfNoti.onNext(post)
+//        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
+//    }
     
     @objc private func updateCollectionView(_ notification: Notification) {
         makeToast(message: "뮤직토리를 남겼습니다!", presentTime: 2)
@@ -207,8 +210,16 @@ final class MusictoryHomeViewController: UIViewController {
         updateCollectionViewMethod()
         NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
-    @objc private func updateCommentPost(_ notification: Notification) {
-        guard let post = notification.userInfo?["updateOfComment"] as? PostModel else {
+//    @objc private func updateCommentPost(_ notification: Notification) {
+//        guard let post = notification.userInfo?["updateOfComment"] as? PostModel else {
+//                return
+//            }
+//        updatePostActionOfNoti.onNext(post)
+//        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
+//    }
+    
+    @objc private func updatePostOfDetailView(_ notification: Notification) {
+        guard let post = notification.userInfo?["updatePostOfDetailView"] as? PostModel else {
                 return
             }
         updatePostActionOfNoti.onNext(post)
