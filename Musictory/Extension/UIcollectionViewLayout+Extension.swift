@@ -49,13 +49,13 @@ extension UICollectionViewLayout {
             default:
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1/2),
-                    heightDimension: .absolute(250)
+                    heightDimension: .absolute(240)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
                 
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .fractionalWidth(1),
-                     heightDimension: .absolute(250)
+                     heightDimension: .absolute(240)
                 )
                 
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])

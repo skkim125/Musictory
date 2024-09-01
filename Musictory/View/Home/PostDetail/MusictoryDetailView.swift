@@ -170,14 +170,9 @@ final class MusictoryDetailView: UIViewController {
         output.showErrorAlert
             .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
-                self.showAlert(title: error.title, message: error.alertMessage) {
+                owner.showAlert(title: error.title, message: error.alertMessage) {
                     if error == NetworkError.expiredRefreshToken {
-                        UserDefaultsManager.shared.accessT = ""
-                        UserDefaultsManager.shared.refreshT = ""
-                        UserDefaultsManager.shared.userID = ""
-                        
-                        let vc = LogInViewController()
-                        self.setRootViewController(vc)
+                        owner.goLoginView()
                     }
                 }
             }

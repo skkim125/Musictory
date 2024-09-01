@@ -137,7 +137,9 @@ final class EditProfileViewController: UIViewController {
                                 }
                                 
                             case .failure(let error):
-                                print(error)
+                                if error == .expiredRefreshToken {
+                                    owner.goLoginView()
+                                }
                             }
                         }
                     }

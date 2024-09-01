@@ -26,8 +26,9 @@ final class LSLP_API {
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
+                request.timeoutInterval = TimeInterval(5)
                 guard error == nil else {
-                    print(error?.localizedDescription)
+                    NetworkError.custom("네트워크 연결이 불안정합니다.")
                     
                     return
                 }
@@ -40,6 +41,10 @@ final class LSLP_API {
                 
                 print("response.url =", response.url)
                 print("response.statusCode =", response.statusCode)
+                
+                if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response Body: \(responseBody)")
+                }
                 
                 switch response.statusCode {
                 case 200 :
@@ -91,6 +96,7 @@ final class LSLP_API {
         ]
         
         request.httpBody = apiType.httpBody
+        request.timeoutInterval = TimeInterval(5)
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {

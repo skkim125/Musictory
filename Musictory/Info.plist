@@ -2,9 +2,25 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.harvey.Musictory</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>musictory</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>music</string>
+		<string>shinhan-sr-ansimclick</string>
+		<string>kb-acp</string>
+		<string>kakaotalk</string>
+		<string>payco</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import Toast
 
 extension UIViewController {
     func showAlert(title: String?, message: String?, completionHandelr: (()->Void)? = nil) {
@@ -47,10 +48,22 @@ extension UIViewController {
     }
     
     func makeToast(message: String, presentTime: TimeInterval) {
+        ToastManager.shared.style.backgroundColor = .systemRed
+        ToastManager.shared.style.titleColor = .white
         view.isUserInteractionEnabled = false
+        view.makeToast(message, duration: presentTime)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + presentTime) {
             self.view.isUserInteractionEnabled = true
         }
+    }
+    
+    func goLoginView() {
+        UserDefaultsManager.shared.accessT = ""
+        UserDefaultsManager.shared.refreshT = ""
+        UserDefaultsManager.shared.userID = ""
+        
+        let vc = LogInViewController()
+        setRootViewController(vc)
     }
 }

@@ -17,7 +17,7 @@ final class MyPageViewModel: BaseViewModel {
     let disposeBag = DisposeBag()
     
     struct Input {
-        let checkRefreshToken: PublishRelay<Void>
+        let checkAccessToken: PublishRelay<Void>
         let loadMyProfile: PublishRelay<Void>
         let loadMyPosts: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
@@ -43,7 +43,7 @@ final class MyPageViewModel: BaseViewModel {
         let outputConvertPosts = PublishRelay<[ConvertPost]>()
         let outputGetLiked = BehaviorRelay(value: originalPosts.count)
         
-        input.checkRefreshToken
+        input.checkAccessToken
             .bind(with: self) { owner, _ in
                 owner.lslp_API.updateRefresh { result in
                     switch result {

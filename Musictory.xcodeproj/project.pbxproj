@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */; };
+		04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A762C8420B60007BC58 /* UIView+Extension.swift */; };
+		04157A7A2C8423DC0007BC58 /* iamport-ios in Frameworks */ = {isa = PBXBuildFile; productRef = 04157A792C8423DC0007BC58 /* iamport-ios */; };
+		04157A7C2C8427000007BC58 /* DonationWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A7B2C8427000007BC58 /* DonationWebViewController.swift */; };
+		04157A7E2C842C1B0007BC58 /* DonationWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A7D2C842C1B0007BC58 /* DonationWebViewModel.swift */; };
+		04157A802C842C610007BC58 /* DonationQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A7F2C842C610007BC58 /* DonationQuery.swift */; };
+		04157A822C8432100007BC58 /* DonationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A812C8432100007BC58 /* DonationModel.swift */; };
 		0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */; };
 		045833892C74AF14000D6E81 /* PostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833882C74AF14000D6E81 /* PostQuery.swift */; };
 		0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */; };
@@ -71,6 +77,11 @@
 
 /* Begin PBXFileReference section */
 		04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileQuery.swift; sourceTree = "<group>"; };
+		04157A762C8420B60007BC58 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
+		04157A7B2C8427000007BC58 /* DonationWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewController.swift; sourceTree = "<group>"; };
+		04157A7D2C842C1B0007BC58 /* DonationWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewModel.swift; sourceTree = "<group>"; };
+		04157A7F2C842C610007BC58 /* DonationQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationQuery.swift; sourceTree = "<group>"; };
+		04157A812C8432100007BC58 /* DonationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationModel.swift; sourceTree = "<group>"; };
 		0449DF492C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileCollectionViewCell.swift; sourceTree = "<group>"; };
 		045833882C74AF14000D6E81 /* PostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostQuery.swift; sourceTree = "<group>"; };
 		0458338A2C74AFE4000D6E81 /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -139,6 +150,7 @@
 				04E430662C6E18EC007FA9C6 /* SnapKit in Frameworks */,
 				045833E12C79CF5A000D6E81 /* Differentiator in Frameworks */,
 				048DFDDC2C6F9C92000F5293 /* RxSwift in Frameworks */,
+				04157A7A2C8423DC0007BC58 /* iamport-ios in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +172,7 @@
 			isa = PBXGroup;
 			children = (
 				045833B52C75C0E7000D6E81 /* UIViewController+Extension.swift */,
+				04157A762C8420B60007BC58 /* UIView+Extension.swift */,
 				0458338C2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift */,
 				045833BA2C7620F6000D6E81 /* DateFormatter+Extension.swift */,
 			);
@@ -230,6 +243,7 @@
 				045833D92C787125000D6E81 /* LikeModel.swift */,
 				045833F82C7AF99D000D6E81 /* ImageFileModel.swift */,
 				045833E62C79DF27000D6E81 /* ProfileModel.swift */,
+				04157A812C8432100007BC58 /* DonationModel.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -243,6 +257,7 @@
 				045833D72C786FE1000D6E81 /* LikeQuery.swift */,
 				04F1829A2C80A1A10073B882 /* CommentsQuery.swift */,
 				04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */,
+				04157A7F2C842C610007BC58 /* DonationQuery.swift */,
 			);
 			path = QueryModel;
 			sourceTree = "<group>";
@@ -317,6 +332,7 @@
 			children = (
 				045833DD2C79979E000D6E81 /* MyPageViewController.swift */,
 				04F182A42C81BD720073B882 /* EditProfileViewController.swift */,
+				04157A7B2C8427000007BC58 /* DonationWebViewController.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -359,6 +375,7 @@
 			isa = PBXGroup;
 			children = (
 				045833E42C79DB4C000D6E81 /* MyPageViewModel.swift */,
+				04157A7D2C842C1B0007BC58 /* DonationWebViewModel.swift */,
 			);
 			path = MyPage;
 			sourceTree = "<group>";
@@ -398,6 +415,7 @@
 				045833902C74C145000D6E81 /* RxGesture */,
 				045833E02C79CF5A000D6E81 /* Differentiator */,
 				045833E22C79CF5A000D6E81 /* RxDataSources */,
+				04157A792C8423DC0007BC58 /* iamport-ios */,
 			);
 			productName = Musictory;
 			productReference = 04E430472C6CF68E007FA9C6 /* Musictory.app */;
@@ -436,6 +454,7 @@
 				048DFDD82C6F9C92000F5293 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */,
 				045833DF2C79CF5A000D6E81 /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				04157A782C8423DC0007BC58 /* XCRemoteSwiftPackageReference "iamport-ios" */,
 			);
 			productRefGroup = 04E430482C6CF68E007FA9C6 /* Products */;
 			projectDirPath = "";
@@ -471,6 +490,7 @@
 				045833BB2C7620F6000D6E81 /* DateFormatter+Extension.swift in Sources */,
 				048DFDFB2C7363FE000F5293 /* PostModel.swift in Sources */,
 				04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */,
+				04157A7C2C8427000007BC58 /* DonationWebViewController.swift in Sources */,
 				048DFE072C738BC5000F5293 /* RequsetPostModel.swift in Sources */,
 				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
@@ -482,7 +502,11 @@
 				04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
+				04157A802C842C610007BC58 /* DonationQuery.swift in Sources */,
+				04157A7E2C842C1B0007BC58 /* DonationWebViewModel.swift in Sources */,
+				04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */,
 				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,
+				04157A822C8432100007BC58 /* DonationModel.swift in Sources */,
 				04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */,
 				045833C12C763CC9000D6E81 /* AddSongViewController.swift in Sources */,
 				045833B92C75E536000D6E81 /* WriteMusictoryViewController.swift in Sources */,
@@ -737,6 +761,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		04157A782C8423DC0007BC58 /* XCRemoteSwiftPackageReference "iamport-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/iamport/iamport-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.2;
+			};
+		};
 		0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
@@ -804,6 +836,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		04157A792C8423DC0007BC58 /* iamport-ios */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04157A782C8423DC0007BC58 /* XCRemoteSwiftPackageReference "iamport-ios" */;
+			productName = "iamport-ios";
+		};
 		045833902C74C145000D6E81 /* RxGesture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 0458338F2C74C145000D6E81 /* XCRemoteSwiftPackageReference "RxGesture" */;

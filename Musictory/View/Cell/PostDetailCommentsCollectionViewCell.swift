@@ -12,8 +12,6 @@ import RxSwift
 import RxCocoa
 
 final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
-    static let identifier = "PostDetailCommentsCollectionViewCell"
-    
     private let userImageView = UIImageView()
     private let userNicknameLabel = UILabel()
     private let commentsLabel = UILabel()

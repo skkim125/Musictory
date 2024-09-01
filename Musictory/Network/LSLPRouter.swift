@@ -19,6 +19,7 @@ enum LSLPRouter {
 //    case uploadImage(Data?, String)
     case writeComment(String, CommentsQuery)
     case editMyProfile(EditProfileQuery)
+    case donation(DonationQuery)
 }
 
 extension LSLPRouter {
@@ -29,7 +30,7 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost, .like,/* .uploadImage,*/ .writeComment:
+        case .login, .writePost, .like,/* .uploadImage,*/ .writeComment, .donation:
             "POST"
         case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
             "GET"
@@ -60,6 +61,8 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/\(id)" + "/comments"
         case .editMyProfile:
             APIPath.fetchProfile.rawValue
+        case .donation:
+            "/payments/validation"
         }
     }
     
@@ -82,7 +85,7 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.refresh.rawValue: UserDefaultsManager.shared.refreshT
             ]
-        case .writePost, .like, .writeComment:
+        case .writePost, .like, .writeComment, .donation:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
@@ -153,6 +156,8 @@ extension LSLPRouter {
             
             return body
             
+        case .donation(let donationQuery):
+            return try? encoder.encode(donationQuery)
         default:
             return nil
         }
@@ -256,6 +261,15 @@ extension LSLPRouter {
                 return NetworkError.custom("\(statusCode)")
             }
         case .editMyProfile:
+            switch statusCode {
+            case 401:
+                return NetworkError.custom("유효하지 않은 계정입니다.")
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("알 수 없는 에러입니다.")
+            }
+        case .donation:
             switch statusCode {
             case 401:
                 return NetworkError.custom("유효하지 않은 계정입니다.")

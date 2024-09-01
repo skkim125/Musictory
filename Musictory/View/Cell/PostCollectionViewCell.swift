@@ -14,8 +14,6 @@ import RxCocoa
 import RxGesture
 
 final class PostCollectionViewCell: UICollectionViewCell {
-    static let identifier = "PostCollectionViewCell"
-    
     private let userImageView = UIImageView()
     private let userNicknameLabel = UILabel()
     private let postTitleLabel = UILabel()
@@ -168,7 +166,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             commentCountLabel.snp.makeConstraints { make in
                 make.top.equalTo(postTitleLabel.snp.bottom).offset(10)
                 make.trailing.equalTo(contentView.safeAreaLayoutGuide).inset(10)
-                make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+                make.bottom.equalTo(contentView.safeAreaLayoutGuide)
             }
             
             commentImageView.snp.makeConstraints { make in
@@ -222,7 +220,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         case .myPage:
             userImageView.isHidden = true
             userNicknameLabel.isHidden = true
-            postCreateAtLabel.font = .systemFont(ofSize: 13)
+            postCreateAtLabel.font = .systemFont(ofSize: 12)
         }
         
         postTitleLabel.text = post.title

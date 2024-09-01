@@ -10,8 +10,6 @@ import SnapKit
 import Kingfisher
 
 final class ProfileCollectionViewCell: UICollectionViewCell {
-    static let identifier = "ProfileCollectionViewCell"
-    
     let userProfileImageView = UIImageView()
     private let userNicknameLabel = UILabel()
     private let userPostLabel = UILabel()
@@ -79,10 +77,12 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         userNicknameLabel.numberOfLines = 2
         userNicknameLabel.textAlignment = .left
         userPostLabel.text = "게시물 " + profile.posts.count.formatted(.number)
+        userPostLabel.font = .systemFont(ofSize: 14)
     }
     
     func configureLikedLabel(likeCount: Int) {
         userLikedLabel.text = "받은 좋아요 " + likeCount.formatted(.number)
+        userLikedLabel.font = .systemFont(ofSize: 14)
     }
     
     @available(*, unavailable)

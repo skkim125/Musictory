@@ -47,9 +47,7 @@ final class MusictoryHomeViewController: UIViewController {
         
         postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+        notificationCenterObserver()
         
         Task {
             do {
@@ -58,6 +56,12 @@ final class MusictoryHomeViewController: UIViewController {
                 
             }
         }
+    }
+    
+    private func notificationCenterObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
     }
     
     private func bind() {
@@ -69,13 +73,8 @@ final class MusictoryHomeViewController: UIViewController {
         
         output.showErrorAlert
             .bind(with: self) { owner, error in
-                self.showAlert(title: error.title, message: error.alertMessage) {
-                    UserDefaultsManager.shared.accessT = ""
-                    UserDefaultsManager.shared.refreshT = ""
-                    UserDefaultsManager.shared.userID = ""
-                    
-                    let vc = LogInViewController()
-                    self.setRootViewController(vc)
+                owner.showAlert(title: error.title, message: error.alertMessage) {
+                    owner.goLoginView()
                 }
             }
             .disposed(by: disposeBag)
@@ -196,13 +195,15 @@ final class MusictoryHomeViewController: UIViewController {
             }
         print(post)
         updateLikePostFromMyPage.onNext(post)
+        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
     
-    @objc func updateCollectionView(_ notification: Notification) {
-        makeToast(message: "뮤직토리를 기록하였습니다", presentTime: 2)
+    @objc private func updateCollectionView(_ notification: Notification) {
+        makeToast(message: "뮤직토리를 남겼습니다!", presentTime: 2)
         
         postCollectionView.setContentOffset(CGPoint(x: 0, y: -refreshControl.frame.height), animated: true)
         updateCollectionViewMethod()
+        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
     
     func updateCollectionViewMethod() {

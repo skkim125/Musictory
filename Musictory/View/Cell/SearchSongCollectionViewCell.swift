@@ -12,8 +12,6 @@ import Kingfisher
 import RxSwift
 
 final class SearchSongCollectionViewCell: UICollectionViewCell {
-    static let identifier = "SearchSongCollectionViewCell"
-    
     private let songView = UIView()
     private let songImageView = UIImageView()
     private let songTitleLabel = {

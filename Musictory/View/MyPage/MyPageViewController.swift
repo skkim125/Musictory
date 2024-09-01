@@ -19,7 +19,7 @@ final class MyPageViewController: UIViewController {
     private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionView())
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageViewModel()
-    private let checkRefreshToken = PublishRelay<Void>()
+    private let checkAccessToken = PublishRelay<Void>()
     private let loadMyProfile = PublishRelay<Void>()
     private let loadMyPost = PublishRelay<Void>()
     private var refreshControl = UIRefreshControl()
@@ -49,15 +49,17 @@ final class MyPageViewController: UIViewController {
         
         myPostCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         myPostCollectionView.register(ProfileCollectionViewCell.self, forCellWithReuseIdentifier: ProfileCollectionViewCell.identifier)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(showToastAlert(_: )), name: Notification.Name(rawValue: "DonationSuccess"), object: nil)
     }
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MyPageViewModel.Input(checkRefreshToken: checkRefreshToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MyPageViewModel.Input(checkAccessToken: checkAccessToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
-        checkRefreshToken.accept(())
+        checkAccessToken.accept(())
         loadMyProfile.accept(())
         loadMyPost.accept(())
         
@@ -158,13 +160,8 @@ final class MyPageViewController: UIViewController {
             .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
                 self.showAlert(title: error.title, message: error.alertMessage) {
-                    if error == NetworkError.expiredRefreshToken {
-                        UserDefaultsManager.shared.accessT = ""
-                        UserDefaultsManager.shared.refreshT = ""
-                        UserDefaultsManager.shared.userID = ""
-                        
-                        let vc = LogInViewController()
-                        self.setRootViewController(vc)
+                    if error == .expiredRefreshToken {
+                        owner.goLoginView()
                     }
                 }
             }
@@ -187,8 +184,13 @@ final class MyPageViewController: UIViewController {
             }
         })
         
-        let donation = UIAction(title: "개발자 후원하기", image: UIImage(systemName: "dollarsign.circle"), handler: { _ in
-
+        let donation = UIAction(title: "개발자 후원하기", image: UIImage(systemName: "dollarsign.circle"), handler: { [weak self] _ in
+            guard let self = self else { return }
+            
+            let vc = DonationWebViewController()
+            vc.userNickname = self.viewModel.toUseEditMyProfile?.nick ?? ""
+            
+            self.present(vc, animated: true)
         })
         
         let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { [weak self] _ in
@@ -201,10 +203,16 @@ final class MyPageViewController: UIViewController {
         return UIMenu(title: "설정", options: .displayInline, children: [editProfile, donation, withdraw])
     }
     
+    @objc private func showToastAlert(_ notification: Notification) {
+        makeToast(message: "후원해주셔서 감사합니다.", presentTime: 3)
+        
+        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        checkRefreshToken.accept(())
+        checkAccessToken.accept(())
         loadMyProfile.accept(())
         loadMyPost.accept(())
     }

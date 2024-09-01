@@ -181,7 +181,11 @@ final class WriteMusictoryViewController: UIViewController {
         
         output.showUploadPostErrorAlert
             .bind(with: self) { owner, error in
-                owner.showAlert(title: error.title, message: error.alertMessage)
+                owner.showAlert(title: error.title, message: error.alertMessage) {
+                    if error == .expiredRefreshToken {
+                        owner.goLoginView()
+                    }
+                }
             }
             .disposed(by: disposeBag)
         
