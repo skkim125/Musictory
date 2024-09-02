@@ -82,9 +82,12 @@ final class MyPageViewController: UIViewController {
             case .postItem(item: let post):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
-                cell.configureCell(.myPage, post: post.post)
+                cell.configureCell(.myPage, post: post)
                 
-                if let song = post.song {
+                let songData = Data(post.content1.utf8)
+                do {
+                    let song = try JSONDecoder().decode(SongModel.self, from: songData)
+                    
                     cell.configureSongView(song: song, viewType: .myPage) { tapGesture in
                         tapGesture
                             .bind(with: self) { owner, _ in
@@ -94,6 +97,8 @@ final class MyPageViewController: UIViewController {
                             }
                             .disposed(by: cell.disposeBag)
                     }
+                } catch {
+                    
                 }
                 
                 cell.configureLikeButtonTap { likeButtonTap in
@@ -178,6 +183,7 @@ final class MyPageViewController: UIViewController {
                 vc.image = cell.userProfileImageView.image
                 vc.moveData = { profile in
                     cell.configureUI(profile: profile)
+                    NotificationCenter.default.post(name: Notification.Name("updateProfile"), object: nil, userInfo: ["updateProfile": profile])
                 }
                 
                 self.navigationController?.pushViewController(vc, animated: true)

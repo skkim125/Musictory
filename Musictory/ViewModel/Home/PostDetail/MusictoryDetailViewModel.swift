@@ -21,12 +21,12 @@ final class MusictoryDetailViewModel: BaseViewModel {
     
     private let lslp_API = LSLP_API.shared
     private let disposeBag = DisposeBag()
-    private var currentPost: ConvertPost?
+    private var currentPost: PostModel?
     
     struct Input {
         let updateAccessToken: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
-        let currentPost: PublishRelay<ConvertPost?>
+        let currentPost: PublishRelay<PostModel?>
         let commentText: ControlProperty<String>
         let sendCommendButtonTap: ControlEvent<Void>
         let backButtonTap: PublishRelay<Void>
@@ -36,17 +36,17 @@ final class MusictoryDetailViewModel: BaseViewModel {
         let postDetailData: BehaviorRelay<[PostDetailDataType]>
         let showErrorAlert: PublishRelay<NetworkError>
         let outputButtonEnable: Observable<Bool>
-        let finalPost: PublishRelay<ConvertPost>
+        let finalPost: PublishRelay<PostModel>
         let backButtonTapAction: PublishRelay<Void>
         let commentSendEnd: PublishRelay<Void>
     }
     
     func transform(input: Input) -> Output {
         var postID = ""
-        let inputCurrentPost = PublishRelay<ConvertPost?>()
+        let inputCurrentPost = PublishRelay<PostModel?>()
         let showErrorAlert = PublishRelay<NetworkError>()
         let postData = BehaviorRelay<[PostDetailDataType]>(value: [])
-        let finalPost = PublishRelay<ConvertPost>()
+        let finalPost = PublishRelay<PostModel>()
         let backButtonTapAction = PublishRelay<Void>()
         let sendEnd = PublishRelay<Void>()
         
@@ -57,11 +57,11 @@ final class MusictoryDetailViewModel: BaseViewModel {
             .bind(with: self) { owner, value in
                 guard let post = value else { return }
                 
-                owner.lslp_API.callRequest(apiType: .fetchPostOfReload(post.post.postID, PostQuery()), decodingType: PostModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .fetchPostOfReload(post.postID, PostQuery()), decodingType: PostModel.self) { result in
                     switch result {
                     case .success(let success):
                         var convert = post
-                        convert.post = success
+                        convert = success
                         inputCurrentPost.accept(convert)
                     case .failure(let error):
                         showErrorAlert.accept(error)
@@ -76,9 +76,9 @@ final class MusictoryDetailViewModel: BaseViewModel {
                 guard let post = post, let self = self else { return [] }
                 self.currentPost = post
                 finalPost.accept(post)
-                let convertComments = post.post.comments.map { PostDetailItem.commentItem(item: $0) }
+                let convertComments = post.comments.map { PostDetailItem.commentItem(item: $0) }
                 print(111111,postID)
-                postID = post.post.postID
+                postID = post.postID
                 print(111111,postID)
                 let result = PostDetailDataType.post(items: convertComments)
                 
@@ -101,13 +101,13 @@ final class MusictoryDetailViewModel: BaseViewModel {
                     case .success(let success):
                         guard let before = owner.currentPost else { return }
                         var afterPost = before
-                        afterPost.post.comments.insert(success, at: 0)
+                        afterPost.comments.insert(success, at: 0)
                         
                         owner.lslp_API.callRequest(apiType: .fetchPostOfReload(postID, PostQuery()), decodingType: PostModel.self) { result in
                             switch result {
                             case .success(let success):
                                 var convert = afterPost
-                                convert.post = success
+                                convert = success
                                 inputCurrentPost.accept(convert)
                             case .failure(let error):
                                 showErrorAlert.accept(error)
@@ -144,15 +144,15 @@ final class MusictoryDetailViewModel: BaseViewModel {
             .withLatestFrom(finalPost)
             .bind(with: self) { owner, value in
                 var updatedPost = value
-                print(#function, 3, updatedPost.post)
+                print(#function, 3, updatedPost)
                 
-                let isLike = updatedPost.post.likes.contains(UserDefaultsManager.shared.userID)
+                let isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
                 print(#function, 3, isLike)
                 
                 if isLike {
-                    updatedPost.post.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
+                    updatedPost.likes.removeAll { $0 == UserDefaultsManager.shared.userID }
                 } else {
-                    updatedPost.post.likes.append(UserDefaultsManager.shared.userID)
+                    updatedPost.likes.append(UserDefaultsManager.shared.userID)
                 }
                 
                 inputCurrentPost.accept(updatedPost)
@@ -162,17 +162,17 @@ final class MusictoryDetailViewModel: BaseViewModel {
         input.backButtonTap
             .withLatestFrom(finalPost)
             .bind(with: self) { owner, value in
-                let isLike = value.post.likes.contains(UserDefaultsManager.shared.userID)
+                let isLike = value.likes.contains(UserDefaultsManager.shared.userID)
                 let likeQuery = LikeQuery(like_status: isLike)
                 
-                owner.lslp_API.callRequest(apiType: .like(value.post.postID, likeQuery), decodingType: LikeModel.self) { result in
+                owner.lslp_API.callRequest(apiType: .like(value.postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success:
                         owner.lslp_API.callRequest(apiType: .fetchPostOfReload(postID, PostQuery()), decodingType: PostModel.self) { result in
                             switch result {
                             case .success(let success):
                                 var convert = value
-                                convert.post = success
+                                convert = success
                                 finalPost.accept(convert)
                                 NotificationCenter.default.post(name: Notification.Name("updatePostOfDetailView"), object: nil, userInfo: ["updatePostOfDetailView": success])
                                 backButtonTapAction.accept(())

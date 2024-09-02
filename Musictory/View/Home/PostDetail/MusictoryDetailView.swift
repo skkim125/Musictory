@@ -20,8 +20,8 @@ final class MusictoryDetailView: UIViewController {
     private let divider = UIView()
     var viewModel = MusictoryDetailViewModel()
     var currentPostIndex: Int?
-    var currentPost: ConvertPost?
-    var moveData: ((ConvertPost?)->Void)?
+    var currentPost: PostModel?
+    var moveData: ((PostModel?)->Void)?
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -98,10 +98,10 @@ final class MusictoryDetailView: UIViewController {
         sendCommentButton.backgroundColor = .systemRed
     }
     
-    private func bind(currentPost: ConvertPost?) {
+    private func bind(currentPost: PostModel?) {
         let updateAccessToken = PublishRelay<Void>()
         let likePostIndex = PublishRelay<Int>()
-        let post = PublishRelay<ConvertPost?>()
+        let post = PublishRelay<PostModel?>()
         let backButtonTap = PublishRelay<Void>()
         
         let input = MusictoryDetailViewModel.Input(updateAccessToken: updateAccessToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap, backButtonTap: backButtonTap)
@@ -109,15 +109,18 @@ final class MusictoryDetailView: UIViewController {
         updateAccessToken.accept(())
         post.accept(currentPost)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailDataType> (configureCell: { dataSource, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailDataType> (configureCell: { _, collectionView, indexPath, item in
             
             switch item {
             case .postItem(item: let post):
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
                 
-                cell.configureCell(.home, post: post.post)
+                cell.configureCell(.home, post: post)
                 
-                if let song = post.song {
+                let songData = Data(post.content1.utf8)
+                do {
+                    let song = try JSONDecoder().decode(SongModel.self, from: songData)
+                    
                     cell.configureSongView(song: song, viewType: .home) { tapGesture in
                         tapGesture
                             .bind(with: self) { owner, _ in
@@ -127,6 +130,8 @@ final class MusictoryDetailView: UIViewController {
                             }
                             .disposed(by: cell.disposeBag)
                     }
+                } catch {
+                    
                 }
                 
                 cell.configureLikeButtonTap { likeButtonTap in

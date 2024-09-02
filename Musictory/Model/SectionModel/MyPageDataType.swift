@@ -37,5 +37,5 @@ extension MyPageDataType: SectionModelType {
 
 enum MyPageItem {
     case profileItem(item: ProfileModel)
-    case postItem(item: ConvertPost)
+    case postItem(item: PostModel)
 }

@@ -10,13 +10,7 @@ import RxSwift
 import RxCocoa
 import MusicKit
 
-struct ConvertPost {
-    var post: PostModel
-    let song: Song?
-}
-
 final class MusictoryHomeViewModel: BaseViewModel {
-    private var originalConvertPosts: [ConvertPost] = []
     private var originalPosts: [PostModel] = []
     private let lslp_API = LSLP_API.shared
     let disposeBag = DisposeBag()
@@ -26,13 +20,14 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let fetchPost: PublishSubject<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetchIndexPatch: PublishRelay<[IndexPath]>
-        let updatePosts: PublishRelay<(Int, ConvertPost)>
+        let updatePosts: PublishRelay<(Int, PostModel)>
         let updatePostActionOfNoti: PublishSubject<PostModel>
+        let updateMyProfileOfNoti: PublishSubject<ProfileModel>
     }
     
     struct Output {
-        let convertPosts: BehaviorRelay<[ConvertPost]>
-        let likeTogglePost: PublishRelay<ConvertPost>
+        let posts: BehaviorRelay<[PostModel]>
+        let likeTogglePost: PublishRelay<PostModel>
         let showErrorAlert: PublishRelay<NetworkError>
         let paginating: PublishRelay<Bool>
     }
@@ -41,9 +36,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let prefetching = PublishRelay<Void>()
         var nextCursor = "0"
         let posts = BehaviorRelay<[PostModel]>(value: [])
-        let outputConvertPosts = BehaviorRelay<[ConvertPost]>(value: [])
         let showErrorAlert = PublishRelay<NetworkError>()
-        let newPost = PublishRelay<ConvertPost>()
+        let newPost = PublishRelay<PostModel>()
         let paginating = PublishRelay<Bool>()
         
         input.updateAccessToken
@@ -83,17 +77,9 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        posts
-            .bind(with: self) { owner, value in
-                Task {
-                    try await convertPostFunction(posts: value)
-                }
-            }
-            .disposed(by: disposeBag)
-        
         input.likePostIndex
             .bind(with: self) { owner, value in
-                var updatedPost = owner.originalConvertPosts[value].post
+                var updatedPost = owner.originalPosts[value]
                 
                 var isLike = updatedPost.likes.contains(UserDefaultsManager.shared.userID)
                 print(#function, 4.0, isLike)
@@ -104,17 +90,16 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 }
                 isLike.toggle()
 
-                owner.originalConvertPosts[value].post = updatedPost
+                owner.originalPosts[value] = updatedPost
                 let likeQuery = LikeQuery(like_status: isLike)
                 print(#function, 4.1, isLike)
                 
-                LSLP_API.shared.callRequest(apiType: .like(owner.originalConvertPosts[value].post.postID, likeQuery), decodingType: LikeModel.self) { result in
+                LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success:
-                        print(#function, 4, owner.originalConvertPosts[value])
-                        owner.originalConvertPosts[value].post = updatedPost
-                        newPost.accept(owner.originalConvertPosts[value])
-                        outputConvertPosts.accept(owner.originalConvertPosts)
+                        print(#function, 4, owner.originalPosts[value])
+                        owner.originalPosts[value] = updatedPost
+                        newPost.accept(owner.originalPosts[value])
                     case .failure(let error1):
                         showErrorAlert.accept(error1)
                     }
@@ -141,41 +126,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 }
             }
             .disposed(by: disposeBag)
-     
-        @Sendable func convertPostFunction(posts: [PostModel]) async throws {
-            await withThrowingTaskGroup(of: ConvertPost.self) {  group in
-                paginating.accept(false)
-                var array: [ConvertPost] = []
-                for post in posts {
-                    group.addTask {
-                        do {
-                            let song = try await MusicManager.shared.requsetMusicId(id: post.content1)
-                            return ConvertPost(post: post, song: song)
-                        } catch {
-                            return ConvertPost(post: post, song: nil)
-                        }
-                    }
-                }
-                
-                do {
-                    for try await post in group {
-                        array.append(post)
-                    }
-                } catch {
-                    print("Error: \(error.localizedDescription)")
-                }
-                
-                let recentArray = array.sorted(by: { $0.post.createdAt > $1.post.createdAt })
-                originalConvertPosts = recentArray
-                
-                DispatchQueue.main.async {
-                    outputConvertPosts.accept(self.originalConvertPosts)
-                    paginating.accept(true)
-                }
-            }
-        }
         
-        Observable.combineLatest(input.prefetchIndexPatch, outputConvertPosts)
+        Observable.combineLatest(input.prefetchIndexPatch, posts)
             .bind(with: self, onNext: { owner, value in
                 guard let lastIndex = value.0.last else { return }
                 print("value1.count", value.1.count-5)
@@ -189,8 +141,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
         
         input.updatePosts
             .bind(with: self) { owner, value in
-                owner.originalConvertPosts[value.0] = value.1
-                outputConvertPosts.accept(owner.originalConvertPosts)
+                owner.originalPosts[value.0] = value.1
+                posts.accept(owner.originalPosts)
             }
             .disposed(by: disposeBag)
         
@@ -198,12 +150,25 @@ final class MusictoryHomeViewModel: BaseViewModel {
             .bind(with: self) { owner, value in
                 guard let index = owner.originalPosts.firstIndex(where: { $0.postID == value.postID }) else { return }
                 owner.originalPosts[index] = value
-                owner.originalConvertPosts[index].post = owner.originalPosts[index]
-                outputConvertPosts.accept(owner.originalConvertPosts)
+                print(value)
+                posts.accept(owner.originalPosts)
             }
             .disposed(by: disposeBag)
         
-        return Output(convertPosts: outputConvertPosts, likeTogglePost: newPost, showErrorAlert: showErrorAlert, paginating: paginating)
+        input.updateMyProfileOfNoti
+            .bind(with: self) { owner, value in
+                
+                for (index, post) in owner.originalPosts.enumerated() {
+                    if post.creator.userID == value.user_id {
+                        owner.originalPosts[index].creator = User(userID: value.nick, nickname: value.nick, profileImage: value.profileImage)
+                    }
+                }
+                
+                posts.accept(owner.originalPosts)
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(posts: posts, likeTogglePost: newPost, showErrorAlert: showErrorAlert, paginating: paginating)
     }
 }
 

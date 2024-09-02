@@ -10,6 +10,14 @@ import SnapKit
 import MusicKit
 import RxSwift
 
+struct SongModel: Codable {
+    let id: String
+    let title: String
+    let artistName: String
+    let albumCoverUrl: String
+    let songURL: String
+}
+
 class CustomButton: UIButton {
     private let buttonTitleLabel = UILabel()
     private let goNextViewImageView = UIImageView()
@@ -79,7 +87,7 @@ class CustomButton: UIButton {
         dataLabel.text = data
     }
     
-    func configureAddSongUI(song: Song, _ type: ButtonType) {
+    func configureAddSongUI(song: SongModel, _ type: ButtonType) {
         switch type {
         case .song:
             dataLabel.rx.text.onNext("\(song.title) - \(song.artistName)")

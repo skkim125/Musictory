@@ -11,7 +11,6 @@ import RxCocoa
 
 final class MyPageViewModel: BaseViewModel {
     private let lslp_API = LSLP_API.shared
-    private var originalConvertPosts: [ConvertPost] = []
     private var originalPosts: [PostModel] = []
     var toUseEditMyProfile: ProfileModel?
     let disposeBag = DisposeBag()
@@ -40,7 +39,6 @@ final class MyPageViewModel: BaseViewModel {
         let showErrorAlert = PublishRelay<Void>()
         let networkError = PublishRelay<NetworkError>()
         let myPageData = PublishRelay<[MyPageDataType]>()
-        let outputConvertPosts = PublishRelay<[ConvertPost]>()
         let outputGetLiked = BehaviorRelay(value: originalPosts.count)
         
         input.checkAccessToken
@@ -125,41 +123,8 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        @Sendable func convertPostFunction(posts: [PostModel]) async throws {
-            await withThrowingTaskGroup(of: ConvertPost.self) {  group in
-                var array: [ConvertPost] = []
-                for post in posts {
-                    group.addTask {
-                        do {
-                            let song = try await MusicManager.shared.requsetMusicId(id: post.content1)
-                            return ConvertPost(post: post, song: song)
-                        } catch {
-                            return ConvertPost(post: post, song: nil)
-                        }
-                    }
-                }
-                
-                do {
-                    for try await post in group {
-                        array.append(post)
-                    }
-                } catch {
-                    print("Error: \(error.localizedDescription)")
-                }
-                
-                let recentArray = array.sorted(by: { $0.post.createdAt > $1.post.createdAt })
-                originalConvertPosts = recentArray
-                
-                outputConvertPosts.accept(originalConvertPosts)
-            }
-        }
-        
         myPosts
             .bind(with: self) { owner, value in
-                Task {
-                    try await convertPostFunction(posts: value)
-                }
-                
                 DispatchQueue.main.async {
                     var like = 0
                     value.forEach { post in
@@ -171,7 +136,7 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(myProfile, outputConvertPosts)
+        Observable.combineLatest(myProfile, myPosts)
             .map { [weak self] (profile, posts) -> [MyPageDataType] in
                 if let self = self {
                     self.toUseEditMyProfile = profile
@@ -228,7 +193,6 @@ final class MyPageViewModel: BaseViewModel {
                                     }
                                     owner.originalPosts[value] = updatedPost
                                     myPosts.accept(owner.originalPosts)
-                                    outputConvertPosts.accept(owner.originalConvertPosts)
                                     networkError.accept(error2)
                                     showErrorAlert.accept(())
                                 }

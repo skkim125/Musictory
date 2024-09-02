@@ -15,9 +15,9 @@ final class WriteMusictoryViewModel: BaseViewModel {
     let disposeBag = DisposeBag()
     
     struct Input {
-        let song: PublishRelay<Song>
         let title: ControlProperty<String>
         let content: ControlProperty<String>
+        let song: PublishRelay<SongModel>
         let uploadPost: PublishRelay<Void>
     }
     
@@ -41,7 +41,7 @@ final class WriteMusictoryViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         Observable.combineLatest(input.title, input.content, input.song)
-            .map({ $0.0.trimmingCharacters(in: .whitespaces).count > 5 && $0.1.trimmingCharacters(in: .whitespaces).count > 5 && !$0.2.id.rawValue.isEmpty } )
+            .map({ $0.0.trimmingCharacters(in: .whitespaces).count > 5 && $0.1.trimmingCharacters(in: .whitespaces).count > 5 && !$0.2.id.isEmpty } )
             .bind(with: self) { owner, value in
                 writeButtonEnable.accept(value)
             }
@@ -49,7 +49,13 @@ final class WriteMusictoryViewModel: BaseViewModel {
         
         Observable.combineLatest(input.title, input.content, input.song)
             .bind { value in
-                writePostQuery = WritePostQuery(title: value.0, content: value.1, content1: value.2.id.rawValue, content2: "", content3: "", files: [])
+                do {
+                    let encoder = JSONEncoder()
+                    let data = try encoder.encode(value.2)
+                    writePostQuery = WritePostQuery(title: value.0, content: value.1, content1: String(data: data, encoding: .utf8) ?? "", content2: "", content3: "", files: [])
+                } catch {
+                    print(error)
+                }
             }
             .disposed(by: disposeBag)
         

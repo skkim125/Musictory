@@ -152,10 +152,10 @@ final class WriteMusictoryViewController: UIViewController {
     }
     
     private func bind() {
-        let addSongInfo = PublishRelay<Song>()
+        let addSongInfo = PublishRelay<SongModel>()
         let uploadPost = PublishRelay<Void>()
         
-        let input = WriteMusictoryViewModel.Input(song: addSongInfo, title: postTitleTextField.rx.text.orEmpty, content: postContentTextView.rx.text.orEmpty, uploadPost: uploadPost)
+        let input = WriteMusictoryViewModel.Input(title: postTitleTextField.rx.text.orEmpty, content: postContentTextView.rx.text.orEmpty, song: addSongInfo, uploadPost: uploadPost)
         
         let output = viewModel.transform(input: input)
         

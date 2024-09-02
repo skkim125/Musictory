@@ -10,8 +10,8 @@ import Foundation
 // 유저 모델
 struct User: Decodable, Hashable {
     let userID: String
-    let nickname: String
-    let profileImage: String?
+    var nickname: String
+    var profileImage: String?
     
     enum CodingKeys: String, CodingKey {
         case userID = "user_id"

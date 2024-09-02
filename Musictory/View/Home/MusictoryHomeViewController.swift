@@ -22,7 +22,7 @@ final class MusictoryHomeViewController: UIViewController {
     private let fetchPost = PublishSubject<Void>()
     private var refreshControl = UIRefreshControl()
     private let updatePostActionOfNoti = PublishSubject<PostModel>()
-    
+    private let updateMyProfileOfNoti = PublishSubject<ProfileModel>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -61,19 +61,21 @@ final class MusictoryHomeViewController: UIViewController {
     private func notificationCenterObserver() {
         NotificationCenter.default.addObserver(self, selector: #selector(updateCollectionView(_: )), name: Notification.Name(rawValue: "updatePost"), object: nil)
         
-//        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
-//        
-//        NotificationCenter.default.addObserver(self, selector: #selector(updateCommentPost(_: )), name: Notification.Name("updateOfComment"), object: nil)
-//        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateLikePost(_: )), name: Notification.Name("changeLikePost"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateCommentPost(_: )), name: Notification.Name("updateOfComment"), object: nil)
+        
         NotificationCenter.default.addObserver(self, selector: #selector(updatePostOfDetailView(_: )), name: Notification.Name("updatePostOfDetailView"), object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updateMyProfile(_: )), name: Notification.Name("updateProfile"), object: nil)
         
     }
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let indexPaths = PublishRelay<[IndexPath]>()
-        let updatePosts = PublishRelay<(Int, ConvertPost)>()
-        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updatePostActionOfNoti: updatePostActionOfNoti)
+        let updatePosts = PublishRelay<(Int, PostModel)>()
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updatePostActionOfNoti: updatePostActionOfNoti, updateMyProfileOfNoti: updateMyProfileOfNoti)
         let output = viewModel.transform(input: input)
         
         output.showErrorAlert
@@ -84,13 +86,16 @@ final class MusictoryHomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, ConvertPost>>(configureCell: { _, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { _, collectionView, indexPath, item in
             
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
-            cell.configureCell(.home, post: item.post)
+            cell.configureCell(.home, post: item)
             
-            if let song = item.song {
+            let songData = Data(item.content1.utf8)
+            do {
+                let song = try JSONDecoder().decode(SongModel.self, from: songData)
+                
                 cell.configureSongView(song: song, viewType: .home) { tapGesture in
                     tapGesture
                         .bind(with: self) { owner, _ in
@@ -100,8 +105,9 @@ final class MusictoryHomeViewController: UIViewController {
                         }
                         .disposed(by: cell.disposeBag)
                 }
+            } catch {
+                
             }
-            
             cell.configureLikeButtonTap { likeButtonTap in
                 likeButtonTap
                     .map({
@@ -119,7 +125,7 @@ final class MusictoryHomeViewController: UIViewController {
             return cell
         })
         
-        Observable.zip(postCollectionView.rx.itemSelected, postCollectionView.rx.modelSelected(ConvertPost.self))
+        Observable.zip(postCollectionView.rx.itemSelected, postCollectionView.rx.modelSelected(PostModel.self))
             .bind(with: self) { owner, value in
                 let vc = MusictoryDetailView()
                 vc.currentPost = value.1
@@ -127,7 +133,7 @@ final class MusictoryHomeViewController: UIViewController {
                     guard let post = post else { return }
                     guard let cell = owner.postCollectionView.cellForItem(at: IndexPath(item: value.0.item, section: 0)) as? PostCollectionViewCell else { return }
                     updatePosts.accept((value.0.item, post))
-                    cell.configureCell(.home, post: post.post)
+                    cell.configureCell(.home, post: post)
                 }
                 
                 owner.navigationController?.pushViewController(vc, animated: true)
@@ -138,7 +144,7 @@ final class MusictoryHomeViewController: UIViewController {
             .bind(to: indexPaths)
             .disposed(by: disposeBag)
         
-        output.convertPosts
+        output.posts
             .map({ [SectionModel(model: "", items: $0)] })
             .bind(to: postCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
@@ -149,7 +155,7 @@ final class MusictoryHomeViewController: UIViewController {
                     return
                 }
                 
-                cell.configureCell(.home, post: value.1.post)
+                cell.configureCell(.home, post: value.1)
             }
             .disposed(by: disposeBag)
         
@@ -194,14 +200,13 @@ final class MusictoryHomeViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
-//    @objc func updateLikePost(_ notification: Notification) {
-//        guard let post = notification.userInfo?["post"] as? PostModel else {
-//                return
-//            }
-//        print(post)
-//        updatePostActionOfNoti.onNext(post)
-//        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
-//    }
+    @objc func updateLikePost(_ notification: Notification) {
+        guard let post = notification.userInfo?["post"] as? PostModel else {
+                return
+            }
+        print(post)
+        updatePostActionOfNoti.onNext(post)
+    }
     
     @objc private func updateCollectionView(_ notification: Notification) {
         makeToast(message: "뮤직토리를 남겼습니다!", presentTime: 2)
@@ -210,20 +215,27 @@ final class MusictoryHomeViewController: UIViewController {
         updateCollectionViewMethod()
         NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
     }
-//    @objc private func updateCommentPost(_ notification: Notification) {
-//        guard let post = notification.userInfo?["updateOfComment"] as? PostModel else {
-//                return
-//            }
-//        updatePostActionOfNoti.onNext(post)
-//        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
-//    }
+    
+    @objc private func updateCommentPost(_ notification: Notification) {
+        guard let post = notification.userInfo?["updateOfComment"] as? PostModel else {
+                return
+            }
+        updatePostActionOfNoti.onNext(post)
+    }
     
     @objc private func updatePostOfDetailView(_ notification: Notification) {
         guard let post = notification.userInfo?["updatePostOfDetailView"] as? PostModel else {
                 return
             }
         updatePostActionOfNoti.onNext(post)
-        NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
+    }
+    
+    @objc func updateMyProfile(_ notification: Notification) {
+        guard let profile = notification.userInfo?["updateProfile"] as? ProfileModel else {
+                return
+            }
+        print(profile)
+        updateMyProfileOfNoti.onNext(profile)
     }
     
     func updateCollectionViewMethod() {

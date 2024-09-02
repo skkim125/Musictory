@@ -90,16 +90,17 @@ final class CustomSongView: UIView {
         }
     }
     
-    func configureUI(song: Song, viewType: ViewType) {
+    func configureUI(song: SongModel, viewType: ViewType) {
         configureView(viewType: viewType)
         
         switch viewType {
         case .home:
-            guard let url = song.artwork?.url(width: 150, height: 150) else { return }
+            guard let url = URL(string: song.albumCoverUrl) else { return }
             songImageView.kf.setImage(with: url)
         case .myPage:
             songTitleLabel.isHidden = true
             songArtistLabel.isHidden = true
+            songImageView.isHidden = true
             
             var image = UIImage(systemName: "play.circle.fill")?.withRenderingMode(.alwaysOriginal)
             image = image?.applyingSymbolConfiguration(.init(font: .boldSystemFont(ofSize: 18), scale: .large))

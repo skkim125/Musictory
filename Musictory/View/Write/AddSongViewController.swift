@@ -22,7 +22,7 @@ final class AddSongViewController: UIViewController {
     }()
     private let viewModel = AddSongViewModel()
     private let disposeBag = DisposeBag()
-    var bindData: ((Song)-> Void)?
+    var bindData: ((SongModel)-> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -93,7 +93,10 @@ final class AddSongViewController: UIViewController {
         searchResultCollectionView.rx.modelSelected(Song.self)
             .bind(with: self) { owner, song in
                 owner.showTwoButtonAlert(title: "\(song.title)을 선택하시겠습니까?", message: nil) {
-                    owner.bindData?(song)
+                    guard let albumCoverUrl = song.artwork?.url(width: 300, height: 300)?.absoluteString, let songUrl = song.url?.absoluteString else { return }
+                    let songModel = SongModel(id: song.id.rawValue, title: song.title, artistName: song.artistName, albumCoverUrl: albumCoverUrl, songURL: songUrl)
+                    print(songModel)
+                    owner.bindData?(songModel)
                     owner.navigationController?.popToRootViewController(animated: true)
                 }
             }

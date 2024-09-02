@@ -232,10 +232,10 @@ final class PostCollectionViewCell: UICollectionViewCell {
         configureLikeButton(isLike: post.likes.contains(UserDefaultsManager.shared.userID))
     }
     
-    func configureSongView(song: Song, viewType: ViewType, completionHandler: @escaping (Observable<UITapGestureRecognizer>)-> ()) {
+    func configureSongView(song: SongModel, viewType: ViewType, completionHandler: @escaping (Observable<UITapGestureRecognizer>)-> ()) {
         songView.configureUI(song: song, viewType: viewType)
         
-        guard let albumImageUrl = song.artwork?.url(width: 300, height: 300) else { return }
+        guard let albumImageUrl = URL(string: song.albumCoverUrl) else { return }
         songImageView.kf.setImage(with: albumImageUrl)
         songImageView.clipsToBounds = true
         songImageView.layer.borderWidth = 0.3

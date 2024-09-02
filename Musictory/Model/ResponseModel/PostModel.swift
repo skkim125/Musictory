@@ -16,7 +16,7 @@ struct PostModel: Decodable, Hashable {
     let content1: String // 노래 id
     let content2: String? // 위도
     let content3: String? // 경도
-    let creator: User // 작성자(유저 구조체 만들기)
+    var creator: User // 작성자(유저 구조체 만들기)
     let files: [String]? // 이미지 파일
     var likes: [String] // 좋아요한 사람 id(좋아요 개수로 만들기)
     let hashTags: [String] // 해시태그(해시태그로 검색하기 기능)

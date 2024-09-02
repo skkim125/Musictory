@@ -36,6 +36,6 @@ extension PostDetailDataType: SectionModelType {
 }
 
 enum PostDetailItem {
-    case postItem(item: ConvertPost)
+    case postItem(item: PostModel)
     case commentItem(item: CommentModel)
 }

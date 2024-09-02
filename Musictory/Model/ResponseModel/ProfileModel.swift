@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class ProfileModel: Decodable {
+struct ProfileModel: Decodable, Hashable {
     let user_id: String
     let email: String
     let nick: String
