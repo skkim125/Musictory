@@ -97,6 +97,11 @@ final class EditProfileViewController: UIViewController {
         editMyProfileImageButton.setTitle("프로필 사진 변경하기", for: .normal)
         editMyProfileImageButton.setTitleColor(.systemBlue, for: .normal)
         
+        DispatchQueue.main.async {
+            self.editMyProfileImageView.layer.borderColor = UIColor.systemGray.cgColor
+            self.editMyProfileImageView.layer.borderWidth = 0.5
+        }
+        
         editMyProfileNicknameTextField.text = myProfile.nick
         editMyProfileNicknameTextField.placeholder = myProfile.nick
         divider.backgroundColor = .systemRed

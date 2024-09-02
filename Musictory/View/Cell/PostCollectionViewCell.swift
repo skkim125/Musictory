@@ -210,6 +210,8 @@ final class PostCollectionViewCell: UICollectionViewCell {
                 userImageView.clipsToBounds = true
                 DispatchQueue.main.async {
                     self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2
+                    self.userImageView.layer.borderColor = UIColor.systemGray.cgColor
+                    self.userImageView.layer.borderWidth = 0.5
                 }
             } else {
                 userImageView.image = UIImage(systemName: "person.circle")

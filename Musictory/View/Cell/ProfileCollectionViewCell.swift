@@ -57,6 +57,11 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
         userProfileImageView.contentMode = .scaleAspectFit
         userProfileImageView.tintColor = .systemRed
         
+        DispatchQueue.main.async {
+            self.userProfileImageView.layer.borderColor = UIColor.systemGray.cgColor
+            self.userProfileImageView.layer.borderWidth = 0.5
+        }
+        
         userNicknameLabel.textAlignment = .center
         userNicknameLabel.font = .boldSystemFont(ofSize: 20)
     }
