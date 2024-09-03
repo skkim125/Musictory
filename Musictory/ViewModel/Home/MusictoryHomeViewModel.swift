@@ -19,8 +19,8 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let updateAccessToken: PublishSubject<Void>
         let fetchPost: PublishSubject<Void>
         let likePostIndex: PublishRelay<Int>
-        let prefetchIndexPatch: PublishRelay<[IndexPath]>
-        let updatePosts: PublishRelay<(Int, PostModel)>
+        let prefetchIndex: PublishRelay<Int>
+        let updatePost: PublishRelay<(Int, PostModel)>
         let updatePostActionOfNoti: PublishSubject<PostModel>
         let updateMyProfileOfNoti: PublishSubject<ProfileModel>
     }
@@ -64,10 +64,10 @@ final class MusictoryHomeViewModel: BaseViewModel {
                         
                         owner.originalPosts = success.data
                         posts.accept(owner.originalPosts)
-                        print("nextCursor = \(nextCursor)")
+                        print(#function, "nextCursor = \(nextCursor)")
                         if success.nextCursor != "0" {
                             nextCursor = success.nextCursor
-                            print("nextCursor = \(nextCursor)")
+                            print(#function, "nextCursor = \(nextCursor)")
                         }
                         
                     case .failure(let error):
@@ -127,19 +127,29 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(input.prefetchIndexPatch, posts)
-            .bind(with: self, onNext: { owner, value in
-                guard let lastIndex = value.0.last else { return }
-                print("value1.count", value.1.count-5)
-                print("indexPaths", lastIndex.row)
-                if value.1.count - 3 == lastIndex.row && nextCursor != "0" {
-                    print("indexPath", lastIndex.item)
+        input.prefetchIndex
+            .bind(with: self) { owner, value in
+                print(value)
+                guard owner.originalPosts.count - value == 1 else { return }
+                if nextCursor != "0" {
+                    print("indexPath", value)
                     prefetching.accept(())
                 }
-            })
+            }
             .disposed(by: disposeBag)
         
-        input.updatePosts
+//            .bind(with: self, onNext: { owner, value in
+//                guard row == ss.dataSource.count - 1 else { return }
+//                print("value1.count", value.1.count)
+//                print("indexPaths", firstIndex)
+//                if value.1.count - 5 == firstIndex.item && nextCursor != "0" {
+//                    print("indexPath", firstIndex.item)
+//                    prefetching.accept(())
+//                }
+//            })
+//            .disposed(by: disposeBag)
+        
+        input.updatePost
             .bind(with: self) { owner, value in
                 owner.originalPosts[value.0] = value.1
                 posts.accept(owner.originalPosts)

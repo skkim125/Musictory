@@ -172,8 +172,13 @@ final class MusictoryDetailView: UIViewController {
         output.showErrorAlert
             .bind(with: self) { owner, error in
                 owner.showAlert(title: error.title, message: error.alertMessage) {
-                    if error == NetworkError.expiredRefreshToken {
+                    switch error {
+                    case .custom(let string):
+                        owner.dismiss(animated: true)
+                    case .expiredRefreshToken:
                         owner.goLoginView()
+                    default:
+                        owner.dismiss(animated: true)
                     }
                 }
             }

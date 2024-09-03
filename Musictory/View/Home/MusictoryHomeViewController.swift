@@ -23,6 +23,7 @@ final class MusictoryHomeViewController: UIViewController {
     private var refreshControl = UIRefreshControl()
     private let updatePostActionOfNoti = PublishSubject<PostModel>()
     private let updateMyProfileOfNoti = PublishSubject<ProfileModel>()
+    var rxCellHeights = PublishSubject<[IndexPath: CGFloat]>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,9 +74,9 @@ final class MusictoryHomeViewController: UIViewController {
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
-        let indexPaths = PublishRelay<[IndexPath]>()
-        let updatePosts = PublishRelay<(Int, PostModel)>()
-        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndexPatch: indexPaths, updatePosts: updatePosts, updatePostActionOfNoti: updatePostActionOfNoti, updateMyProfileOfNoti: updateMyProfileOfNoti)
+        let indexPaths = PublishRelay<Int>()
+        let updatePost = PublishRelay<(Int, PostModel)>()
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndex: indexPaths, updatePost: updatePost, updatePostActionOfNoti: updatePostActionOfNoti, updateMyProfileOfNoti: updateMyProfileOfNoti)
         let output = viewModel.transform(input: input)
         
         output.showErrorAlert
@@ -119,9 +120,6 @@ final class MusictoryHomeViewController: UIViewController {
                     .disposed(by: cell.disposeBag)
             }
             
-            cell.layer.cornerRadius = 12
-            cell.clipsToBounds = true
-            
             return cell
         })
         
@@ -132,7 +130,7 @@ final class MusictoryHomeViewController: UIViewController {
                 vc.moveData = { post in
                     guard let post = post else { return }
                     guard let cell = owner.postCollectionView.cellForItem(at: IndexPath(item: value.0.item, section: 0)) as? PostCollectionViewCell else { return }
-                    updatePosts.accept((value.0.item, post))
+                    updatePost.accept((value.0.item, post))
                     cell.configureCell(.home, post: post)
                 }
                 
@@ -141,6 +139,7 @@ final class MusictoryHomeViewController: UIViewController {
             .disposed(by: disposeBag)
         
         postCollectionView.rx.prefetchItems
+            .compactMap({ $0.last?.row })
             .bind(to: indexPaths)
             .disposed(by: disposeBag)
         
@@ -242,14 +241,8 @@ final class MusictoryHomeViewController: UIViewController {
         refreshControl.beginRefreshing()
         
         DispatchQueue.main.asyncAfter(wallDeadline: .now() + 1.5) {
-            self.fetchPost.onNext(())
             self.refreshControl.endRefreshing()
+            self.fetchPost.onNext(())
         }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        updateAccessToken.onNext(())
-        
     }
 }

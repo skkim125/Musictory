@@ -16,7 +16,7 @@ enum LSLPRouter {
     case like(String, LikeQuery)
     case fetchProfile
     case fetchMyPost(PostQuery)
-//    case uploadImage(Data?, String)
+    case uploadImage(ImageQuery)
     case writeComment(String, CommentsQuery)
     case editMyProfile(EditProfileQuery)
     case donation(DonationQuery)
@@ -30,7 +30,7 @@ extension LSLPRouter {
     
     var method: String {
         switch self {
-        case .login, .writePost, .like,/* .uploadImage,*/ .writeComment, .donation:
+        case .login, .writePost, .like, .uploadImage, .writeComment, .donation:
             "POST"
         case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
             "GET"
@@ -53,8 +53,8 @@ extension LSLPRouter {
             APIPath.fetchPost.rawValue + "/\(id)"
         case .fetchProfile:
             APIPath.fetchProfile.rawValue
-//        case .uploadImage:
-//            APIPath.fetchPost.rawValue + "/files"
+        case .uploadImage:
+            APIPath.fetchPost.rawValue + "/files"
         case .fetchMyPost:
             APIPath.fetchPost.rawValue + "/users" + "/\(UserDefaultsManager.shared.userID)"
         case .writeComment(let id, _):
@@ -91,7 +91,7 @@ extension LSLPRouter {
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case /*.uploadImage,*/ .editMyProfile:
+        case .uploadImage, .editMyProfile:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
@@ -119,24 +119,29 @@ extension LSLPRouter {
         switch self {
         case .login(let loginQuery):
             return try? encoder.encode(loginQuery)
+            
         case .writePost(let writePostQuery):
             return try? encoder.encode(writePostQuery)
+            
         case .like(_, let likeQuery):
             return try? encoder.encode(likeQuery)
-//        case .uploadImage(let image, let boundary):
-//            var body = Data()
-//            let boundaryPrefix = "--\(boundary)\r\n"
-//            
-//            body.append(boundaryPrefix.data(using: .utf8)!)
-//            body.append("Content-Disposition: form-data; name=\"image\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
-//            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-//            body.append(image ?? Data())
-//            body.append("\r\n".data(using: .utf8)!)
-//            body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-//            
-//            return body
+            
+        case .uploadImage(let imageQuery):
+            var body = Data()
+            let boundaryPrefix = "--\(imageQuery.boundary)\r\n"
+            
+            body.append(boundaryPrefix.data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"files\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+            body.append(imageQuery.imageData ?? Data())
+            body.append("\r\n".data(using: .utf8)!)
+            body.append("--\(imageQuery.boundary)--\r\n".data(using: .utf8)!)
+            
+            return body
+            
         case .writeComment( _, let commentQuery):
             return try? encoder.encode(commentQuery)
+            
         case .editMyProfile(let editProfile):
             
             var body = Data()
@@ -167,6 +172,8 @@ extension LSLPRouter {
         switch self {
         case .editMyProfile(let editProfileQuery):
             editProfileQuery.boundary
+        case .uploadImage(let imageQuery):
+            imageQuery.boundary
         default:
             nil
         }
@@ -225,6 +232,8 @@ extension LSLPRouter {
             }
         case .fetchPostOfReload:
             switch statusCode {
+            case 410:
+                return NetworkError.custom("게시물이 존재하지 않습니다.")
             case 419:
                 return NetworkError.expiredAccessToken
             default:
@@ -239,13 +248,13 @@ extension LSLPRouter {
                 return NetworkError.custom("\(statusCode)")
             }
             
-//        case .uploadImage:
-//            switch statusCode {
-//            case 419:
-//                return NetworkError.expiredAccessToken
-//            default:
-//                return NetworkError.custom("\(statusCode)")
-//            }
+        case .uploadImage:
+            switch statusCode {
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("\(statusCode)")
+            }
         case .fetchMyPost:
             switch statusCode {
             case 419:

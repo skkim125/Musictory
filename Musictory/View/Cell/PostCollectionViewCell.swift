@@ -19,6 +19,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     private let postTitleLabel = UILabel()
     private let postContentLabel = UILabel()
     private let postCreateAtLabel = UILabel()
+    private let postImageView = UIImageView()
     private let songImageView = UIImageView()
     private let songView = CustomSongView()
     private let likeButton = {
@@ -63,7 +64,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
     }
     
     private func configureView(type: ViewType) {
-        let subViews = [userImageView, userNicknameLabel, postTitleLabel, postContentLabel, postCreateAtLabel, likeButton, likeCountLabel, commentImageView, commentCountLabel, songImageView, songView]
+        let subViews = [userImageView, userNicknameLabel, postTitleLabel, postImageView, postContentLabel, postCreateAtLabel, likeButton, likeCountLabel, commentImageView, commentCountLabel, songImageView, songView]
 
         subViews.forEach { subView in
             contentView.addSubview(subView)
@@ -98,7 +99,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
             }
             
             postContentLabel.snp.makeConstraints { make in
-                make.top.equalTo(postTitleLabel.snp.bottom).offset(5)
+                make.top.equalTo(postTitleLabel.snp.bottom).offset(10)
                 make.leading.equalTo(postTitleLabel.snp.leading)
                 make.trailing.equalTo(contentView.safeAreaLayoutGuide).offset(20)
                 make.height.equalTo(15)
@@ -188,7 +189,6 @@ final class PostCollectionViewCell: UICollectionViewCell {
             }
         }
         
-        configureUI()
     }
     
     required init?(coder: NSCoder) {
@@ -197,27 +197,50 @@ final class PostCollectionViewCell: UICollectionViewCell {
     
     func configureCell( _ viewType: ViewType, post: PostModel) {
         configureView(type: viewType)
-        
         switch viewType {
             
         case .home:
             songImageView.isHidden = true
-            if let profile = post.creator.profileImage, let url = URL(string: APIURL.baseURL + "v1/" + profile) {
-                print("profile =", profile)
-                print("url = \(url)")
-                KingfisherManager.shared.setHeaders()
-                userImageView.kf.setImage(with: url)
-                userImageView.clipsToBounds = true
+            postImageView.isHidden = false
+            if let profile = post.creator.profileImage, let profileURL = URL(string: APIURL.baseURL + "v1/" + profile) {
+                
+                postImageView.kf.indicatorType = .activity
                 DispatchQueue.main.async {
-                    self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2
-                    self.userImageView.layer.borderColor = UIColor.systemGray.cgColor
-                    self.userImageView.layer.borderWidth = 0.5
+                    self.userImageView.kf.setImage(with: profileURL)
                 }
             } else {
                 userImageView.image = UIImage(systemName: "person.circle")
                 userImageView.tintColor = .systemRed
             }
+            
+            if let postImages = post.files?.first, let postImageURL = URL(string: APIURL.baseURL + "v1/" + postImages) {
+                remakeLayout()
+                
+                postImageView.kf.indicatorType = .activity
+                postImageView.kf.setImage(with: postImageURL)
+                
+                postImageView.contentMode = .scaleAspectFill
+                postImageView.clipsToBounds = true
+                
+                DispatchQueue.main.async {
+                    self.postImageView.kf.setImage(with: postImageURL)
+                }
+                
+            } else {
+                postImageView.isHidden = true
+            }
             userNicknameLabel.text = post.creator.nickname
+            
+            DispatchQueue.main.async {
+                self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2
+                self.userImageView.layer.borderColor = UIColor.systemGray.cgColor
+                self.userImageView.layer.borderWidth = 0.5
+                self.userImageView.clipsToBounds = true
+                
+                self.postImageView.layer.cornerRadius = 12
+                self.postImageView.layer.borderColor = UIColor.systemGray.cgColor
+                self.postImageView.layer.borderWidth = 0.3
+            }
             
         case .myPage:
             userImageView.isHidden = true
@@ -240,6 +263,9 @@ final class PostCollectionViewCell: UICollectionViewCell {
         guard let albumImageUrl = URL(string: song.albumCoverUrl) else { return }
         songImageView.kf.setImage(with: albumImageUrl)
         songImageView.clipsToBounds = true
+        DispatchQueue.main.async {
+            self.songImageView.layer.cornerRadius = self.songImageView.bounds.width / 2
+        }
         songImageView.layer.borderWidth = 0.3
         songImageView.layer.borderColor = UIColor.systemGray5.cgColor
         
@@ -248,6 +274,22 @@ final class PostCollectionViewCell: UICollectionViewCell {
     
     func configureLikeButtonTap(completionHandler: (ControlEvent<Void>)-> Void) {
         completionHandler(likeButton.rx.tap)
+    }
+    
+    private func remakeLayout() {
+        
+        postImageView.snp.makeConstraints { make in
+            make.top.equalTo(postTitleLabel.snp.bottom).offset(10)
+            make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(postImageView.snp.width)
+        }
+        
+        postContentLabel.snp.remakeConstraints { make in
+            make.top.equalTo(postImageView.snp.bottom).offset(10)
+            make.leading.equalTo(postTitleLabel.snp.leading)
+            make.trailing.equalTo(contentView.safeAreaLayoutGuide).offset(20)
+            make.height.equalTo(15)
+        }
     }
     
     private func configureLikeButton(isLike: Bool) {
@@ -262,19 +304,13 @@ final class PostCollectionViewCell: UICollectionViewCell {
         userImageView.contentMode = .scaleAspectFill
         userNicknameLabel.font = .boldSystemFont(ofSize: 16)
         postTitleLabel.font = .boldSystemFont(ofSize: 16)
-        postContentLabel.font = .systemFont(ofSize: 13)
+        postContentLabel.font = .systemFont(ofSize: 14)
         
         postCreateAtLabel.font = .systemFont(ofSize: 12)
         postCreateAtLabel.textColor = .systemGray
         postCreateAtLabel.textAlignment = .left
         
         commentImageView.image = UIImage(systemName: "bubble.right")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        userImageView.layer.cornerRadius = userImageView.bounds.width / 2
-        songImageView.layer.cornerRadius = songImageView.bounds.width / 2
     }
     
     override func prepareForReuse() {
@@ -288,6 +324,7 @@ final class PostCollectionViewCell: UICollectionViewCell {
         postTitleLabel.text = nil
         postContentLabel.text = nil
         postCreateAtLabel.text = nil
+        KingfisherManager.shared.setHeaders()
         
         disposeBag = DisposeBag()
     }

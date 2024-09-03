@@ -28,8 +28,13 @@ class CustomButton: UIButton {
         
         configureButton()
         configureHierarchy()
-        configureLayout()
-        configureSubView(type.title)
+        configureLayout(type)
+        configureSubView(type)
+        
+        if type == .location {
+            buttonTitleLabel.textColor = .gray
+            goNextViewImageView.tintColor = .gray
+        }
     }
     
     private func configureButton() {
@@ -49,33 +54,68 @@ class CustomButton: UIButton {
         addSubview(dataLabel)
     }
     
-    private func configureLayout() {
-        buttonTitleLabel.snp.makeConstraints { make in
-            make.leading.equalTo(self.snp.leading).offset(10)
-            make.centerY.equalTo(self)
-        }
-        
-        goNextViewImageView.snp.makeConstraints { make in
-            make.trailing.equalTo(self.snp.trailing).inset(10)
-            make.size.equalTo(20)
-            make.centerY.equalTo(self)
-        }
-        
-        dataLabel.snp.makeConstraints { make in
-            make.leading.equalTo(self.snp.centerX)
-            make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
-            make.centerY.equalTo(goNextViewImageView.snp.centerY)
-            make.height.equalTo(25)
+    private func configureLayout(_ type: ButtonType) {
+        switch type {
+        case .song:
+            buttonTitleLabel.snp.makeConstraints { make in
+                make.leading.equalTo(self.snp.leading).offset(10)
+                make.centerY.equalTo(self)
+            }
+            
+            goNextViewImageView.snp.makeConstraints { make in
+                make.trailing.equalTo(self.snp.trailing).inset(10)
+                make.size.equalTo(20)
+                make.centerY.equalTo(self)
+            }
+            
+            dataLabel.snp.makeConstraints { make in
+                make.leading.equalTo(self.snp.centerX)
+                make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
+                make.centerY.equalTo(goNextViewImageView.snp.centerY)
+                make.height.equalTo(25)
+            }
+        case .photo:
+            buttonTitleLabel.snp.makeConstraints { make in
+//                make.leading.greaterThanOrEqualTo(self.snp.leading).inset(10)
+                make.center.equalTo(self)
+            }
+            
+//            goNextViewImageView.snp.makeConstraints { make in
+//                make.leading.equalTo(buttonTitleLabel.snp.trailing)
+//                make.trailing.lessThanOrEqualTo(self.snp.trailing)
+//                make.size.equalTo(20)
+//                make.centerY.equalTo(self)
+//            }
+            
+//            dataLabel.snp.makeConstraints { make in
+//                make.leading.equalTo(self.snp.centerX)
+//                make.trailing.equalTo(goNextViewImageView.snp.leading).inset(-5)
+//                make.centerY.equalTo(goNextViewImageView.snp.centerY)
+//                make.height.equalTo(25)
+//            }
+        case .location:
+            break
         }
     }
     
-    private func configureSubView(_ title: String) {
-        buttonTitleLabel.text = title
+    private func configureSubView(_ type: ButtonType) {
+        
+        switch type {
+        case .photo:
+            dataLabel.textAlignment = .center
+            configuration?.baseBackgroundColor = .systemGray5.withAlphaComponent(0.5)
+
+        default:
+            buttonTitleLabel.textAlignment = .center
+            dataLabel.textAlignment = .right
+        }
+        
+        buttonTitleLabel.text = type.title
         buttonTitleLabel.textColor = .systemRed
         buttonTitleLabel.font = .boldSystemFont(ofSize: 16)
         
         dataLabel.textColor = .systemRed
-        dataLabel.textAlignment = .right
+//        dataLabel.textAlignment = .right
         dataLabel.font = .systemFont(ofSize: 14)
         
         goNextViewImageView.image = UIImage(systemName: "plus")
@@ -99,6 +139,7 @@ class CustomButton: UIButton {
                 make.centerY.equalTo(goNextViewImageView.snp.centerY)
                 make.height.equalTo(25)
             }
+            configuration?.baseBackgroundColor = .systemRed
         default:
             break
         }
@@ -107,8 +148,6 @@ class CustomButton: UIButton {
         buttonTitleLabel.rx.isHidden.onNext(true)
         dataLabel.rx.textAlignment.onNext(.left)
         dataLabel.rx.textColor.onNext(.white)
-        
-        self.configuration?.baseBackgroundColor = .systemRed
     }
     
     required init?(coder: NSCoder) {

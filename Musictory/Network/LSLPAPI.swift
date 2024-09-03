@@ -23,10 +23,10 @@ final class LSLP_API {
         request.httpMethod = apiType.method
         request.allHTTPHeaderFields = apiType.header
         request.httpBody = apiType.httpBody
+        request.timeoutInterval = TimeInterval(5)
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                request.timeoutInterval = TimeInterval(5)
                 guard error == nil else {
                     NetworkError.custom("네트워크 연결이 불안정합니다.")
                     
@@ -61,7 +61,6 @@ final class LSLP_API {
                         switch result {
                         case .success(let refresh):
                             UserDefaultsManager.shared.accessT = refresh.accessToken
-                            KingfisherManager.shared.setHeaders()
                             self.callRequest(apiType: apiType, decodingType: decodingType) { result2 in
                                 completionHandler?(result2)
                             }
@@ -130,6 +129,7 @@ final class LSLP_API {
     
     func updateRefresh(completionHandler: ((Result<RefreshModel, NetworkError>) -> Void)? = nil) {
         self.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+            KingfisherManager.shared.setHeaders()
             completionHandler?(result)
         }
     }
