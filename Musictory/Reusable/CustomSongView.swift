@@ -10,6 +10,7 @@ import SnapKit
 import MusicKit
 import RxSwift
 import RxCocoa
+import Kingfisher
 
 final class CustomSongView: UIView {
     let songImageView = {
@@ -96,7 +97,9 @@ final class CustomSongView: UIView {
         switch viewType {
         case .home:
             guard let url = URL(string: song.albumCoverUrl) else { return }
-            songImageView.kf.setImage(with: url)
+            songImageView.kf.setImage(with: url, options: [.processor(DownsamplingImageProcessor(size: songImageView.bounds.size)), .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage])
+            
         case .myPage:
             songTitleLabel.isHidden = true
             songArtistLabel.isHidden = true

@@ -30,7 +30,6 @@
 		045833C32C763EB2000D6E81 /* SearchSongCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833C22C763EB2000D6E81 /* SearchSongCollectionViewCell.swift */; };
 		045833CC2C77264B000D6E81 /* AddSongViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833CB2C77264B000D6E81 /* AddSongViewModel.swift */; };
 		045833CE2C772A71000D6E81 /* CustomSongView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833CD2C772A71000D6E81 /* CustomSongView.swift */; };
-		045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D12C773B57000D6E81 /* AddPhotoViewController.swift */; };
 		045833D42C774B72000D6E81 /* WriteMusictoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */; };
 		045833D62C774F3E000D6E81 /* WritePostQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D52C774F3E000D6E81 /* WritePostQuery.swift */; };
 		045833D82C786FE1000D6E81 /* LikeQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045833D72C786FE1000D6E81 /* LikeQuery.swift */; };
@@ -101,7 +100,6 @@
 		045833C22C763EB2000D6E81 /* SearchSongCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchSongCollectionViewCell.swift; sourceTree = "<group>"; };
 		045833CB2C77264B000D6E81 /* AddSongViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddSongViewModel.swift; sourceTree = "<group>"; };
 		045833CD2C772A71000D6E81 /* CustomSongView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSongView.swift; sourceTree = "<group>"; };
-		045833D12C773B57000D6E81 /* AddPhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotoViewController.swift; sourceTree = "<group>"; };
 		045833D32C774B72000D6E81 /* WriteMusictoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteMusictoryViewModel.swift; sourceTree = "<group>"; };
 		045833D52C774F3E000D6E81 /* WritePostQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WritePostQuery.swift; sourceTree = "<group>"; };
 		045833D72C786FE1000D6E81 /* LikeQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeQuery.swift; sourceTree = "<group>"; };
@@ -342,7 +340,6 @@
 			children = (
 				045833B82C75E536000D6E81 /* WriteMusictoryViewController.swift */,
 				045833C02C763CC9000D6E81 /* AddSongViewController.swift */,
-				045833D12C773B57000D6E81 /* AddPhotoViewController.swift */,
 			);
 			path = Write;
 			sourceTree = "<group>";
@@ -515,7 +512,6 @@
 				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				04D930012C86C2200094F78F /* ImageModel.swift in Sources */,
-				045833D22C773B57000D6E81 /* AddPhotoViewController.swift in Sources */,
 				04F182A52C81BD720073B882 /* EditProfileViewController.swift in Sources */,
 				04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,

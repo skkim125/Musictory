@@ -115,7 +115,6 @@ class CustomButton: UIButton {
         buttonTitleLabel.font = .boldSystemFont(ofSize: 16)
         
         dataLabel.textColor = .systemRed
-//        dataLabel.textAlignment = .right
         dataLabel.font = .systemFont(ofSize: 14)
         
         goNextViewImageView.image = UIImage(systemName: "plus")

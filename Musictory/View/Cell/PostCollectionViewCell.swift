@@ -203,11 +203,9 @@ final class PostCollectionViewCell: UICollectionViewCell {
             songImageView.isHidden = true
             postImageView.isHidden = false
             if let profile = post.creator.profileImage, let profileURL = URL(string: APIURL.baseURL + "v1/" + profile) {
+                userImageView.kf.setImage(with: profileURL, options: [.processor(DownsamplingImageProcessor(size: userImageView.bounds.size)), .scaleFactor(UIScreen.main.scale),
+                    .cacheOriginalImage])
                 
-                postImageView.kf.indicatorType = .activity
-                DispatchQueue.main.async {
-                    self.userImageView.kf.setImage(with: profileURL)
-                }
             } else {
                 userImageView.image = UIImage(systemName: "person.circle")
                 userImageView.tintColor = .systemRed
@@ -216,15 +214,11 @@ final class PostCollectionViewCell: UICollectionViewCell {
             if let postImages = post.files?.first, let postImageURL = URL(string: APIURL.baseURL + "v1/" + postImages) {
                 remakeLayout()
                 
-                postImageView.kf.indicatorType = .activity
-                postImageView.kf.setImage(with: postImageURL)
+                postImageView.kf.setImage(with: postImageURL, options: [.processor(DownsamplingImageProcessor(size: postImageView.bounds.size)), .scaleFactor(UIScreen.main.scale),
+                    .cacheOriginalImage])
                 
                 postImageView.contentMode = .scaleAspectFill
                 postImageView.clipsToBounds = true
-                
-                DispatchQueue.main.async {
-                    self.postImageView.kf.setImage(with: postImageURL)
-                }
                 
             } else {
                 postImageView.isHidden = true
@@ -261,11 +255,8 @@ final class PostCollectionViewCell: UICollectionViewCell {
         songView.configureUI(song: song, viewType: viewType)
         
         guard let albumImageUrl = URL(string: song.albumCoverUrl) else { return }
-        songImageView.kf.setImage(with: albumImageUrl)
+        songImageView.kf.setImage(with: albumImageUrl, options: [.processor(DownsamplingImageProcessor(size: songImageView.bounds.size))])
         songImageView.clipsToBounds = true
-        DispatchQueue.main.async {
-            self.songImageView.layer.cornerRadius = self.songImageView.bounds.width / 2
-        }
         songImageView.layer.borderWidth = 0.3
         songImageView.layer.borderColor = UIColor.systemGray5.cgColor
         
@@ -313,6 +304,12 @@ final class PostCollectionViewCell: UICollectionViewCell {
         commentImageView.image = UIImage(systemName: "bubble.right")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        songImageView.layer.cornerRadius = songImageView.bounds.width / 2
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         
@@ -320,11 +317,12 @@ final class PostCollectionViewCell: UICollectionViewCell {
         songView.songImageView.tintColor = .clear
         songView.songTitleLabel.text = nil
         songView.songArtistLabel.text = nil
+        userImageView.image = UIImage(systemName: "")
+        postImageView.image = UIImage(systemName: "")
         userNicknameLabel.text = nil
         postTitleLabel.text = nil
         postContentLabel.text = nil
         postCreateAtLabel.text = nil
-        KingfisherManager.shared.setHeaders()
         
         disposeBag = DisposeBag()
     }

@@ -42,6 +42,5 @@ final class MusictoryMapViewController: UIViewController {
                 owner.dismiss(animated: true)
             }
             .disposed(by: disposeBag)
-        
     }
 }

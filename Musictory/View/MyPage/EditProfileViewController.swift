@@ -14,10 +14,6 @@ import RxGesture
 import PhotosUI
 
 final class EditProfileViewController: UIViewController {
-    deinit {
-        print("\(self)deinit됨")
-    }
-    
     private let editMyProfileImageView = UIImageView()
     private let editMyProfileImageButton = UIButton(type: .system)
     private let editMyProfileNicknameTextField = UITextField()

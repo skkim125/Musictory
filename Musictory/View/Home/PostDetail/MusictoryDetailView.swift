@@ -13,12 +13,15 @@ import RxDataSources
 import MusicKit
 
 final class MusictoryDetailView: UIViewController {
+    deinit {
+        print("\(self) deinit")
+    }
     private let musictoryDetailCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .postCollectionViewLayout(.myPage))
     private let commentTFBackgroundView = UIView()
     private let commentTextField = UITextField()
     private let sendCommentButton = UIButton(type: .system)
     private let divider = UIView()
-    var viewModel = MusictoryDetailViewModel()
+    let viewModel = MusictoryDetailViewModel()
     var currentPostIndex: Int?
     var currentPost: PostModel?
     var moveData: ((PostModel?)->Void)?
@@ -33,6 +36,7 @@ final class MusictoryDetailView: UIViewController {
     
     private func configureView() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: nil)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: nil, image: UIImage(systemName: "ellipsis"), menu: configureMenuButton())
         navigationItem.title = "Musictory"
         
         view.backgroundColor = .systemBackground
@@ -109,7 +113,8 @@ final class MusictoryDetailView: UIViewController {
         updateAccessToken.accept(())
         post.accept(currentPost)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailDataType> (configureCell: { _, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<PostDetailDataType> (configureCell: { [weak self] _, collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
             
             switch item {
             case .postItem(item: let post):
@@ -189,9 +194,9 @@ final class MusictoryDetailView: UIViewController {
             .disposed(by: disposeBag)
         
         navigationItem.leftBarButtonItem?.rx.tap
-            .bind(with: self, onNext: { owner, _ in
+            .bind(with: self) { owner, _ in
                 backButtonTap.accept(())
-            })
+            }
             .disposed(by: disposeBag)
         
         output.backButtonTapAction
@@ -208,5 +213,21 @@ final class MusictoryDetailView: UIViewController {
                 owner.commentTextField.rx.text.onNext(nil)
             }
             .disposed(by: disposeBag)
+    }
+    
+    private func configureMenuButton() -> UIMenu {
+        let deletePost = UIAction(title: "게시물 삭제", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
+            guard let self = self else { return }
+            self.showAlert(title: "게시물을 삭제하시겠습니까?", message: "삭제 이후 되돌릴 수 없습니다. ") {
+                self.navigationController?.popViewController(animated: true)
+            }
+        })
+        
+        let reportPost = UIAction(title: "게시물 신고", image: UIImage(systemName: "exclamationmark.bubble.fill"), handler: { [weak self] _ in
+            guard let self = self else { return }
+            self.showAlert(title: "신고가 완료되었습니다.", message: "")
+        })
+        
+        return UIMenu(title: "설정", options: .displayInline, children: [deletePost, reportPost])
     }
 }

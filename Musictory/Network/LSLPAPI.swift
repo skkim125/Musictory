@@ -12,7 +12,7 @@ final class LSLP_API {
     static let shared = LSLP_API()
     private init() { }
     
-    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
+    func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
         
         let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         var component = URLComponents(string: encodingUrl)
@@ -25,7 +25,9 @@ final class LSLP_API {
         request.httpBody = apiType.httpBody
         request.timeoutInterval = TimeInterval(5)
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
             DispatchQueue.main.async {
                 guard error == nil else {
                     NetworkError.custom("네트워크 연결이 불안정합니다.")
@@ -35,7 +37,7 @@ final class LSLP_API {
                 
                 guard let response = response as? HTTPURLResponse else {
                     print("response error")
-                    completionHandler?(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
+                    completionHandler(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
                     return
                 }
                 
@@ -51,10 +53,10 @@ final class LSLP_API {
                     guard let data = data else { return }
                     do {
                         let result = try JSONDecoder().decode(decodingType.self, from: data)
-                        return completionHandler?(.success(result)) ?? ()
+                        return completionHandler(.success(result))
                         
                     } catch {
-                        completionHandler?(.failure(.decodingError("디코딩 에러")))
+                        completionHandler(.failure(.decodingError("디코딩 에러")))
                     }
                 case 419:
                     self.updateRefresh { result in
@@ -62,23 +64,23 @@ final class LSLP_API {
                         case .success(let refresh):
                             UserDefaultsManager.shared.accessT = refresh.accessToken
                             self.callRequest(apiType: apiType, decodingType: decodingType) { result2 in
-                                completionHandler?(result2)
+                                completionHandler(result2)
                             }
                         case .failure(let error):
-                            completionHandler?(.failure(error))
+                            completionHandler(.failure(error))
                         }
                     }
                 default:
                     print(response.url)
                     let error = apiType.errorHandler(statusCode: response.statusCode)
                     print(response.statusCode)
-                    completionHandler?(.failure(error))
+                    completionHandler(.failure(error))
                 }
             }
         }.resume()
     }
     
-    func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: ((Result<T, NetworkError>) -> Void)? = nil) {
+    func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
         let component = URLComponents(string: apiType.baseURL)
         
         guard let url = component?.url else { return }
@@ -114,13 +116,13 @@ final class LSLP_API {
                     if response.statusCode == 200 {
                         do {
                             let result = try JSONDecoder().decode(decodingType.self, from: data!)
-                            completionHandler?(.success(result))
+                            completionHandler(.success(result))
                             print(result)
                         } catch {
-                            completionHandler?(.failure(.decodingError("Decoding error: \(error)")))
+                            completionHandler(.failure(.decodingError("Decoding error: \(error)")))
                         }
                     } else {
-                        completionHandler?(.failure(.responseError("HTTP Error: \(response.statusCode)")))
+                        completionHandler(.failure(.responseError("HTTP Error: \(response.statusCode)")))
                     }
                 }
             }
@@ -128,10 +130,10 @@ final class LSLP_API {
     }
 
     
-    func updateRefresh(completionHandler: ((Result<RefreshModel, NetworkError>) -> Void)? = nil) {
+    func updateRefresh(completionHandler: @escaping (Result<RefreshModel, NetworkError>) -> Void) {
         self.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
             KingfisherManager.shared.setHeaders()
-            completionHandler?(result)
+            completionHandler(result)
         }
     }
 }

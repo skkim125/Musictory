@@ -18,7 +18,6 @@ final class MyPageViewModel: BaseViewModel {
     struct Input {
         let checkAccessToken: PublishRelay<Void>
         let loadMyProfile: PublishRelay<Void>
-        let loadMyPosts: PublishRelay<Void>
         let likePostIndex: PublishRelay<Int>
         let prefetching: PublishRelay<Bool>
     }
@@ -33,6 +32,7 @@ final class MyPageViewModel: BaseViewModel {
     
     func transform(input: Input) -> Output {
         var nextCursor = ""
+        let loadMyPosts = PublishRelay<Void>()
         let myProfile = PublishRelay<ProfileModel>()
         let myPosts = PublishRelay<[PostModel]>()
         let showErrorAlert = PublishRelay<NetworkError>()
@@ -62,6 +62,7 @@ final class MyPageViewModel: BaseViewModel {
                         print("마이페이지", profile.posts.count)
                         print("마이페이지 userdefaults id", UserDefaultsManager.shared.userID)
                         myProfile.accept(profile)
+                        loadMyPosts.accept(())
                     case .failure(let error1):
                         switch error1 {
                         case .expiredAccessToken, .expiredRefreshToken:
@@ -69,7 +70,7 @@ final class MyPageViewModel: BaseViewModel {
                                 switch result {
                                 case .success(let success):
                                     UserDefaultsManager.shared.accessT = success.accessToken
-                                    input.loadMyProfile.accept(())
+                                    loadMyPosts.accept(())
                                 case .failure(let error2):
                                     showErrorAlert.accept(error2)
                                 }
@@ -83,9 +84,8 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        input.loadMyPosts
+        loadMyPosts
             .bind(with: self) { owner, _ in
-                nextCursor = "0"
                 owner.lslp_API.callRequest(apiType: .fetchMyPost(PostQuery(next: nextCursor)), decodingType: fetchPostModel.self) { result in
                     switch result {
                     case .success(let posts):
@@ -102,7 +102,6 @@ final class MyPageViewModel: BaseViewModel {
                                 switch result {
                                 case .success(let success):
                                     UserDefaultsManager.shared.accessT = success.accessToken
-                                    input.loadMyPosts.accept(())
                                 case .failure(let error2):
                                     showErrorAlert.accept(error2)
                                 }
@@ -129,7 +128,7 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(myProfile, myPosts)
+        Observable.zip(myProfile, myPosts)
             .map { [weak self] (profile, posts) -> [MyPageDataType] in
                 if let self = self {
                     self.toUseEditMyProfile = profile

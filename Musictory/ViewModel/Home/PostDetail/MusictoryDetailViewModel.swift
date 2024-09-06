@@ -10,15 +10,6 @@ import RxSwift
 import RxCocoa
 
 final class MusictoryDetailViewModel: BaseViewModel {
-    deinit {
-        print("==== MusictoryDetailViewModel deinit ==== ")
-    }
-    
-    
-    init () {
-        print("==== MusictoryDetailViewModel init ==== ")
-    }
-    
     private let lslp_API = LSLP_API.shared
     private let disposeBag = DisposeBag()
     private var currentPost: PostModel?
@@ -116,8 +107,6 @@ final class MusictoryDetailViewModel: BaseViewModel {
                         
                         sendEnd.accept(())
                         inputCurrentPost.accept(afterPost)
-                        
-//                        NotificationCenter.default.post(name: Notification.Name("updateOfComment"), object: nil, userInfo: ["updateOfComment": afterPost.post])
                         
                     case .failure(let error1):
                         showErrorAlert.accept(error1)

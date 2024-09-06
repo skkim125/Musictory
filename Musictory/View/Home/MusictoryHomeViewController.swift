@@ -87,7 +87,8 @@ final class MusictoryHomeViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { _, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { [weak self] _, collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
             
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PostCollectionViewCell.identifier, for: indexPath) as? PostCollectionViewCell else { return UICollectionViewCell() }
             
@@ -109,6 +110,7 @@ final class MusictoryHomeViewController: UIViewController {
             } catch {
                 
             }
+            
             cell.configureLikeButtonTap { likeButtonTap in
                 likeButtonTap
                     .map({

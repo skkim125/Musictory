@@ -13,9 +13,6 @@ import RxGesture
 import RxDataSources
 
 final class MyPageViewController: UIViewController {
-    deinit {
-        print("\(self)deinit됨")
-    }
     private let myPostCollectionView = UICollectionView(frame: .zero, collectionViewLayout: .myPageCollectionView())
     private let disposeBag = DisposeBag()
     private let viewModel = MyPageViewModel()
@@ -56,14 +53,13 @@ final class MyPageViewController: UIViewController {
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let prefetching = PublishRelay<Bool>()
-        let input = MyPageViewModel.Input(checkAccessToken: checkAccessToken, loadMyProfile: loadMyProfile, loadMyPosts: loadMyPost, likePostIndex: likePostIndex, prefetching: prefetching)
+        let input = MyPageViewModel.Input(checkAccessToken: checkAccessToken, loadMyProfile: loadMyProfile, likePostIndex: likePostIndex, prefetching: prefetching)
         let output = viewModel.transform(input: input)
         
-        checkAccessToken.accept(())
         loadMyProfile.accept(())
-        loadMyPost.accept(())
         
-        let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { dataSource, collectionView, indexPath, item in
+        let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { [weak self] _ , collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
             
             switch item {
             case .profileItem(item: let profile):
@@ -223,13 +219,5 @@ final class MyPageViewController: UIViewController {
         makeToast(message: "후원해주셔서 감사합니다.", presentTime: 3)
         
         NotificationCenter.default.removeObserver(self, name: notification.name, object: nil)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        checkAccessToken.accept(())
-        loadMyProfile.accept(())
-        loadMyPost.accept(())
     }
 }

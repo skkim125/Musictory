@@ -13,7 +13,7 @@ final class TabViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.delegate = self
+        delegate = self
 
         tabBar.tintColor = .systemRed
         
@@ -41,7 +41,7 @@ final class TabViewController: UITabBarController {
         myPageViewController.view.backgroundColor = .systemBackground
         myPageViewController.tabBarItem = UITabBarItem(title: nil, image: UIImage(systemName: "person.crop.circle"), tag: 3)
 
-        self.viewControllers = [homeViewController, writeView, myPageViewController]
+        viewControllers = [homeViewController, writeView, myPageViewController]
 
         let writeButton = UIButton(type: .system)
         writeButton.frame = CGRect(x: (tabBar.frame.width / 2) - 15, y: 5, width: 30, height: 30)
@@ -58,7 +58,7 @@ final class TabViewController: UITabBarController {
         
         let nav = UINavigationController(rootViewController: vc)
         nav.modalPresentationStyle = .formSheet
-        self.present(nav, animated: true)
+        present(nav, animated: true)
     }
 }
 
