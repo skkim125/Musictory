@@ -162,7 +162,6 @@ final class MyPageViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.showErrorAlert
-            .withLatestFrom(output.networkError)
             .bind(with: self) { owner, error in
                 self.showAlert(title: error.title, message: error.alertMessage) {
                     if error == .expiredRefreshToken {
@@ -199,14 +198,25 @@ final class MyPageViewController: UIViewController {
             self.present(vc, animated: true)
         })
         
-        let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { [weak self] _ in
+        let logOut = UIAction(title: "로그아웃", image: UIImage(systemName: "rectangle.portrait.and.arrow.right"), handler: { [weak self] _ in
+            guard let self = self else { return }
+
+            self.showTwoButtonAlert(title: "로그아웃하시겠습니까??", message: "로그인 화면으로 돌아갑니다.") {
+                self.goLoginView()
+                
+                print("로그아웃")
+            }
+        })
+        
+        let withdraw = UIAction(title: "탈퇴하기", image: UIImage(systemName: "person.crop.circle.badge.xmark")?.applyingSymbolConfiguration(.init(hierarchicalColor: .systemRed)), handler: { [weak self] _ in
             guard let self = self else { return }
 
             self.showTwoButtonAlert(title: "탈퇴하시겠습니까?", message: "탈퇴 이후 유저 정보를 복구할 수 없습니다.") {
                 print("탈퇴")
             }
         })
-        return UIMenu(title: "설정", options: .displayInline, children: [editProfile, donation, withdraw])
+        
+        return UIMenu(title: "설정", options: .displayInline, children: [editProfile, donation, logOut, withdraw])
     }
     
     @objc private func showToastAlert(_ notification: Notification) {

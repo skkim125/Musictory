@@ -105,6 +105,7 @@ final class LSLP_API {
                 }
                 
                 if let response = response as? HTTPURLResponse {
+                    print("response: \(response.debugDescription)")
                     print("Status Code: \(response.statusCode)")
                     if let data = data, let responseBody = String(data: data, encoding: .utf8) {
                         print("Response Body: \(responseBody)")

@@ -27,8 +27,7 @@ final class MyPageViewModel: BaseViewModel {
         let myProfile: PublishRelay<ProfileModel>
         let myPosts: PublishRelay<[PostModel]>
         let myPageData: PublishRelay<[MyPageDataType]>
-        let showErrorAlert: PublishRelay<Void>
-        let networkError: PublishRelay<NetworkError>
+        let showErrorAlert: PublishRelay<NetworkError>
         let myGetLiked: BehaviorRelay<Int>
     }
     
@@ -36,8 +35,7 @@ final class MyPageViewModel: BaseViewModel {
         var nextCursor = ""
         let myProfile = PublishRelay<ProfileModel>()
         let myPosts = PublishRelay<[PostModel]>()
-        let showErrorAlert = PublishRelay<Void>()
-        let networkError = PublishRelay<NetworkError>()
+        let showErrorAlert = PublishRelay<NetworkError>()
         let myPageData = PublishRelay<[MyPageDataType]>()
         let outputGetLiked = BehaviorRelay(value: originalPosts.count)
         
@@ -48,9 +46,8 @@ final class MyPageViewModel: BaseViewModel {
                     case .success(let success):
                         UserDefaultsManager.shared.accessT = success.accessToken
                         print(success.accessToken)
-                    case .failure(let error2):
-                        networkError.accept(error2)
-                        showErrorAlert.accept(())
+                    case .failure(let error):
+                        showErrorAlert.accept(error)
                     }
                 }
             }
@@ -74,14 +71,12 @@ final class MyPageViewModel: BaseViewModel {
                                     UserDefaultsManager.shared.accessT = success.accessToken
                                     input.loadMyProfile.accept(())
                                 case .failure(let error2):
-                                    networkError.accept(error2)
-                                    showErrorAlert.accept(())
+                                    showErrorAlert.accept(error2)
                                 }
                             }
                             
                         default:
-                            networkError.accept(error1)
-                            showErrorAlert.accept(())
+                            showErrorAlert.accept(error1)
                         }
                     }
                 }
@@ -109,14 +104,12 @@ final class MyPageViewModel: BaseViewModel {
                                     UserDefaultsManager.shared.accessT = success.accessToken
                                     input.loadMyPosts.accept(())
                                 case .failure(let error2):
-                                    networkError.accept(error2)
-                                    showErrorAlert.accept(())
+                                    showErrorAlert.accept(error2)
                                 }
                             }
                             
                         default:
-                            networkError.accept(error1)
-                            showErrorAlert.accept(())
+                            showErrorAlert.accept(error1)
                         }
                     }
                 }
@@ -193,13 +186,11 @@ final class MyPageViewModel: BaseViewModel {
                                     }
                                     owner.originalPosts[value] = updatedPost
                                     myPosts.accept(owner.originalPosts)
-                                    networkError.accept(error2)
-                                    showErrorAlert.accept(())
+                                    showErrorAlert.accept(error2)
                                 }
                             }
                         default:
-                            networkError.accept(error1)
-                            showErrorAlert.accept(())
+                            showErrorAlert.accept(error1)
                         }
                     }
                 }
@@ -228,6 +219,6 @@ final class MyPageViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(myProfile: myProfile, myPosts: myPosts, myPageData: myPageData, showErrorAlert: showErrorAlert, networkError: networkError, myGetLiked: outputGetLiked)
+        return Output(myProfile: myProfile, myPosts: myPosts, myPageData: myPageData, showErrorAlert: showErrorAlert, myGetLiked: outputGetLiked)
     }
 }

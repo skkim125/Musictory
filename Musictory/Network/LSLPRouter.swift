@@ -128,9 +128,8 @@ extension LSLPRouter {
             
         case .uploadImage(let imageQuery):
             var body = Data()
-            let boundaryPrefix = "--\(imageQuery.boundary)\r\n"
             
-            body.append(boundaryPrefix.data(using: .utf8)!)
+            body.append("--\(imageQuery.boundary)\r\n".data(using: .utf8)!)
             body.append("Content-Disposition: form-data; name=\"files\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
             body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
             body.append(imageQuery.imageData ?? Data())
