@@ -71,7 +71,8 @@ final class PostDetailCommentsCollectionViewCell: UICollectionViewCell {
             print("profile =", profile)
             print("url = \(url)")
             KingfisherManager.shared.setHeaders()
-            userImageView.kf.setImage(with: url)
+            userImageView.kf.setImage(with: url, options: [.processor(DownsamplingImageProcessor(size: userImageView.bounds.size)), .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage])
             userImageView.clipsToBounds = true
             DispatchQueue.main.async {
                 self.userImageView.layer.cornerRadius = self.userImageView.bounds.width / 2

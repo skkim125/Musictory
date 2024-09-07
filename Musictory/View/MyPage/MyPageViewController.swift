@@ -124,7 +124,7 @@ final class MyPageViewController: UIViewController {
             .bind(with: self) { owner, value in
                 switch value {
                 case.postItem(item: let item):
-                    let vc = MusictoryDetailView()
+                    let vc = MusictoryDetailViewController()
                     vc.currentPost = item
                     
                     owner.navigationController?.pushViewController(vc, animated: true)
@@ -208,7 +208,23 @@ final class MyPageViewController: UIViewController {
             guard let self = self else { return }
 
             self.showTwoButtonAlert(title: "탈퇴하시겠습니까?", message: "탈퇴 이후 유저 정보를 복구할 수 없습니다.") {
-                print("탈퇴")
+                LSLP_API.shared.callRequest(apiType: .withdraw, decodingType: WithdrawModel.self) { result in
+                    switch result {
+                    case .success(let success):
+                        if success.userID == UserDefaultsManager.shared.userID {
+                            UserDefaultsManager.shared.email = ""
+                            UserDefaultsManager.shared.password = ""
+                            self.goLoginView()
+                        }
+                    case .failure(let error):
+                        switch error {
+                        case .expiredRefreshToken:
+                            self.showAlert(title: "로그인이 만료되었습니다.", message: "재로그인 후 진행해주세요.")
+                        default:
+                            self.showAlert(title: "탈퇴를 완료할 수 없습니다.", message: "네트워크 연결 후 다시 시도하여 주세요.")
+                        }
+                    }
+                }
             }
         })
         

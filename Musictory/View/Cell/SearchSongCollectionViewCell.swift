@@ -86,7 +86,11 @@ final class SearchSongCollectionViewCell: UICollectionViewCell {
     
     func configureCell(song: Song) {
         guard let url = song.artwork?.url(width: 150, height: 150) else { return }
-        songImageView.kf.setImage(with: url)
+        songImageView.kf.setImage(with: url, options: 
+        [.processor(DownsamplingImageProcessor(size: songImageView.bounds.size)),
+         .scaleFactor(UIScreen.main.scale),
+         .cacheOriginalImage])
+        
         songImageView.layer.borderColor = UIColor.lightGray.withAlphaComponent(0.5).cgColor
         songImageView.layer.borderWidth = 0.5
         songImageView.clipsToBounds = true

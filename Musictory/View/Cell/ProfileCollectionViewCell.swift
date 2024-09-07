@@ -72,7 +72,8 @@ final class ProfileCollectionViewCell: UICollectionViewCell {
             print("profile =", profile)
             print("url = \(url)")
             KingfisherManager.shared.setHeaders()
-            userProfileImageView.kf.setImage(with: url)
+            userProfileImageView.kf.setImage(with: url, options: [.processor(DownsamplingImageProcessor(size: userProfileImageView.bounds.size)), .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage])
             userProfileImageView.contentMode = .scaleAspectFill
             userProfileImageView.clipsToBounds = true
         } else {

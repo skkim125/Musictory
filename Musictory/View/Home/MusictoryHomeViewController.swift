@@ -127,7 +127,7 @@ final class MusictoryHomeViewController: UIViewController {
         
         Observable.zip(postCollectionView.rx.itemSelected, postCollectionView.rx.modelSelected(PostModel.self))
             .bind(with: self) { owner, value in
-                let vc = MusictoryDetailView()
+                let vc = MusictoryDetailViewController()
                 vc.currentPost = value.1
                 vc.moveData = { post in
                     guard let post = post else { return }

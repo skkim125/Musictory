@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0411B1512C8C2D2D008C8734 /* WithdrawModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */; };
 		04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */; };
 		04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A762C8420B60007BC58 /* UIView+Extension.swift */; };
 		04157A7A2C8423DC0007BC58 /* iamport-ios in Frameworks */ = {isa = PBXBuildFile; productRef = 04157A792C8423DC0007BC58 /* iamport-ios */; };
@@ -73,12 +74,13 @@
 		04E430732C6E2142007FA9C6 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 04E430722C6E2142007FA9C6 /* MusadoraKit */; };
 		04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F1829A2C80A1A10073B882 /* CommentsQuery.swift */; };
 		04F182A52C81BD720073B882 /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F182A42C81BD720073B882 /* EditProfileViewController.swift */; };
-		04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */; };
+		04FB24182C7E21F20081DE2A /* MusictoryDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB24172C7E21F20081DE2A /* MusictoryDetailViewController.swift */; };
 		04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */; };
 		04FB241E2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawModel.swift; sourceTree = "<group>"; };
 		04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileQuery.swift; sourceTree = "<group>"; };
 		04157A762C8420B60007BC58 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		04157A7B2C8427000007BC58 /* DonationWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewController.swift; sourceTree = "<group>"; };
@@ -136,7 +138,7 @@
 		04E430622C6DCA4C007FA9C6 /* APIKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIKey.swift; sourceTree = "<group>"; };
 		04F1829A2C80A1A10073B882 /* CommentsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsQuery.swift; sourceTree = "<group>"; };
 		04F182A42C81BD720073B882 /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
-		04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailView.swift; sourceTree = "<group>"; };
+		04FB24172C7E21F20081DE2A /* MusictoryDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailViewController.swift; sourceTree = "<group>"; };
 		04FB241B2C7E37F20081DE2A /* MusictoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusictoryDetailViewModel.swift; sourceTree = "<group>"; };
 		04FB241D2C7E388B0081DE2A /* PostDetailCommentsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostDetailCommentsCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -261,6 +263,7 @@
 				045833E62C79DF27000D6E81 /* ProfileModel.swift */,
 				04157A812C8432100007BC58 /* DonationModel.swift */,
 				04D930002C86C2200094F78F /* ImageModel.swift */,
+				0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */,
 			);
 			path = ResponseModel;
 			sourceTree = "<group>";
@@ -357,7 +360,7 @@
 		04F182A32C81BD370073B882 /* PostDetail */ = {
 			isa = PBXGroup;
 			children = (
-				04FB24172C7E21F20081DE2A /* MusictoryDetailView.swift */,
+				04FB24172C7E21F20081DE2A /* MusictoryDetailViewController.swift */,
 			);
 			path = PostDetail;
 			sourceTree = "<group>";
@@ -516,7 +519,7 @@
 				04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,
 				0449DF4A2C7B75EA00EA0B9C /* ProfileCollectionViewCell.swift in Sources */,
-				04FB24182C7E21F20081DE2A /* MusictoryDetailView.swift in Sources */,
+				04FB24182C7E21F20081DE2A /* MusictoryDetailViewController.swift in Sources */,
 				04E4304B2C6CF68E007FA9C6 /* AppDelegate.swift in Sources */,
 				04E430632C6DCA4C007FA9C6 /* APIKey.swift in Sources */,
 				04157A802C842C610007BC58 /* DonationQuery.swift in Sources */,
@@ -549,6 +552,7 @@
 				048DFDFF2C736423000F5293 /* CommentModel.swift in Sources */,
 				04157A852C84680E0007BC58 /* PostDetailDataType.swift in Sources */,
 				045833C32C763EB2000D6E81 /* SearchSongCollectionViewCell.swift in Sources */,
+				0411B1512C8C2D2D008C8734 /* WithdrawModel.swift in Sources */,
 				04157A872C84686A0007BC58 /* MyPageDataType.swift in Sources */,
 				045833F92C7AF99E000D6E81 /* ImageFileModel.swift in Sources */,
 				048DFDE42C70F04F000F5293 /* BaseViewModel.swift in Sources */,

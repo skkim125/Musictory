@@ -12,7 +12,7 @@ import RxCocoa
 import RxDataSources
 import MusicKit
 
-final class MusictoryDetailView: UIViewController {
+final class MusictoryDetailViewController: UIViewController {
     deinit {
         print("\(self) deinit")
     }
@@ -178,7 +178,8 @@ final class MusictoryDetailView: UIViewController {
             .bind(with: self) { owner, error in
                 owner.showAlert(title: error.title, message: error.alertMessage) {
                     switch error {
-                    case .custom(let string):
+                    case .custom(let error1):
+                        print(error1)
                         owner.dismiss(animated: true)
                     case .expiredRefreshToken:
                         owner.goLoginView()
@@ -216,18 +217,24 @@ final class MusictoryDetailView: UIViewController {
     }
     
     private func configureMenuButton() -> UIMenu {
-        let deletePost = UIAction(title: "게시물 삭제", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
-            guard let self = self else { return }
-            self.showAlert(title: "게시물을 삭제하시겠습니까?", message: "삭제 이후 되돌릴 수 없습니다. ") {
-                self.navigationController?.popViewController(animated: true)
-            }
-        })
+        guard let post = currentPost else { return UIMenu() }
         
         let reportPost = UIAction(title: "게시물 신고", image: UIImage(systemName: "exclamationmark.bubble.fill"), handler: { [weak self] _ in
             guard let self = self else { return }
             self.showAlert(title: "신고가 완료되었습니다.", message: "")
         })
         
-        return UIMenu(title: "설정", options: .displayInline, children: [deletePost, reportPost])
+        if UserDefaultsManager.shared.userID == post.creator.userID {
+            let deletePost = UIAction(title: "게시물 삭제", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
+                guard let self = self else { return }
+                self.showTwoButtonAlert(title: "게시물을 삭제하시겠습니까?", message: "삭제 이후 되돌릴 수 없습니다. ") {
+                    self.navigationController?.popViewController(animated: true)
+                }
+            })
+            
+            return UIMenu(title: "설정", options: .displayInline, children: [deletePost, reportPost])
+        } else {
+            return UIMenu(title: "설정", options: .displayInline, children: [reportPost])
+        }
     }
 }

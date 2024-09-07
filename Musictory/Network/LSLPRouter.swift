@@ -20,6 +20,7 @@ enum LSLPRouter {
     case writeComment(String, CommentsQuery)
     case editMyProfile(EditProfileQuery)
     case donation(DonationQuery)
+    case withdraw
 }
 
 extension LSLPRouter {
@@ -32,7 +33,7 @@ extension LSLPRouter {
         switch self {
         case .login, .writePost, .like, .uploadImage, .writeComment, .donation:
             "POST"
-        case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .refresh, .fetchMyPost, .withdraw:
             "GET"
         case .editMyProfile:
             "PUT"
@@ -42,27 +43,27 @@ extension LSLPRouter {
     var path: String {
         switch self {
         case .login:
-            APIPath.my.rawValue + "/login"
+            APIPath.user.rawValue + "/login"
         case .fetchPost, .writePost:
-            APIPath.fetchPost.rawValue
+            APIPath.post.rawValue
         case .refresh:
             APIPath.refresh.rawValue
         case .like(let id, _):
-            APIPath.fetchPost.rawValue + "/\(id)/like"
+            APIPath.post.rawValue + "/\(id)/like"
         case .fetchPostOfReload(let id, _):
-            APIPath.fetchPost.rawValue + "/\(id)"
-        case .fetchProfile:
-            APIPath.fetchProfile.rawValue
+            APIPath.post.rawValue + "/\(id)"
+        case .fetchProfile, .editMyProfile:
+            APIPath.user.rawValue + APIPath.my.rawValue + APIPath.profile.rawValue
         case .uploadImage:
-            APIPath.fetchPost.rawValue + "/files"
+            APIPath.post.rawValue + "/files"
         case .fetchMyPost:
-            APIPath.fetchPost.rawValue + "/users" + "/\(UserDefaultsManager.shared.userID)"
+            APIPath.post.rawValue + APIPath.user.rawValue + "/\(UserDefaultsManager.shared.userID)"
         case .writeComment(let id, _):
-            APIPath.fetchPost.rawValue + "/\(id)" + "/comments"
-        case .editMyProfile:
-            APIPath.fetchProfile.rawValue
+            APIPath.post.rawValue + "/\(id)" + "/comments"
         case .donation:
             "/payments/validation"
+        case .withdraw:
+            APIPath.user.rawValue + "/withdraw"
         }
     }
     
@@ -73,7 +74,7 @@ extension LSLPRouter {
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .fetchPost, .fetchPostOfReload, .fetchProfile, .fetchMyPost:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .fetchMyPost, .withdraw:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT
@@ -278,6 +279,15 @@ extension LSLPRouter {
                 return NetworkError.custom("알 수 없는 에러입니다.")
             }
         case .donation:
+            switch statusCode {
+            case 401:
+                return NetworkError.custom("유효하지 않은 계정입니다.")
+            case 419:
+                return NetworkError.expiredAccessToken
+            default:
+                return NetworkError.custom("알 수 없는 에러입니다.")
+            }
+        case .withdraw:
             switch statusCode {
             case 401:
                 return NetworkError.custom("유효하지 않은 계정입니다.")
