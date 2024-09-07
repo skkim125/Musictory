@@ -21,12 +21,14 @@ final class LoginViewModel: BaseViewModel {
     struct Output {
         let loginButtonEnable: PublishRelay<Bool>
         let loginModel: PublishRelay<LoginModel>
+        let showErrorAlert: PublishRelay<NetworkError>
     }
     
     func transform(input: Input) -> Output {
         let loginButtonTap = input.loginButtonTap
         let loginButtonEnable = PublishRelay<Bool>()
         let loginModel = PublishRelay<LoginModel>()
+        let showErrorAlert = PublishRelay<NetworkError>()
         
         var loginQuery = LoginQuery(email: "", password: "")
         
@@ -66,20 +68,14 @@ final class LoginViewModel: BaseViewModel {
                         UserDefaultsManager.shared.refreshT = success.refreshT
                         UserDefaultsManager.shared.password = loginQuery.password
                         
-                    case .failure(let failure):
-                        switch failure {
-                        case .expiredAccessToken:
-                            owner.tokenRefresh()
-                            
-                        default:
-                            print(failure)
-                        }
+                    case .failure(let error):
+                        showErrorAlert.accept(error)
                     }
                 }
             }
             .disposed(by: disposeBag)
         
-        return Output(loginButtonEnable: loginButtonEnable, loginModel: loginModel)
+        return Output(loginButtonEnable: loginButtonEnable, loginModel: loginModel, showErrorAlert: showErrorAlert)
     }
     
     private func tokenRefresh() {

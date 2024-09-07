@@ -178,9 +178,6 @@ final class MusictoryDetailViewController: UIViewController {
             .bind(with: self) { owner, error in
                 owner.showAlert(title: error.title, message: error.alertMessage) {
                     switch error {
-                    case .custom(let error1):
-                        print(error1)
-                        owner.dismiss(animated: true)
                     case .expiredRefreshToken:
                         owner.goLoginView()
                     default:

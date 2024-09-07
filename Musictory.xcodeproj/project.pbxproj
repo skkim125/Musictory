@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0411B1512C8C2D2D008C8734 /* WithdrawModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */; };
+		0411B1532C8C3E12008C8734 /* ErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1522C8C3E12008C8734 /* ErrorManager.swift */; };
+		0411B1552C8C5043008C8734 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1542C8C5043008C8734 /* NetworkError.swift */; };
 		04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */; };
 		04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A762C8420B60007BC58 /* UIView+Extension.swift */; };
 		04157A7A2C8423DC0007BC58 /* iamport-ios in Frameworks */ = {isa = PBXBuildFile; productRef = 04157A792C8423DC0007BC58 /* iamport-ios */; };
@@ -81,6 +83,8 @@
 
 /* Begin PBXFileReference section */
 		0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawModel.swift; sourceTree = "<group>"; };
+		0411B1522C8C3E12008C8734 /* ErrorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorManager.swift; sourceTree = "<group>"; };
+		0411B1542C8C5043008C8734 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileQuery.swift; sourceTree = "<group>"; };
 		04157A762C8420B60007BC58 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		04157A7B2C8427000007BC58 /* DonationWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewController.swift; sourceTree = "<group>"; };
@@ -245,6 +249,8 @@
 			children = (
 				048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */,
 				048DFDE62C71D1F7000F5293 /* LSLPAPI.swift */,
+				0411B1522C8C3E12008C8734 /* ErrorManager.swift */,
+				0411B1542C8C5043008C8734 /* NetworkError.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -504,6 +510,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */,
+				0411B1552C8C5043008C8734 /* NetworkError.swift in Sources */,
 				045833BD2C762F1A000D6E81 /* CustomButton.swift in Sources */,
 				045833B12C75A192000D6E81 /* RefreshModel.swift in Sources */,
 				048DFDEF2C722AE3000F5293 /* LoginQuery.swift in Sources */,
@@ -515,6 +522,7 @@
 				045833E52C79DB4C000D6E81 /* MyPageViewModel.swift in Sources */,
 				048DFDD72C6F9BC5000F5293 /* LogInViewController.swift in Sources */,
 				04D930012C86C2200094F78F /* ImageModel.swift in Sources */,
+				0411B1532C8C3E12008C8734 /* ErrorManager.swift in Sources */,
 				04F182A52C81BD720073B882 /* EditProfileViewController.swift in Sources */,
 				04FB241C2C7E37F20081DE2A /* MusictoryDetailViewModel.swift in Sources */,
 				0458338D2C74B00A000D6E81 /* UICollectionViewLayout+Extension.swift in Sources */,

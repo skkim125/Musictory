@@ -30,14 +30,14 @@ final class LSLP_API {
             
             DispatchQueue.main.async {
                 guard error == nil else {
-                    NetworkError.custom("네트워크 연결이 불안정합니다.")
+                    completionHandler(.failure(.serverError))
                     
                     return
                 }
                 
                 guard let response = response as? HTTPURLResponse else {
                     print("response error")
-                    completionHandler(.failure(.responseError("네트워크를 확인할 수 없습니다.")))
+                    completionHandler(.failure(.noResponse))
                     return
                 }
                 
@@ -56,7 +56,7 @@ final class LSLP_API {
                         return completionHandler(.success(result))
                         
                     } catch {
-                        completionHandler(.failure(.decodingError("디코딩 에러")))
+                        completionHandler(.failure(.decodingError))
                     }
                 case 419:
                     self.updateRefresh { result in
@@ -72,7 +72,7 @@ final class LSLP_API {
                     }
                 default:
                     print(response.url)
-                    let error = apiType.errorHandler(statusCode: response.statusCode)
+                    let error = ErrorManager.shared.errorHandler(api: apiType, statusCode: response.statusCode)
                     print(response.statusCode)
                     completionHandler(.failure(error))
                 }
@@ -119,10 +119,11 @@ final class LSLP_API {
                             completionHandler(.success(result))
                             print(result)
                         } catch {
-                            completionHandler(.failure(.decodingError("Decoding error: \(error)")))
+                            completionHandler(.failure(.decodingError))
                         }
                     } else {
-                        completionHandler(.failure(.responseError("HTTP Error: \(response.statusCode)")))
+                        print(response.statusCode)
+                        completionHandler(.failure(.badRequest))
                     }
                 }
             }

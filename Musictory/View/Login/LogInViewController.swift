@@ -170,5 +170,11 @@ final class LogInViewController: UIViewController {
                 owner.setRootViewController(vc)
             }
             .disposed(by: disposeBag)
+        
+        output.showErrorAlert
+            .bind(with: self) { owner, error in
+                owner.showAlert(title: error.title, message: error.alertMessage)
+            }
+            .disposed(by: disposeBag)
     }
 }
