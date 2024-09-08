@@ -12,7 +12,7 @@ import MusicKit
 
 final class MusictoryHomeViewModel: BaseViewModel {
     private var originalPosts: [PostModel] = []
-    private let lslp_API = LSLP_API.shared
+    private let lslp_API = LSLP_Manager.shared
     let disposeBag = DisposeBag()
     
     struct Input {
@@ -23,6 +23,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         let updatePost: PublishRelay<(Int, PostModel)>
         let updatePostActionOfNoti: PublishSubject<PostModel>
         let updateMyProfileOfNoti: PublishSubject<ProfileModel>
+        let updateDeletePostOfNoti: PublishSubject<String>
     }
     
     struct Output {
@@ -94,7 +95,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
                 let likeQuery = LikeQuery(like_status: isLike)
                 print(#function, 4.1, isLike)
                 
-                LSLP_API.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
+                LSLP_Manager.shared.callRequest(apiType: .like(owner.originalPosts[value].postID, likeQuery), decodingType: LikeModel.self) { result in
                     switch result {
                     case .success:
                         print(#function, 4, owner.originalPosts[value])
@@ -130,7 +131,7 @@ final class MusictoryHomeViewModel: BaseViewModel {
         input.prefetchIndex
             .bind(with: self) { owner, value in
                 print(value)
-                guard owner.originalPosts.count - value == 1 else { return }
+                guard owner.originalPosts.count - value == 5 else { return }
                 if nextCursor != "0" {
                     print("indexPath", value)
                     prefetching.accept(())
@@ -138,16 +139,13 @@ final class MusictoryHomeViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-//            .bind(with: self, onNext: { owner, value in
-//                guard row == ss.dataSource.count - 1 else { return }
-//                print("value1.count", value.1.count)
-//                print("indexPaths", firstIndex)
-//                if value.1.count - 5 == firstIndex.item && nextCursor != "0" {
-//                    print("indexPath", firstIndex.item)
-//                    prefetching.accept(())
-//                }
-//            })
-//            .disposed(by: disposeBag)
+        input.updateDeletePostOfNoti
+            .bind(with: self) { owner, value in
+                guard let index = owner.originalPosts.firstIndex(where: { $0.postID == value }) else { return }
+                owner.originalPosts.remove(at: index)
+                posts.accept(owner.originalPosts)
+            }
+            .disposed(by: disposeBag)
         
         input.updatePost
             .bind(with: self) { owner, value in

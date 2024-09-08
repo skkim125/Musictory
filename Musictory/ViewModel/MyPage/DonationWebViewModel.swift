@@ -30,7 +30,7 @@ final class DonationWebViewModel: BaseViewModel {
                 let donationQuery = DonationQuery(imp_uid: impuid)
                 dump(donationQuery)
                 print(impuid)
-                LSLP_API.shared.callRequest(apiType: .donation(donationQuery), decodingType: DonationModel.self) { result in
+                LSLP_Manager.shared.callRequest(apiType: .donation(donationQuery), decodingType: DonationModel.self) { result in
                     switch result {
                     case .success(let donation):
                         print("도네이션:", donation)

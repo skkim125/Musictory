@@ -21,11 +21,13 @@ final class MusictoryDetailViewController: UIViewController {
     private let commentTextField = UITextField()
     private let sendCommentButton = UIButton(type: .system)
     private let divider = UIView()
+    private let disposeBag = DisposeBag()
+    
+    let deletePost = PublishRelay<Void>()
     let viewModel = MusictoryDetailViewModel()
     var currentPostIndex: Int?
     var currentPost: PostModel?
     var moveData: ((PostModel?)->Void)?
-    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,7 +110,7 @@ final class MusictoryDetailViewController: UIViewController {
         let post = PublishRelay<PostModel?>()
         let backButtonTap = PublishRelay<Void>()
         
-        let input = MusictoryDetailViewModel.Input(updateAccessToken: updateAccessToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap, backButtonTap: backButtonTap)
+        let input = MusictoryDetailViewModel.Input(updateAccessToken: updateAccessToken , likePostIndex: likePostIndex, currentPost: post, commentText: commentTextField.rx.text.orEmpty, sendCommendButtonTap: sendCommentButton.rx.tap, backButtonTap: backButtonTap, deletePost: deletePost)
         let output = viewModel.transform(input: input)
         updateAccessToken.accept(())
         post.accept(currentPost)
@@ -162,7 +164,7 @@ final class MusictoryDetailViewController: UIViewController {
                 
                 return cell
             }
-
+            
         })
         
         output.postDetailData
@@ -211,6 +213,17 @@ final class MusictoryDetailViewController: UIViewController {
                 owner.commentTextField.rx.text.onNext(nil)
             }
             .disposed(by: disposeBag)
+        
+        output.endDelete
+            .bind(with: self) { owner, value in
+                NotificationCenter.default.post(name: Notification.Name("deletePost"), object: nil, userInfo: ["deletePost": value])
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.showAlert(title: "게시물을 삭제하였습니다.", message: "홈으로 이동합니다.") {
+                        self.navigationController?.popViewController(animated: true)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
     }
     
     private func configureMenuButton() -> UIMenu {
@@ -222,14 +235,14 @@ final class MusictoryDetailViewController: UIViewController {
         })
         
         if UserDefaultsManager.shared.userID == post.creator.userID {
-            let deletePost = UIAction(title: "게시물 삭제", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
+            let delete = UIAction(title: "게시물 삭제", image: UIImage(systemName: "trash.fill")?.applyingSymbolConfiguration(.init(paletteColors: [.systemRed])), handler: { [weak self] _ in
                 guard let self = self else { return }
                 self.showTwoButtonAlert(title: "게시물을 삭제하시겠습니까?", message: "삭제 이후 되돌릴 수 없습니다. ") {
-                    self.navigationController?.popViewController(animated: true)
+                    self.deletePost.accept(())
                 }
             })
             
-            return UIMenu(title: "설정", options: .displayInline, children: [deletePost, reportPost])
+            return UIMenu(title: "설정", options: .displayInline, children: [reportPost, delete])
         } else {
             return UIMenu(title: "설정", options: .displayInline, children: [reportPost])
         }

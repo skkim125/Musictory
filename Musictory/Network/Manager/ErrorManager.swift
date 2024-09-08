@@ -290,6 +290,26 @@ final class ErrorManager {
             default:
                 return NetworkError.unknownError
             }
+            
+        case .deletePost:
+            switch statusCode {
+            case 401:
+                return NetworkError.unauthorized
+            case 403:
+                return NetworkError.forbidden
+            case 419:
+                return NetworkError.expiredAccessToken
+            case 420:
+                return NetworkError.wrongHeader
+            case 429:
+                return NetworkError.toManyRequests
+            case 444:
+                return NetworkError.noResponse
+            case 500:
+                return NetworkError.serverError
+            default:
+                return NetworkError.unknownError
+            }
         }
     }
 }

@@ -23,6 +23,7 @@ final class MusictoryHomeViewController: UIViewController {
     private var refreshControl = UIRefreshControl()
     private let updatePostActionOfNoti = PublishSubject<PostModel>()
     private let updateMyProfileOfNoti = PublishSubject<ProfileModel>()
+    private let updateDeletePostOfNoti = PublishSubject<String>()
     var rxCellHeights = PublishSubject<[IndexPath: CGFloat]>()
     
     override func viewDidLoad() {
@@ -62,13 +63,15 @@ final class MusictoryHomeViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateMyProfile(_: )), name: Notification.Name("updateProfile"), object: nil)
         
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(updatePostByDeleted(_: )), name: Notification.Name("deletePost"), object: nil)
     }
     
     private func bind() {
         let likePostIndex = PublishRelay<Int>()
         let indexPaths = PublishRelay<Int>()
         let updatePost = PublishRelay<(Int, PostModel)>()
-        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndex: indexPaths, updatePost: updatePost, updatePostActionOfNoti: updatePostActionOfNoti, updateMyProfileOfNoti: updateMyProfileOfNoti)
+        let input = MusictoryHomeViewModel.Input(updateAccessToken: updateAccessToken ,fetchPost: fetchPost, likePostIndex: likePostIndex, prefetchIndex: indexPaths, updatePost: updatePost, updatePostActionOfNoti: updatePostActionOfNoti, updateMyProfileOfNoti: updateMyProfileOfNoti, updateDeletePostOfNoti: updateDeletePostOfNoti)
         let output = viewModel.transform(input: input)
         
         output.showErrorAlert
@@ -231,6 +234,14 @@ final class MusictoryHomeViewController: UIViewController {
             }
         print(profile)
         updateMyProfileOfNoti.onNext(profile)
+    }
+    
+    @objc func updatePostByDeleted(_ notification: Notification) {
+        guard let deletePostId = notification.userInfo?["deletePost"] as? String else {
+                return
+            }
+        print(deletePostId)
+        updateDeletePostOfNoti.onNext(deletePostId)
     }
     
     func updateCollectionViewMethod() {

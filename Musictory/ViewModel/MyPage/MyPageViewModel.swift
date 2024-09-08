@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class MyPageViewModel: BaseViewModel {
-    private let lslp_API = LSLP_API.shared
+    private let lslp_API = LSLP_Manager.shared
     private var originalPosts: [PostModel] = []
     var toUseEditMyProfile: ProfileModel?
     let disposeBag = DisposeBag()

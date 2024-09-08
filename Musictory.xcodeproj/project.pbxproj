@@ -190,6 +190,23 @@
 			path = Manager;
 			sourceTree = "<group>";
 		};
+		0411B15E2C8D6FD7008C8734 /* Router */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */,
+			);
+			path = Router;
+			sourceTree = "<group>";
+		};
+		0411B15F2C8D6FDE008C8734 /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				0411B1542C8C5043008C8734 /* NetworkError.swift */,
+				0411B15C2C8D6AEB008C8734 /* MusicKitError.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
 		04157A832C8467EE0007BC58 /* SectionModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -268,11 +285,10 @@
 		048DFDE52C71D1E5000F5293 /* Network */ = {
 			isa = PBXGroup;
 			children = (
-				0411B1592C8D6993008C8734 /* Manager */,
+				0411B15E2C8D6FD7008C8734 /* Router */,
 				0411B1562C8D6978008C8734 /* API */,
-				048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */,
-				0411B1542C8C5043008C8734 /* NetworkError.swift */,
-				0411B15C2C8D6AEB008C8734 /* MusicKitError.swift */,
+				0411B1592C8D6993008C8734 /* Manager */,
+				0411B15F2C8D6FDE008C8734 /* Error */,
 			);
 			path = Network;
 			sourceTree = "<group>";

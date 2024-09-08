@@ -9,7 +9,7 @@ import RxSwift
 import RxCocoa
 
 final class LoginViewModel: BaseViewModel {
-    private let lslp_API = LSLP_API.shared
+    private let lslp_API = LSLP_Manager.shared
     let disposeBag = DisposeBag()
     
     struct Input {
@@ -79,7 +79,7 @@ final class LoginViewModel: BaseViewModel {
     }
     
     private func tokenRefresh() {
-        LSLP_API.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
+        LSLP_Manager.shared.callRequest(apiType: .refresh, decodingType: RefreshModel.self) { result in
             switch result {
             case .success(let success):
                 UserDefaultsManager.shared.accessT = success.accessToken

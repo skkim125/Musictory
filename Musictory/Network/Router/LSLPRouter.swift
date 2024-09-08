@@ -18,6 +18,7 @@ enum LSLPRouter {
     case fetchMyPost(PostQuery)
     case uploadImage(ImageQuery)
     case writeComment(String, CommentsQuery)
+    case deletePost(String)
     case editMyProfile(EditProfileQuery)
     case donation(DonationQuery)
     case withdraw
@@ -37,6 +38,8 @@ extension LSLPRouter {
             "GET"
         case .editMyProfile:
             "PUT"
+        case .deletePost:
+            "DELETE"
         }
     }
     
@@ -50,7 +53,7 @@ extension LSLPRouter {
             APIPath.refresh.rawValue
         case .like(let id, _):
             APIPath.post.rawValue + "/\(id)/like"
-        case .fetchPostOfReload(let id, _):
+        case .fetchPostOfReload(let id, _), .deletePost(let id):
             APIPath.post.rawValue + "/\(id)"
         case .fetchProfile, .editMyProfile:
             APIPath.user.rawValue + APIPath.my.rawValue + APIPath.profile.rawValue
@@ -74,7 +77,7 @@ extension LSLPRouter {
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.contentType.rawValue: APIHeader.json.rawValue
             ]
-        case .fetchPost, .fetchPostOfReload, .fetchProfile, .fetchMyPost, .withdraw:
+        case .fetchPost, .fetchPostOfReload, .fetchProfile, .fetchMyPost, .withdraw, .deletePost:
             [
                 APIHeader.sesac.rawValue: APIKey.key,
                 APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT

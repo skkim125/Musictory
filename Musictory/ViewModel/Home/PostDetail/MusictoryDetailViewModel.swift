@@ -10,7 +10,7 @@ import RxSwift
 import RxCocoa
 
 final class MusictoryDetailViewModel: BaseViewModel {
-    private let lslp_API = LSLP_API.shared
+    private let lslp_API = LSLP_Manager.shared
     private let disposeBag = DisposeBag()
     private var currentPost: PostModel?
     
@@ -21,6 +21,7 @@ final class MusictoryDetailViewModel: BaseViewModel {
         let commentText: ControlProperty<String>
         let sendCommendButtonTap: ControlEvent<Void>
         let backButtonTap: PublishRelay<Void>
+        let deletePost: PublishRelay<Void>
     }
     
     struct Output {
@@ -30,6 +31,7 @@ final class MusictoryDetailViewModel: BaseViewModel {
         let finalPost: PublishRelay<PostModel>
         let backButtonTapAction: PublishRelay<Void>
         let commentSendEnd: PublishRelay<Void>
+        let endDelete: PublishRelay<String>
     }
     
     func transform(input: Input) -> Output {
@@ -40,6 +42,7 @@ final class MusictoryDetailViewModel: BaseViewModel {
         let finalPost = PublishRelay<PostModel>()
         let backButtonTapAction = PublishRelay<Void>()
         let sendEnd = PublishRelay<Void>()
+        let endDelete = PublishRelay<String>()
         
         let commentIsEmpty = input.commentText
             .map({ !$0.trimmingCharacters(in: .whitespaces).isEmpty })
@@ -179,6 +182,21 @@ final class MusictoryDetailViewModel: BaseViewModel {
             }
             .disposed(by: disposeBag)
         
-        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, outputButtonEnable: commentIsEmpty, finalPost: finalPost, backButtonTapAction: backButtonTapAction, commentSendEnd: sendEnd)
+        input.deletePost
+            .bind(with: self) { owner, _ in
+                owner.lslp_API.deleteRequest(apiType: .deletePost(postID)) { result in
+                    switch result {
+                    case .success(let success):
+                        print(success)
+                        endDelete.accept(postID)
+                    case .failure(let failure):
+                        print(failure.localizedDescription)
+                        showErrorAlert.accept(failure)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(postDetailData: postData, showErrorAlert: showErrorAlert, outputButtonEnable: commentIsEmpty, finalPost: finalPost, backButtonTapAction: backButtonTapAction, commentSendEnd: sendEnd, endDelete: endDelete)
     }
 }

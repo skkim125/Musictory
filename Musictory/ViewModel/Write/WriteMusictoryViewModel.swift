@@ -11,7 +11,7 @@ import RxCocoa
 import MusicKit
 
 final class WriteMusictoryViewModel: BaseViewModel {
-    let lslp_API = LSLP_API.shared
+    let lslp_API = LSLP_Manager.shared
     let disposeBag = DisposeBag()
     
     struct Input {

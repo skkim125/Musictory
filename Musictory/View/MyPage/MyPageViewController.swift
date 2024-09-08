@@ -208,7 +208,7 @@ final class MyPageViewController: UIViewController {
             guard let self = self else { return }
 
             self.showTwoButtonAlert(title: "탈퇴하시겠습니까?", message: "탈퇴 이후 유저 정보를 복구할 수 없습니다.") {
-                LSLP_API.shared.callRequest(apiType: .withdraw, decodingType: WithdrawModel.self) { result in
+                LSLP_Manager.shared.callRequest(apiType: .withdraw, decodingType: WithdrawModel.self) { result in
                     switch result {
                     case .success(let success):
                         if success.userID == UserDefaultsManager.shared.userID {

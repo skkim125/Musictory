@@ -129,7 +129,7 @@ final class EditProfileViewController: UIViewController {
                         
                         let query = EditProfileQuery(nick: nickname, profile: imageData)
 
-                        LSLP_API.shared.uploadRequest(apiType: .editMyProfile(query), decodingType: ProfileModel.self) { result in
+                        LSLP_Manager.shared.uploadRequest(apiType: .editMyProfile(query), decodingType: ProfileModel.self) { result in
                             switch result {
                             case .success(let editedProfile):
                                 owner.moveData?(editedProfile)

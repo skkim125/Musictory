@@ -8,8 +8,8 @@
 import Foundation
 import Kingfisher
 
-final class LSLP_API {
-    static let shared = LSLP_API()
+final class LSLP_Manager {
+    static let shared = LSLP_Manager()
     private init() { }
     
     func callRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
@@ -64,6 +64,67 @@ final class LSLP_API {
                         case .success(let refresh):
                             UserDefaultsManager.shared.accessT = refresh.accessToken
                             self.callRequest(apiType: apiType, decodingType: decodingType) { result2 in
+                                completionHandler(result2)
+                            }
+                        case .failure(let error):
+                            completionHandler(.failure(error))
+                        }
+                    }
+                default:
+                    print(response.url)
+                    let error = ErrorManager.shared.errorHandler(api: apiType, statusCode: response.statusCode)
+                    print(response.statusCode)
+                    completionHandler(.failure(error))
+                }
+            }
+        }.resume()
+    }
+    
+    func deleteRequest(apiType: LSLPRouter, completionHandler: @escaping (Result<Void, NetworkError>) -> Void) {
+        
+        let encodingUrl = apiType.baseURL.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        var component = URLComponents(string: encodingUrl)
+        component?.queryItems = apiType.parameters
+        
+        guard let url = component?.url else { return }
+        var request = URLRequest(url: url.appendingPathComponent(apiType.path))
+        request.httpMethod = apiType.method
+        request.allHTTPHeaderFields = apiType.header
+        request.httpBody = apiType.httpBody
+        request.timeoutInterval = TimeInterval(5)
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            DispatchQueue.main.async {
+                guard error == nil else {
+                    completionHandler(.failure(.serverError))
+                    
+                    return
+                }
+                
+                guard let response = response as? HTTPURLResponse else {
+                    print("response error")
+                    completionHandler(.failure(.noResponse))
+                    return
+                }
+                
+                print("response.url =", response.url)
+                print("response.statusCode =", response.statusCode)
+                
+                if let data = data, let responseBody = String(data: data, encoding: .utf8) {
+                    print("Response Body: \(responseBody)")
+                }
+                
+                switch response.statusCode {
+                case 200 :
+                    completionHandler(.success(()))
+                case 419:
+                    self.updateRefresh { result in
+                        switch result {
+                        case .success(let refresh):
+                            UserDefaultsManager.shared.accessT = refresh.accessToken
+                            self.deleteRequest(apiType: apiType) { result2 in
                                 completionHandler(result2)
                             }
                         case .failure(let error):
