@@ -49,14 +49,6 @@ final class MusictoryHomeViewController: UIViewController {
         postCollectionView.register(PostCollectionViewCell.self, forCellWithReuseIdentifier: PostCollectionViewCell.identifier)
         
         notificationCenterObserver()
-        
-        Task {
-            do {
-                await MusicAuthorization.request()
-            } catch {
-                
-            }
-        }
     }
     
     private func notificationCenterObserver() {
@@ -101,8 +93,10 @@ final class MusictoryHomeViewController: UIViewController {
                 cell.configureSongView(song: song, viewType: .home) { tapGesture in
                     tapGesture
                         .bind(with: self) { owner, _ in
-                            owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
-                                MusicManager.shared.playSong(song: song)
+                            owner.checkMusicAuthorization {
+                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                    MusicManager.shared.playSong(song: song)
+                                }
                             }
                         }
                         .disposed(by: cell.disposeBag)

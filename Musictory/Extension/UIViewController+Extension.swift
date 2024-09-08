@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import MusicKit
 import Toast
 
 extension UIViewController {
@@ -66,4 +67,24 @@ extension UIViewController {
         let vc = LogInViewController()
         setRootViewController(vc)
     }
+    
+    func checkMusicAuthorization(completionHandler: (() -> Void)? = nil) {
+        Task {
+            let status = await MusicAuthorization.request()
+            
+            switch status {
+            case .denied:
+                self.showAlert(title: "원활한 앱 사용을 위해 미디어 권한을 허용해주세요", message: "설정으로 이동합니다.") {
+                    if let deviceSetting = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(deviceSetting)
+                    }
+                }
+            case .authorized:
+                completionHandler?()
+            default:
+                break
+            }
+        }
+    }
+    
 }

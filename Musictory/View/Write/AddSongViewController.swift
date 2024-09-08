@@ -26,7 +26,7 @@ final class AddSongViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        checkMusicAuthorization()
         configureView()
         bind()
     }
@@ -77,7 +77,13 @@ final class AddSongViewController: UIViewController {
         output.showErrorAlert
             .bind(with: self) { owner, value in
                 DispatchQueue.main.async {
-                    owner.showAlert(title: value.1, message: value.2)
+                    owner.showAlert(title: value.alertTitle, message: value.alertMessage) {
+                        if value == .denied {
+                            if let deviceSetting = URL(string: UIApplication.openSettingsURLString) {
+                                UIApplication.shared.open(deviceSetting)
+                            }
+                        }
+                    }
                 }
             }
             .disposed(by: disposeBag)

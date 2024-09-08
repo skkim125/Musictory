@@ -10,6 +10,8 @@
 		0411B1512C8C2D2D008C8734 /* WithdrawModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */; };
 		0411B1532C8C3E12008C8734 /* ErrorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1522C8C3E12008C8734 /* ErrorManager.swift */; };
 		0411B1552C8C5043008C8734 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B1542C8C5043008C8734 /* NetworkError.swift */; };
+		0411B15B2C8D69A0008C8734 /* MusicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B15A2C8D699F008C8734 /* MusicManager.swift */; };
+		0411B15D2C8D6AEB008C8734 /* MusicKitError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0411B15C2C8D6AEB008C8734 /* MusicKitError.swift */; };
 		04157A752C82FD5E0007BC58 /* EditProfileQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */; };
 		04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04157A762C8420B60007BC58 /* UIView+Extension.swift */; };
 		04157A7A2C8423DC0007BC58 /* iamport-ios in Frameworks */ = {isa = PBXBuildFile; productRef = 04157A792C8423DC0007BC58 /* iamport-ios */; };
@@ -85,6 +87,8 @@
 		0411B1502C8C2D2D008C8734 /* WithdrawModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WithdrawModel.swift; sourceTree = "<group>"; };
 		0411B1522C8C3E12008C8734 /* ErrorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorManager.swift; sourceTree = "<group>"; };
 		0411B1542C8C5043008C8734 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		0411B15A2C8D699F008C8734 /* MusicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicManager.swift; sourceTree = "<group>"; };
+		0411B15C2C8D6AEB008C8734 /* MusicKitError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicKitError.swift; sourceTree = "<group>"; };
 		04157A742C82FD5E0007BC58 /* EditProfileQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileQuery.swift; sourceTree = "<group>"; };
 		04157A762C8420B60007BC58 /* UIView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Extension.swift"; sourceTree = "<group>"; };
 		04157A7B2C8427000007BC58 /* DonationWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationWebViewController.swift; sourceTree = "<group>"; };
@@ -169,6 +173,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0411B1562C8D6978008C8734 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				048DFDE62C71D1F7000F5293 /* LSLPAPI.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
+		0411B1592C8D6993008C8734 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				0411B1522C8C3E12008C8734 /* ErrorManager.swift */,
+				0411B15A2C8D699F008C8734 /* MusicManager.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		04157A832C8467EE0007BC58 /* SectionModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,10 +268,11 @@
 		048DFDE52C71D1E5000F5293 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				0411B1592C8D6993008C8734 /* Manager */,
+				0411B1562C8D6978008C8734 /* API */,
 				048DFDE82C71E1FA000F5293 /* LSLPRouter.swift */,
-				048DFDE62C71D1F7000F5293 /* LSLPAPI.swift */,
-				0411B1522C8C3E12008C8734 /* ErrorManager.swift */,
 				0411B1542C8C5043008C8734 /* NetworkError.swift */,
+				0411B15C2C8D6AEB008C8734 /* MusicKitError.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -535,6 +557,7 @@
 				04157A772C8420B60007BC58 /* UIView+Extension.swift in Sources */,
 				048DFDFD2C736411000F5293 /* UserModel.swift in Sources */,
 				04157A822C8432100007BC58 /* DonationModel.swift in Sources */,
+				0411B15B2C8D69A0008C8734 /* MusicManager.swift in Sources */,
 				04F1829B2C80A1A10073B882 /* CommentsQuery.swift in Sources */,
 				045833C12C763CC9000D6E81 /* AddSongViewController.swift in Sources */,
 				045833B92C75E536000D6E81 /* WriteMusictoryViewController.swift in Sources */,
@@ -553,6 +576,7 @@
 				048DFDEC2C722A9E000F5293 /* LoginModel.swift in Sources */,
 				045833F12C7A3B37000D6E81 /* MusictoryMapViewController.swift in Sources */,
 				04E4304D2C6CF68E007FA9C6 /* SceneDelegate.swift in Sources */,
+				0411B15D2C8D6AEB008C8734 /* MusicKitError.swift in Sources */,
 				048DFE032C736670000F5293 /* MusictoryHomeViewModel.swift in Sources */,
 				04D930032C86C6C80094F78F /* ImageQuery.swift in Sources */,
 				0458338B2C74AFE4000D6E81 /* PostCollectionViewCell.swift in Sources */,

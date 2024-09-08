@@ -23,7 +23,7 @@ final class AddSongViewModel: BaseViewModel {
         let result: PublishRelay<MusicItemCollection<Song>>
         let resultIsEmpty: PublishRelay<Void>
         let showSearchTextIsEmptyAlert: PublishRelay<Void>
-        let showErrorAlert: PublishRelay<(Void, String, String)>
+        let showErrorAlert: PublishRelay<MusicKitError>
     }
     
     func transform(input: Input) -> Output {
@@ -31,7 +31,7 @@ final class AddSongViewModel: BaseViewModel {
         let search = PublishRelay<String>()
         let resultIsEmpty = PublishRelay<Void>()
         let showSearchTextIsEmptyAlert =  PublishRelay<Void>()
-        let showErrorAlert = PublishRelay<(Void, String, String)>()
+        let showErrorAlert = PublishRelay<MusicKitError>()
         
         input.searchButtonTap
             .withLatestFrom(input.searchText)
@@ -57,7 +57,7 @@ final class AddSongViewModel: BaseViewModel {
                                 songs.accept(success)
                             }
                         case .failure(let failure):
-                            showErrorAlert.accept(((), failure.alertTitle, failure.alertMessage))
+                            showErrorAlert.accept(failure)
                         }
                     }
                 }
