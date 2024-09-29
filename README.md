@@ -3,6 +3,12 @@
 ## 🎧 프로젝트 소개
 > 일상을 음악과 함께 하는 사람들이 기록을 남기듯 일상을 노래와 함께 공유하는 SNS 앱
 
+<img src="https://github.com/user-attachments/assets/00d5a9f7-88cf-4b2e-9cbb-952ddd8d0161" width="19%"/>
+<img src="https://github.com/user-attachments/assets/c9721c15-1de1-4827-a9d8-9b696f208538" width="19%"/>
+<img src="https://github.com/user-attachments/assets/8b665c5c-e358-4e6b-b0d5-a1765a75c3f4" width="19%"/>
+<img src="https://github.com/user-attachments/assets/09c14dfe-1950-4df8-a9fc-487a72691b27" width="19%"/>
+<img src="https://github.com/user-attachments/assets/efccf9e2-9132-42b7-a366-dcd9c34f61a5" width="19%"/>
+
 ## 🎧 프로젝트 환경
 - 인원: 1명
 - 기간: 2024.08.14 ~ 24.09.08
