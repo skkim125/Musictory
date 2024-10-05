@@ -18,8 +18,8 @@
 
 ## 🎧 기술 스택
 - UIKit, CodeBaseUI, MVVM, Input/Output, RxSwift, SnapKit
--  MusicKit(MusadoraKit), URLScheme, URLSession, PHPickerView, Kingfisher
-- Decoder, Singleton, Router Pattern, Access Control
+-  MusicKit(MusadoraKit), URLScheme, URLSession, PHPickerView, Kingfisher, iamport, Toast
+- Decoder, Singleton, Router Pattern, Access Control, UserDefaults
 
 ## 🎧 핵심 기능
 - 뮤직토리(음악 필수 추가) 작성 및 보기, 뮤직토리에 좋아요 및 댓글 기능
@@ -91,3 +91,6 @@
 </details>
 
 ## 🎧 회고
+- MVVM 디자인 패턴에 RxSwift와 Input/Output 패턴을 적용해봄으로 직관적인 반응형 프로그래밍 코드를 구현할 수 있었습니다.
+- API요청에 관한 다양한 에러 케이스들을 겪어보고, 그에 해당하는 에러 핸들링을 적용해볼 수 있었습니다.
+- 그리고 게시물 작성, 삭제, 댓글 작성 등의 기능 구현을 위해 NotificationCenter를 통해 내부적으로 알림 및 데이터 전달을 진행하도록 구현할 수 있었습니다.
