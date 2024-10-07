@@ -11,7 +11,7 @@
 
 ## 🎧 프로젝트 환경
 - 인원: 1명
-- 기간: 2024.08.14 ~ 24.09.08
+- 기간: 2024.08.14 ~ 2024.09.08
 - 개발 환경: Xcode 15
 - 최소 버전: iOS 15.0
 
@@ -19,12 +19,13 @@
 ## 🎧 기술 스택
 - UIKit, CodeBaseUI, MVVM, Input/Output, RxSwift, SnapKit
 -  MusicKit(MusadoraKit), URLScheme, URLSession, PHPickerView, Kingfisher, iamport, Toast
-- Decoder, Singleton, Router Pattern, Access Control, UserDefaults
+- Decoder, Singleton, Router Pattern, Access Control, UserDefaults, DTO
 
 ## 🎧 핵심 기능
-- 뮤직토리(음악 필수 추가) 작성 및 보기, 뮤직토리에 좋아요 및 댓글 기능
-- 뮤직토리의 노래 애플뮤직에서 듣기
-- 프로필 수정 및 내가 좋아요한 글 확인 기능
+- 음악 추가가 필수인 게시물 작성 및 보기, 게시물에 좋아요 및 댓글 기능
+- 게시물 작성 시 음악 추가를 위한 음악 검색 기능
+- 게시물의 노래를 애플뮤직에서 듣기 기능
+- 프로필 수정 및 내가 작성한 게시물 확인 기능
 
 ## 🎧 주요 기술
 - MVVM + Input/Output
@@ -33,16 +34,16 @@
    - Genric을 활용하여 Decodable한 타입들로 디코딩 진행
    - API Networking에 대한 요소들을 Router Pattern으로 추상화
    - multipart/form Data upload를 위해 body에 form-data 작성
-- RxSwift로 반응형 프로그래밍 구현
-- MusicKit SongData를 Codable타입으로 변환 후 JSON형태로 한번더 Decoding하여 서버에 전송
+- RxSwift를 사용하여 입력 받은 유저의 이벤트를 토대로 해당하는 기능을 수행하는 반응형 프로그래밍 구현
+- MusicKit SongData를 Codable타입으로 변환하는 DTO 과정 후 JSON형태로 Decoding하여 게시물 쿼리에 추가 후 서버에 전송
 
 ## 🎧 트러블 슈팅
 
-****1. 노래 데이터 전송**** 
+****1. 게시물 작성을 위한 노래 데이터 DTO 과정**** 
 
 1) 문제 발생
-- 처음에는 선택한 노래의 고유 id를 저장하여, 게시물 조회를 할 때마다 게시물 데이터를 가져오면 또다시 MusicKit 메서드로 통신을 하여 노래 정보가 담긴 뷰를 표시
-- 그러나 MusicKit의 노래 조회 메서드는 Async/await 메서드여서, 해당 게시물의 노래가 비동기적으로 뷰에 들어가게 되어 게시물의 노래가 정확하게 들어가지 않음
+- 게시물 작성 중 처음 구현한 방법은 선택한 노래의 고유 id를 저장하여, 게시물 조회를 할 때마다 게시물 데이터를 가져오면 또다시 MusicKit 메서드로 통신을 하여 노래 정보가 담긴 뷰를 표시
+- 그러나 MusicKit의 노래 조회 메서드는 Async/await 메서드여서, 해당 게시물의 노래가 비동기적으로 뷰에 들어가게 되어 게시물의 노래가 해당 게시물에 정확하게 들어가지 않는 문제가 발생함
 - 또한 노래 이미지 불러오기와 노래 듣기의 목적으로 통신이 되어야 했지만, 게시물이 조회될 때와 새로고침 할 때마다 딜레이와 함께 불필요한 나머지 데이터도 불러오게 되는 통신을 하게됨
 
 2) 해결 방법
@@ -61,7 +62,7 @@
 <img src="https://github.com/user-attachments/assets/cccc07c4-cb7a-44e0-867e-36551ebdd898" width="50%"/>
 </details>
 
-****2. multipart/form Data Upload**** 
+****2. multipart/form Data Upload 및 프로필 수정 기능 구현 과정**** 
 
 1) 문제 발생
 - URLSession으로 네트워크 요청 코드를 작성함에 따라, 게시물 추가 기능 구현을 위해서는 Alamofire 라이브러리의 upload 메서드를 직접 구현해야 하는 문제 발생
@@ -91,6 +92,6 @@
 </details>
 
 ## 🎧 회고
-- MVVM 디자인 패턴에 RxSwift와 Input/Output 패턴을 적용해봄으로 직관적인 반응형 프로그래밍 코드를 구현할 수 있었습니다.
+- MVVM 디자인 패턴에 RxSwift와 I/O 패턴을 적용해봄으로 더 직관적이고 MVVM에 충실한 반응형 프로그래밍 코드를 구현할 수 있었습니다. 그러나 점차 Input과 Output에 들어갈 요소들이 많아질수록 뷰모델이 점점 Massive해지고 로직 또한 복잡해짐을 느꼈으며, 이를 좀 더 해결할 수 있는 디자인 패턴들을 공부하고 다음 프로젝트에 적용해봐야겠다고 느꼈습니다.
 - API요청에 관한 다양한 에러 케이스들을 겪어보고, 그에 해당하는 에러 핸들링을 적용해볼 수 있었습니다.
-- 그리고 게시물 작성, 삭제, 댓글 작성 등의 기능 구현을 위해 NotificationCenter를 통해 내부적으로 알림 및 데이터 전달을 진행하도록 구현할 수 있었습니다.
+- 평소 데이터 전달을 클로저와 델리게이트 패턴을 위주로 사용하였는데, 게시물 작성, 삭제, 댓글 작성 등의 기능 구현을 위해 데이터의 광역 전달이 필요했던 이번 프로젝트에서 또다른 방법인 NotificationCenter에 대해 학습해보고 내부적으로 알림 및 데이터 전달을 진행하도록 구현할 수 있었습니다.
