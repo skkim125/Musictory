@@ -17,7 +17,7 @@
 
 
 ## 🎧 기술 스택
-- UIKit, CodeBaseUI, MVVM, Input/Output, RxSwift, SnapKit
+- UIKit, CodeBaseUI, MVVM, Input/Output, RxSwift, RxDataSource, SnapKit
 -  MusicKit(MusadoraKit), URLScheme, URLSession, PHPickerView, Kingfisher, iamport, Toast
 - Decoder, Singleton, Router Pattern, Access Control, UserDefaults, DTO
 
@@ -90,6 +90,52 @@
 - Router Pattern 프로필 수정의 httpBody
 <img src="https://github.com/user-attachments/assets/537c6db6-242a-4d84-948e-fc5cf2024823" width="45%"/>
 
+</details>
+
+****3. 게시물 상세뷰 & 마이페이지 뷰의 ScrollView 불가 이슈**** 
+
+1) 문제 발생
+- 마이페이지 뷰에서 유저의 정보와 유저가 작성한 게시물을 표시하도록 하기 위해 ScrollView에 나의 정보와 나의 게시물 CollectionView를 추가
+- 그러나 나의 게시물 갯수가 정해져 있지 않기에 CollectionView의 높이 지정이 되지 않아 ScrollView가 제대로 동작하지 않는 것을 확인하게 됨
+- 나의 정보와 나의 게시물 collectionView를 구분할 경우 나의 정보 뷰가 고정된 채로 collectionView만이 스크롤되어짐
+- 게시물 상세뷰에서도 게시물 정보와 댓글 CollectionView를 표시하는 경우에도 동일한 이슈 발생
+
+2) 해결 방법
+- RxDataSource를 활용하여 MyPageDataType의 나의 정보, 나의 게시물 2개의 case로 구분
+- 유저 정보 조회하기 API를 요청하여 결과를 받아온 이후 SectionModelType의 item에 따라 mapping 진행
+- Mapping된 데이터를 Output으로 출력하여, RxCollectionViewSectionedReloadDataSource에 전달하여 CollectionView를 구성
+- item을 switch하여 셀 UI를 구성하도록 하여 전체 스크롤이 가능한 뷰로 구성
+- 게시물 상세뷰 또한 같은 방식으로 구현하여 해결
+
+<details><summary> 구현한 코드
+</summary>
+  
+- MyPageDataType
+<img src="https://github.com/user-attachments/assets/a8855732-6734-4200-a550-fd11633f495d" width="45%"/>
+  
+- RxDataSource에 사용하기 위한 변환 및 Array 생성 과정
+<img src="https://github.com/user-attachments/assets/cda8695b-4eb6-4aea-8e58-a872840c4318" width="33%"/>
+  
+- Datasource 구성 코드
+
+```swift
+let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { [weak self] _ , collectionView, indexPath, item in
+    ...
+  switch item {
+    case .profileItem(item: let profile):
+    ...
+    case .postItem(item: let post):
+    ...
+    })
+
+...
+
+output.myPageData
+            .bind(to: myPostCollectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+```
+
+  
 </details>
 
 ## 🎧 회고
