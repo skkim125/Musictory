@@ -29,26 +29,46 @@
 
 ## 🎧 주요 기술
 - MVVM + Input/Output
-  - ViewController와 ViewModel로 분리함으로 비즈니스 로직 분리 및 RxSwift Input/Output 패턴으로 구현
+  - ViewController와 ViewModel로 분리함으로 비즈니스 로직 분리 및 Input/Output 패턴으로 구현
 - URLSession을 사용한 NetworkManager Singleton Pattern으로 구성
-   - Genric을 활용하여 Decodable한 타입들로 디코딩 진행
+   - Generic을 활용하여 Decodable한 타입들로 디코딩 진행
    - API Networking에 대한 요소들을 Router Pattern으로 추상화
    - multipart/form Data upload를 위해 body에 form-data 작성
 - RxSwift를 사용하여 입력 받은 유저의 이벤트를 토대로 해당하는 기능을 수행하는 반응형 프로그래밍 구현
-- MusicKit SongData를 Codable타입으로 변환하는 DTO 과정 후 JSON형태로 Decoding하여 게시물 쿼리에 추가 후 서버에 전송
-- Access Control의 private 키워드와 상속을 막는 final 키워드를 활용하여 컴파일 최적화를 구현하여 WMO 지향
+   - RxDataSource를 활용하여 Section과 데이터별로 CollectionView의 Cell UI를 구성하도록 구현
+   - RxGesture를 활용하여 TapGesture 기능(노래 듣기) 구현
+- MusicKit
+   - MusicKit의 노래 검색 비동기 메서드를 Async/Await로 사용하며 동시성 프로그래밍 구현
+- DTO
+   - MusicKit Song 타입의 Data를 Codable타입으로 DTO 진행
+   - 이후 JSON형태로 Decoding을 진행하여 API 호출에 활용
+- WMO
+   - Access Control의 private 키워드와 final 키워드를 활용하여 컴파일 최적화 진행
+- UserDefaults
+   - 자동 로그인 기능 구현을 위해 UserDefaults를 활용하여 로그인 정보(이메일, 비밀번호, 토큰) 저장
+- Singleton Pattern
+   - 관련 로직들을 담당하는 하나의 클래스 객체로 전역으로 사용가능한 Manager 이름의 싱글톤 클래스 생성 및 사용
+- Compositional Layout
+   - Compositional Layout을 활용하여 섹션별 및 뷰별 CollectionView의 Layout 구성
+- NotificationCenter를 통한 데이터 전달
+   - NotificationCenter를 통해 특정 이벤트 발생 시 해당 알림을 받아 뷰모델에서의 로직 실행과 광역 데이터 전달하도록 구현
+- Memory Leak 방지
+   - 클래스 인스턴스 간 참조와 클로저의 캡쳐로 인한 강한 참조 방지를 위해 객체의 참조 카운트를 증가시키지 않는 약한 참조 방식 사용
+- iamport API
+   - iamport API를 활용해 PG사 결제모듈에 연동하여 인앱에서 실제 결제가 되어지는 개발자 후원하기 기능 구현
+   - 결제 시 API 요청을 통한 영수증 인증 절차를 포함하여 인증이 되었을 경우 결제 알림이 오도록 구현
 
 ## 🎧 트러블 슈팅
 
 ****1. 게시물 작성을 위한 노래 데이터 DTO 과정**** 
 
 1) 문제 발생
-- 게시물 작성 중 처음 구현한 방법은 선택한 노래의 고유 id를 저장하여, 게시물 조회를 할 때마다 게시물 데이터를 가져오면 또다시 MusicKit 메서드로 통신을 하여 노래 정보가 담긴 뷰를 표시
-- 그러나 MusicKit의 노래 조회 메서드는 Async/await 메서드여서, 해당 게시물의 노래가 비동기적으로 뷰에 들어가게 되어 게시물의 노래가 해당 게시물에 정확하게 들어가지 않는 문제가 발생함
-- 또한 노래 이미지 불러오기와 노래 듣기의 목적으로 통신이 되어야 했지만, 게시물이 조회될 때와 새로고침 할 때마다 딜레이와 함께 불필요한 나머지 데이터도 불러오게 되는 통신을 하게됨
+   - 게시물 작성 중 처음 구현한 방법은 선택한 노래의 고유 id를 저장하여, 게시물 조회를 할 때마다 게시물 데이터를 가져오면 또다시 MusicKit 메서드로 통신을 하여 노래 정보가 담긴 뷰를 표시
+   - 그러나 MusicKit의 노래 조회 메서드는 Async/await 메서드여서, 해당 게시물의 노래가 비동기적으로 뷰에 들어가게 되어 게시물의 노래가 해당 게시물에 정확하게 들어가지 않는 문제가 발생함
+   - 또한 노래 이미지 불러오기와 노래 듣기의 목적으로 통신이 되어야 했지만, 게시물이 조회될 때와 새로고침 할 때마다 딜레이와 함께 불필요한 나머지 데이터도 불러오게 되는 통신을 하게됨
 
 2) 해결 방법
--  이를 해결하기 위해 Codable한 데이터 모델을 추가, 선택한 노래를 먼저 데이터 모델에 맞게 담은 후 서버에 post 요청 시 JSONEncoding을 통해 JSON 형태의 문자열 데이터로 변환하여 Query에 추가한 이후 post 요청을 보내도록 구현
+   - 이를 해결하기 위해 Codable한 데이터 모델을 추가, 선택한 노래를 먼저 데이터 모델에 맞게 담은 후 서버에 post 요청 시 JSONEncoding을 통해 JSON 형태의 문자열 데이터로 변환하여 Query에 추가한 이후 post 요청을 보내도록 구현
 
 <details><summary> 구현한 코드
 </summary>
@@ -66,13 +86,13 @@
 ****2. multipart/form Data Upload 및 프로필 수정 기능 구현 과정**** 
 
 1) 문제 발생
-- URLSession으로 네트워크 요청 코드를 작성함에 따라, 게시물 추가 기능 구현을 위해서는 Alamofire 라이브러리의 upload 메서드를 직접 구현해야 하는 문제 발생
-- 추가적으로로 프로필 수정 기능 구현을 위해 프로필 이미지(Image)와 닉네임(String)을 동시에 PUT 해야 하는 문제도 발생
+   - URLSession으로 네트워크 요청 코드를 작성함에 따라, 게시물 추가 기능 구현을 위해서는 Alamofire 라이브러리의 upload 메서드를 직접 구현해야 하는 문제 발생
+   - 추가적으로로 프로필 수정 기능 구현을 위해 프로필 이미지(Image)와 닉네임(String)을 동시에 PUT 해야 하는 문제도 발생
 
 2) 해결 방법
-- 메세지의 Part를 구분 짓는 boundary를 고유한 UUID 값으로 할당하여 메세지 본문과의 충돌 방지
-- 기존에 Router Pattern으로 정의한 headers와 body에 JSON 형태가 아닌 특정 메세지의 형식으로 입력
-- 프로필 수정의 경우, Image part와 Nickname part로 나누어 PUT 요청을 보내도록 구현
+   - 메세지의 Part를 구분 짓는 boundary를 고유한 UUID 값으로 할당하여 메세지 본문과의 충돌 방지
+   - 기존에 Router Pattern으로 정의한 headers와 body에 JSON 형태가 아닌 특정 메세지의 형식으로 입력
+   - 프로필 수정의 경우, Image part와 Nickname part로 나누어 PUT 요청을 보내도록 구현
 
 
 <details><summary> 구현한 코드
@@ -95,17 +115,17 @@
 ****3. 게시물 상세뷰 & 마이페이지 뷰의 ScrollView 불가 이슈**** 
 
 1) 문제 발생
-- 마이페이지 뷰에서 유저의 정보와 유저가 작성한 게시물을 표시하도록 하기 위해 ScrollView에 나의 정보와 나의 게시물 CollectionView를 추가
-- 그러나 나의 게시물 갯수가 정해져 있지 않기에 CollectionView의 높이 지정이 되지 않아 ScrollView가 제대로 동작하지 않는 것을 확인하게 됨
-- 나의 정보와 나의 게시물 collectionView를 구분할 경우 나의 정보 뷰가 고정된 채로 collectionView만이 스크롤되어짐
-- 게시물 상세뷰에서도 게시물 정보와 댓글 CollectionView를 표시하는 경우에도 동일한 이슈 발생
+   - 마이페이지 뷰에서 유저의 정보와 유저가 작성한 게시물을 표시하도록 하기 위해 ScrollView에 나의 정보와 나의 게시물 CollectionView를 추가
+   - 그러나 나의 게시물 갯수가 정해져 있지 않기에 CollectionView의 높이 지정이 되지 않아 ScrollView가 제대로 동작하지 않는 것을 확인하게 됨
+   - 나의 정보와 나의 게시물 collectionView를 구분할 경우 나의 정보 뷰가 고정된 채로 collectionView만이 스크롤되어짐
+   - 게시물 상세뷰에서도 게시물 정보와 댓글 CollectionView를 표시하는 경우에도 동일한 이슈 발생
 
 2) 해결 방법
-- RxDataSource를 활용하여 MyPageDataType의 나의 정보, 나의 게시물 2개의 case로 구분
-- 유저 정보 조회하기 API를 요청하여 결과를 받아온 이후 SectionModelType의 item에 따라 mapping 진행
-- Mapping된 데이터를 Output으로 출력하여, RxCollectionViewSectionedReloadDataSource에 전달하여 CollectionView를 구성
-- item을 switch하여 셀 UI를 구성하도록 하여 전체 스크롤이 가능한 뷰로 구성
-- 게시물 상세뷰 또한 같은 방식으로 구현하여 해결
+   - RxDataSource를 활용하여 MyPageDataType의 나의 정보, 나의 게시물 2개의 case로 구분
+   - 유저 정보 조회하기 API를 요청하여 결과를 받아온 이후 SectionModelType의 item에 따라 mapping 진행
+   - Mapping된 데이터를 Output으로 출력하여, RxCollectionViewSectionedReloadDataSource에 전달하여 CollectionView를 구성
+   - item을 switch하여 셀 UI를 구성하도록 하여 전체 스크롤이 가능한 뷰로 구성
+   - 게시물 상세뷰 또한 같은 방식으로 구현하여 해결
 
 <details><summary> 구현한 코드
 </summary>
