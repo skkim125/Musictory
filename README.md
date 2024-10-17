@@ -17,9 +17,10 @@
 
 
 ## 🎧 기술 스택
-- UIKit, CodeBaseUI, MVVM, Input/Output
+- UIKit, CodeBaseUI, MVVM
 - RxSwift, SnapKit,  MusicKit(MusadoraKit), Kingfisher, iamport, Toast
-- Access Control, Decoder, DTO, PHPickerView, Router Pattern, Singleton,  URLScheme, URLSession, UserDefaults
+- Access Control, Decoder, DTO, PHPickerView,  URLScheme, URLSession, UserDefaults
+- Input/Output﹒Singleton﹒Router Pattern
 
 ## 🎧 핵심 기능
 - 음악 추가가 필수인 게시물 작성 및 보기, 게시물에 좋아요 및 댓글 기능
