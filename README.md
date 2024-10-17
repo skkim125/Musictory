@@ -17,9 +17,9 @@
 
 
 ## 🎧 기술 스택
-- UIKit, CodeBaseUI, MVVM, Input/Output, RxSwift, RxDataSource, SnapKit
--  MusicKit(MusadoraKit), URLScheme, URLSession, PHPickerView, Kingfisher, iamport, Toast
-- Decoder, Singleton, Router Pattern, Access Control, UserDefaults, DTO
+- UIKit, CodeBaseUI, MVVM, Input/Output
+- RxSwift, SnapKit,  MusicKit(MusadoraKit), Kingfisher, iamport, Toast
+- Access Control, Decoder, DTO, PHPickerView, Router Pattern, Singleton,  URLScheme, URLSession, UserDefaults
 
 ## 🎧 핵심 기능
 - 음악 추가가 필수인 게시물 작성 및 보기, 게시물에 좋아요 및 댓글 기능
@@ -37,25 +37,14 @@
 - RxSwift를 사용하여 입력 받은 유저의 이벤트를 토대로 해당하는 기능을 수행하는 반응형 프로그래밍 구현
    - RxDataSource를 활용하여 Section과 데이터별로 CollectionView의 Cell UI를 구성하도록 구현
    - RxGesture를 활용하여 TapGesture 기능(노래 듣기) 구현
-- MusicKit
-   - MusicKit의 노래 검색 비동기 메서드를 Async/Await로 사용하며 동시성 프로그래밍 구현
-- DTO
-   - MusicKit Song 타입의 Data를 Codable타입으로 DTO 진행
-   - 이후 JSON형태로 Decoding을 진행하여 API 호출에 활용
-- WMO
-   - Access Control의 private 키워드와 final 키워드를 활용하여 컴파일 최적화 진행
-- UserDefaults
-   - 자동 로그인 기능 구현을 위해 UserDefaults를 활용하여 로그인 정보(이메일, 비밀번호, 토큰) 저장
-- Singleton Pattern
-   - 관련 로직들을 담당하는 하나의 클래스 객체로 전역으로 사용가능한 Manager 이름의 싱글톤 클래스 생성 및 사용
-- Compositional Layout
-   - Compositional Layout을 활용하여 섹션별 및 뷰별 CollectionView의 Layout 구성
-- NotificationCenter를 통한 데이터 전달
-   - NotificationCenter를 통해 특정 이벤트 발생 시 해당 알림을 받아 뷰모델에서의 로직 실행과 광역 데이터 전달하도록 구현
-- Memory Leak 방지
-   - 클래스 인스턴스 간 참조와 클로저의 캡쳐로 인한 강한 참조 방지를 위해 객체의 참조 카운트를 증가시키지 않는 약한 참조 방식 사용
-- iamport API
-   - iamport API를 활용해 PG사 결제모듈에 연동하여 인앱에서 실제 결제가 되어지는 개발자 후원하기 기능 구현
+- MusicKit의 노래 검색 비동기 메서드를 Async/Await로 사용하며 동시성 프로그래밍 구현
+- MusicKit Song 타입의 Data를 Codable타입으로 DTO를 진행하여 API 호출에 활용
+- Access Control의 private 키워드와 final 키워드를 활용하여 컴파일 최적화 진행
+- 자동 로그인 기능 구현을 위해 UserDefaults를 활용하여 로그인 정보(이메일, 비밀번호, 토큰) 저장
+- Compositional Layout을 활용하여 섹션별 및 뷰별 CollectionView의 group, item을 설정하여 Layout 구성
+- NotificationCenter를 통해 특정 이벤트 발생 시 해당 알림을 받아 뷰모델에서의 로직 실행과 광역으로 데이터 전달
+- 클래스 인스턴스 간 참조와 클로저의 캡쳐로 인한 강한 참조 방지를 위해 객체의 참조 카운트를 증가시키지 않는 약한 참조 방식으로 Memory Leak 방지
+- iamport API를 활용해 PG사 결제모듈에 연동하여 인앱에서 실제 결제가 되어지는 개발자 후원하기 기능 구현
    - 결제 시 API 요청을 통한 영수증 인증 절차를 포함하여 인증이 되었을 경우 결제 알림이 오도록 구현
 
 ## 🎧 트러블 슈팅
