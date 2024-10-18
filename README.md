@@ -8,6 +8,7 @@
 <img src="https://github.com/user-attachments/assets/8b665c5c-e358-4e6b-b0d5-a1765a75c3f4" width="19%"/>
 <img src="https://github.com/user-attachments/assets/09c14dfe-1950-4df8-a9fc-487a72691b27" width="19%"/>
 <img src="https://github.com/user-attachments/assets/efccf9e2-9132-42b7-a366-dcd9c34f61a5" width="19%"/>
+
 <br>
 
 ## 🎧 프로젝트 환경
@@ -66,15 +67,64 @@
 
 <details><summary> 구현한 코드
 </summary>
+<br>
 
-- SongModel
-<img src="https://github.com/user-attachments/assets/459e1796-c4a0-4f45-8000-27d10b045b24" width="33%"/>
+****- SongModel**** 
+```swift
+struct SongModel: Codable {
+    let id: String
+    let title: String
+    let artistName: String
+    let albumCoverUrl: String
+    let songURL: String
+}
+```
+<br>
 
-- Post Logic code
-<img src="https://github.com/user-attachments/assets/93c94fa1-90bb-4d02-8768-bda6669f50fe" width="40%"/>
+****- Post Logic code**** 
+```swift
+input.song
+            .bind(with: self) { owner, value in
+                let encoder = JSONEncoder()
+                do {
+                    let data = try encoder.encode(value)
+                    writePostQuery.content1 = String(data: data, encoding: .utf8) ?? ""
+                    
+                    print("content1: \(writePostQuery.content1))")
+                } catch {
+                    
+                }
+            }
+            .disposed(by: disposeBag)
+```
+<br>
 
-- ConfigureView code
-<img src="https://github.com/user-attachments/assets/cccc07c4-cb7a-44e0-867e-36551ebdd898" width="50%"/>
+****- ConfigureView code**** 
+```swift
+let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, PostModel>>(configureCell: { [weak self] _, collectionView, indexPath, item in
+            guard let self = self else { return UICollectionViewCell() }
+  ...
+let songData = Data(item.content1.utf8)
+            do {
+                let song = try JSONDecoder().decode(SongModel.self, from: songData)
+                
+                cell.configureSongView(song: song, viewType: .home) { tapGesture in
+                    tapGesture
+                        .bind(with: self) { owner, _ in
+                            owner.checkMusicAuthorization {
+                                owner.showTwoButtonAlert(title: "\(song.title)을 재생하기 위해 Apple Music으로 이동합니다.", message: nil) {
+                                    MusicManager.shared.playSong(song: song)
+                                }
+                            }
+                        }
+                        .disposed(by: cell.disposeBag)
+                }
+            } catch {
+                ...
+            }
+  ...
+}
+```
 </details>
 <br>
 
@@ -92,18 +142,88 @@
 
 <details><summary> 구현한 코드
 </summary>
+<br>
 
-- Image Query
-<img src="https://github.com/user-attachments/assets/71537614-ad62-416b-817d-dfdd7b5c0aa5" width="40%"/>
+****- Image Query**** 
+```swift
+struct ImageQuery {
+    let boundary = UUID().uuidString
+    let imageData: Data?
+}
+```
+<br>
 
-- multipart/form Data HeaderFields
-<img src="https://github.com/user-attachments/assets/8b6b1d3c-4077-4a07-b7bd-c1efa2858cb3" width="40%"/>
+****- multipart/form Data HeaderFields**** 
+```swift
+func uploadRequest<T: Decodable>(apiType: LSLPRouter, decodingType: T.Type, completionHandler: @escaping (Result<T, NetworkError>) -> Void) {
+  ...
+        guard let boundary = apiType.boundary else { return }
+        let contentType = "multipart/form-data; boundary=\(boundary)"
+        
+        request.allHTTPHeaderFields = [
+            APIHeader.sesac.rawValue: APIKey.key,
+            APIHeader.authorization.rawValue: UserDefaultsManager.shared.accessT,
+            "Content-Type": contentType
+        ]
+  ...
+}
+```
+<br>
 
-- Router Pattern 게시물 Post의 httpBody
-<img src="https://github.com/user-attachments/assets/9ad7fa3a-4765-4b57-827b-75b6330a1d0c" width="45%"/>
+****- Router Pattern uploadImage httpBody**** 
+```swift
+var httpBody: Data? {
+        let encoder = JSONEncoder()
+        
+        switch self {
+    ...
+        case .uploadImage(let imageQuery):
+            var body = Data()
+            
+            body.append("--\(imageQuery.boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"files\"; filename=\"image.jpg\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+            body.append(imageQuery.imageData ?? Data())
+            body.append("\r\n".data(using: .utf8)!)
+            body.append("--\(imageQuery.boundary)--\r\n".data(using: .utf8)!)
+            
+            return body
 
-- Router Pattern 프로필 수정의 httpBody
-<img src="https://github.com/user-attachments/assets/537c6db6-242a-4d84-948e-fc5cf2024823" width="45%"/>
+    ...
+    }
+}
+```
+<br>
+
+****- Router Pattern editMyProfile httpBody**** 
+```swift
+var httpBody: Data? {
+        let encoder = JSONEncoder()
+        
+        switch self {
+    ...
+        case .editMyProfile(let editProfile):
+            
+            var body = Data()
+            
+            body.append("--\(editProfile.boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"nick\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: application/json\r\n\r\n".data(using: .utf8)!)
+            body.append(editProfile.nick.data(using: .utf8)!)
+            body.append("\r\n".data(using: .utf8)!)
+            
+            body.append("--\(editProfile.boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"profile\"; filename=\"image.png\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
+            body.append(editProfile.profile)
+            body.append("\r\n".data(using: .utf8)!)
+            body.append("--\(editProfile.boundary)--\r\n".data(using: .utf8)!)
+            
+            return body
+  ...
+    }
+}
+```
 
 </details>
 <br>
@@ -123,16 +243,75 @@
    - item을 switch하여 셀 UI를 구성하도록 하여 전체 스크롤이 가능한 뷰로 구성
    - 게시물 상세뷰 또한 같은 방식으로 구현하여 해결
 
-<details><summary> 구현한 코드
-</summary>
-  
-- MyPageDataType
-<img src="https://github.com/user-attachments/assets/a8855732-6734-4200-a550-fd11633f495d" width="45%"/>
-  
-- RxDataSource에 사용하기 위한 변환 및 Array 생성 과정
-<img src="https://github.com/user-attachments/assets/cda8695b-4eb6-4aea-8e58-a872840c4318" width="33%"/>
-  
-- Datasource 구성 코드
+<details><summary> 구현한 코드</summary>
+<br>
+
+****- MyPageDataType****
+
+```swift
+enum MyPageDataType {
+    case profile(items: [MyPageItem])
+    case post(items: [MyPageItem])
+}
+
+extension MyPageDataType: SectionModelType {
+    typealias Item = MyPageItem
+    
+    var items: [MyPageItem] {
+        switch self {
+        case .profile(items: let items):
+            return items.map { $0 }
+        case .post(items: let items):
+            return items.map { $0 }
+        }
+    }
+    
+    init(original: MyPageDataType, items: [Item]) {
+        switch original {
+        case .profile(items: let items):
+            self = .post(items: items)
+        case .post(items: let items):
+            self = .post(items: items)
+        }
+    }
+}
+
+enum MyPageItem {
+    case profileItem(item: ProfileModel)
+    case postItem(item: PostModel)
+}
+
+```
+
+<br>
+
+
+****- RxDataSource에 사용하기 위한 변환 및 Array 생성 과정****
+
+```swift
+final class MyPageViewModel: BaseViewModel {
+  ...
+func transform(input: Input) -> Output {
+  Observable.zip(myProfile, myPosts)
+            .map { [weak self] (profile, posts) -> [MyPageDataType] in
+                if let self = self {
+                    self.toUseEditMyProfile = profile
+                }
+                let convertPosts = posts.map { MyPageItem.postItem(item: $0) }
+                let result = MyPageDataType.post(items: convertPosts)
+                print("마이페이지", convertPosts.count)
+                return [MyPageDataType.profile(items: [MyPageItem.profileItem(item: profile)]), result]
+            }
+            .bind(to: myPageData)
+            .disposed(by: disposeBag)
+  ...
+}
+```
+
+<br>
+
+
+****- Datasource****
 
 ```swift
 let dataSource = RxCollectionViewSectionedReloadDataSource<MyPageDataType> (configureCell: { [weak self] _ , collectionView, indexPath, item in
@@ -151,6 +330,7 @@ output.myPageData
             .disposed(by: disposeBag)
 ```
 </details>
+
 <br>
 
 ## 🎧 회고
