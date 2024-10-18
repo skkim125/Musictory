@@ -8,25 +8,28 @@
 <img src="https://github.com/user-attachments/assets/8b665c5c-e358-4e6b-b0d5-a1765a75c3f4" width="19%"/>
 <img src="https://github.com/user-attachments/assets/09c14dfe-1950-4df8-a9fc-487a72691b27" width="19%"/>
 <img src="https://github.com/user-attachments/assets/efccf9e2-9132-42b7-a366-dcd9c34f61a5" width="19%"/>
+<br>
 
 ## 🎧 프로젝트 환경
 - 인원: 1명
 - 기간: 2024.08.14 ~ 2024.09.08
 - 개발 환경: Xcode 15
 - 최소 버전: iOS 15.0
-
+<br>
 
 ## 🎧 기술 스택
 - UIKit, CodeBaseUI, MVVM
 - RxSwift, SnapKit,  MusicKit(MusadoraKit), Kingfisher, iamport, Toast
 - Access Control, Decoder, DTO, PHPickerView,  URLScheme, URLSession, UserDefaults
 - Input/Output﹒Singleton﹒Router Pattern
+<br>
 
 ## 🎧 핵심 기능
 - 음악 추가가 필수인 게시물 작성 및 보기, 게시물에 좋아요 및 댓글 기능
 - 게시물 작성 시 음악 추가를 위한 음악 검색 기능
 - 게시물의 노래를 애플뮤직에서 듣기 기능
 - 프로필 수정 및 내가 작성한 게시물 확인 기능
+<br>
 
 ## 🎧 주요 기술
 - MVVM + Input/Output
@@ -47,6 +50,7 @@
 - 클래스 인스턴스 간 참조와 클로저의 캡쳐로 인한 강한 참조 방지를 위해 객체의 참조 카운트를 증가시키지 않는 약한 참조 방식으로 Memory Leak 방지
 - iamport API를 활용해 PG사 결제모듈에 연동하여 인앱에서 실제 결제가 되어지는 개발자 후원하기 기능 구현
    - 결제 시 API 요청을 통한 영수증 인증 절차를 포함하여 인증이 되었을 경우 결제 알림이 오도록 구현
+<br>
 
 ## 🎧 트러블 슈팅
 
@@ -72,6 +76,7 @@
 - ConfigureView code
 <img src="https://github.com/user-attachments/assets/cccc07c4-cb7a-44e0-867e-36551ebdd898" width="50%"/>
 </details>
+<br>
 
 ****2. multipart/form Data Upload 및 프로필 수정 기능 구현 과정**** 
 
@@ -101,6 +106,7 @@
 <img src="https://github.com/user-attachments/assets/537c6db6-242a-4d84-948e-fc5cf2024823" width="45%"/>
 
 </details>
+<br>
 
 ****3. 게시물 상세뷰 & 마이페이지 뷰의 ScrollView 불가 이슈**** 
 
@@ -144,11 +150,15 @@ output.myPageData
             .bind(to: myPostCollectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
 ```
-
-  
 </details>
+<br>
 
 ## 🎧 회고
+****- MVVM 디자인 패턴과 Input/Output 디자인 패턴에 대한 고찰****
 - MVVM 디자인 패턴에 RxSwift와 I/O 패턴을 적용해봄으로 더 직관적이고 MVVM에 충실한 반응형 프로그래밍 코드를 구현할 수 있었습니다. 그러나 점차 Input과 Output에 들어갈 요소들이 많아질수록 뷰모델이 점점 Massive해지고 로직 또한 복잡해짐을 느꼈으며, 이를 좀 더 해결할 수 있는 디자인 패턴들을 공부하고 다음 프로젝트에 적용해봐야겠다고 느꼈습니다. 그리고 extension을 많이 활용하지 않아 코드의 가독성이 떨어짐을 확인하였고, 추후 리팩토링과 다음 프로젝트에서 extension을 자주 활용하려고 합니다.
+
+****- 네트워크 통신의 에러 헨들링에 대한 효율적인 코드****
 - API요청에 관한 다양한 에러 케이스들을 겪어보고 그에 해당하는 에러 핸들링을 적용해볼 수 있었지만, 기간 내의 구현을 위해 에러 핸들링 케이스를 생성하여 추가해주어 ErrorManager의 코드의 길이가 매우 길어지게 되었습니다. 각 API에 대한 에러 케이스는 정해져 있었기 때문에, 다음 프로젝트에서는 라우터 패턴에 에러 핸들링에 관한 요소를 추가하여 가독성이 개선된 코드를 작성하려고 합니다.
+
+****- NotificationCenter를 통한 데이터 전달****
 - 평소 데이터 전달을 클로저와 델리게이트 패턴을 주로 사용하였습니다. 그러나 게시물 작성과 삭제, 댓글 작성 등의 기능 구현을 위해 이번 프로젝트에서는 또다른 방법인 NotificationCenter에 대해 학습하여 내부적으로 알림 및 데이터 전달을 진행하도록 구현하였습니다. NotificationCenter가 데이터의 광역적인 범위의 전달이 필요한 기능을 구현하기에 적합한 기술이라고 느꼈고, 다음 프로젝트에서는 더 다양한 용도로 활용해보려고 합니다.
