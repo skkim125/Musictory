@@ -42,10 +42,12 @@
 - RxSwift를 사용하여 입력 받은 유저의 이벤트를 토대로 해당하는 기능을 수행하는 반응형 프로그래밍 구현
    - RxDataSource를 활용하여 Section과 데이터별로 CollectionView의 Cell UI를 구성하도록 구현
    - RxGesture를 활용하여 TapGesture 기능(노래 듣기) 구현
+- Access Token과 Refresh Token을 활용한 로그인 기능 및 관련 기능 구현
+    - 자동 로그인 기능 구현을 위해 UserDefaults를 활용하여 로그인 정보(이메일, 비밀번호, 토큰) 저장
+    - Access Token이 필요한 통신에 Access Token이 유효한지 체크하여, Token이 만료된 case에 대해 Refresh Token을 활용하여 Access Token을 갱신하는 로직 구현
 - MusicKit의 노래 검색 비동기 메서드를 Async/Await로 사용하며 동시성 프로그래밍 구현
 - MusicKit Song 타입의 Data를 Codable타입으로 DTO를 진행하여 API 호출에 활용
 - Access Control의 private 키워드와 final 키워드를 활용하여 컴파일 최적화 진행
-- 자동 로그인 기능 구현을 위해 UserDefaults를 활용하여 로그인 정보(이메일, 비밀번호, 토큰) 저장
 - Compositional Layout을 활용하여 섹션별 및 뷰별 CollectionView의 group, item을 설정하여 Layout 구성
 - NotificationCenter를 통해 특정 이벤트 발생 시 해당 알림을 받아 뷰모델에서의 로직 실행과 광역으로 데이터 전달
 - 클래스 인스턴스 간 참조와 클로저의 캡쳐로 인한 강한 참조 방지를 위해 객체의 참조 카운트를 증가시키지 않는 약한 참조 방식으로 Memory Leak 방지
